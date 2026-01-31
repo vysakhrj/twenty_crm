@@ -4,8 +4,8 @@ import { Repository } from 'typeorm';
 
 import { isDefined } from 'twenty-shared/utils';
 
-import { WorkspaceAuthContext } from 'src/engine/api/common/interfaces/workspace-auth-context.interface';
 import { CommonCreateOneQueryRunnerService } from 'src/engine/api/common/common-query-runners/common-create-one-query-runner.service';
+import { WorkspaceAuthContext } from 'src/engine/api/common/interfaces/workspace-auth-context.interface';
 import { AuthenticatedRequest } from 'src/engine/api/rest/types/authenticated-request';
 import { CommonApiContextBuilderService } from 'src/engine/core-modules/record-crud/services/common-api-context-builder.service';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
@@ -59,7 +59,14 @@ export class LeadWebhookService {
       person = await this.findOrCreatePerson(body.person, authContext);
     }
 
-    // Step 3: Create Task with customerId and propertyId
+    // Step 3: Find or create Origin record (needed for originsId on lead)
+    let origin: any | null = null;
+    if (body.origin) {
+      origin = await this.findOrCreateOrigin(body.origin, authContext);
+    }
+
+    // Step 4: Create Lead/Task with all relations set directly
+    // Relations use plural FK names: customersId, originsId, propertiesId
     const lead = await this.createLead(
       {
         title: body.title,
@@ -68,23 +75,13 @@ export class LeadWebhookService {
         dueDate: body.dueDate,
         assigneeId,
         customerId: person?.id || null,
+        originId: origin?.id || null,
         propertyId: body.propertyId || null,
       },
       authContext,
     );
 
-    // Step 4: Find or create Origin record
-    let origin: any | null = null;
-    if (body.origin) {
-      origin = await this.findOrCreateOrigin(body.origin, authContext);
-    }
-
-    // Step 5: Link Origin to Task directly (update Task with originId)
-    if (origin?.id) {
-      await this.linkOriginToTask(lead.id, origin.id, authContext);
-    }
-
-    // Step 6: Create TaskTarget to link Task, Person, Origin, and Property
+    // Step 5: Create TaskTarget to link Task, Person, Origin, and Property
     let taskTarget: any | null = null;
     if (person || origin || body.propertyId) {
       taskTarget = await this.createTaskTarget(
@@ -578,19 +575,19 @@ export class LeadWebhookService {
       dueDate?: string;
       assigneeId?: string | null;
       customerId?: string | null;
+      originId?: string | null;
       propertyId?: string | null;
     },
     authContext: WorkspaceAuthContext,
   ): Promise<any> {
-    // Using 'task' as workaround since custom 'lead' object isn't accessible via API
-    // TODO: Switch to 'lead' once the Leads object is properly configured
+    // Using 'task' object - the Leads object has relations configured on Task
     const { queryRunnerContext, selectedFields } =
       await this.commonApiContextBuilder.build({
         authContext,
         objectName: 'task',
       });
 
-    // Build task payload (using task fields)
+    // Build task payload
     const taskPayload: any = {
       title: leadData.title,
     };
@@ -605,7 +602,6 @@ export class LeadWebhookService {
 
     // Task status uses: TODO, IN_PROGRESS, DONE (not custom statuses)
     if (leadData.status) {
-      // Map lead statuses to task statuses
       const statusMap: Record<string, string> = {
         New: 'TODO',
         'In Progress': 'IN_PROGRESS',
@@ -629,7 +625,11 @@ export class LeadWebhookService {
       taskPayload.customerId = leadData.customerId;
     }
 
-    // Link to property
+    // Origins relation -> originsId (or try origin/originId)
+    if (leadData.originId) {
+      taskPayload.originId = leadData.originId;
+    }
+
     if (leadData.propertyId) {
       taskPayload.propertyId = leadData.propertyId;
     }
@@ -641,6 +641,8 @@ export class LeadWebhookService {
       },
       queryRunnerContext,
     );
+
+    this.logger.log(`[CreateLead] Created: ${JSON.stringify(createdTask)}`);
 
     return createdTask;
   }
