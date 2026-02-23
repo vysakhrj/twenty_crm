@@ -17,6 +17,7 @@ export const getObjectPermissionsForObject = (
   if (!isDefined(objectPermissions)) {
     return {
       canReadObjectRecords: true,
+      canReadOwnObjectRecordsOnly: false,
       canUpdateObjectRecords: true,
       canSoftDeleteObjectRecords: true,
       canDestroyObjectRecords: true,
@@ -29,6 +30,8 @@ export const getObjectPermissionsForObject = (
 
   return {
     canReadObjectRecords: objectPermissions.canReadObjectRecords ?? true,
+    canReadOwnObjectRecordsOnly:
+      objectPermissions.canReadOwnObjectRecordsOnly ?? false,
     canUpdateObjectRecords: objectPermissions.canUpdateObjectRecords ?? true,
     canSoftDeleteObjectRecords:
       objectPermissions.canSoftDeleteObjectRecords ?? true,

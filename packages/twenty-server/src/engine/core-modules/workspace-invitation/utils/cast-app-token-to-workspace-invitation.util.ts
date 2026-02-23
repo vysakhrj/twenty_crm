@@ -28,5 +28,6 @@ export const castAppTokenToWorkspaceInvitationUtil = (
     id: appToken.id,
     email: appToken.context.email,
     expiresAt: appToken.expiresAt,
+    value: appToken.value,
   };
 };

@@ -13,7 +13,6 @@ import { isDefined } from 'twenty-shared/utils';
 const ORDERED_FIRST_STANDARD_OBJECTS: string[] = [
   CoreObjectNameSingular.Person,
   CoreObjectNameSingular.Company,
-  CoreObjectNameSingular.Opportunity,
   CoreObjectNameSingular.Task,
   CoreObjectNameSingular.Note,
 ];
@@ -21,6 +20,14 @@ const ORDERED_FIRST_STANDARD_OBJECTS: string[] = [
 const ORDERED_LAST_STANDARD_OBJECTS: string[] = [
   CoreObjectNameSingular.Workflow,
   CoreObjectNameSingular.Dashboard,
+];
+
+// MyCRM Configuration: Objects to hide from navigation entirely
+// Add object names here to prevent them from showing in the sidebar
+const HIDDEN_OBJECTS: string[] = [
+  CoreObjectNameSingular.Opportunity,
+  // Add more objects to hide as needed:
+  // CoreObjectNameSingular.CalendarEvent,
 ];
 
 type NavigationDrawerSectionForObjectMetadataItemsProps = {
@@ -88,13 +95,18 @@ export const NavigationDrawerSectionForObjectMetadataItems = ({
   ];
 
   const objectMetadataItemsForNavigationItemsWithReadPermission =
-    objectMetadataItemsForNavigationItems.filter(
-      (objectMetadataItem) =>
-        getObjectPermissionsForObject(
-          objectPermissionsByObjectMetadataId,
-          objectMetadataItem.id,
-        ).canReadObjectRecords,
-    );
+    objectMetadataItemsForNavigationItems
+      .filter(
+        (objectMetadataItem) =>
+          !HIDDEN_OBJECTS.includes(objectMetadataItem.nameSingular),
+      )
+      .filter(
+        (objectMetadataItem) =>
+          getObjectPermissionsForObject(
+            objectPermissionsByObjectMetadataId,
+            objectMetadataItem.id,
+          ).canReadObjectRecords,
+      );
 
   return (
     objectMetadataItems.length > 0 && (

@@ -13,6 +13,7 @@ import { CoreObjectNameSingular } from '@/object-metadata/types/CoreObjectNameSi
 import { useFindManyRecords } from '@/object-record/hooks/useFindManyRecords';
 import { SettingsPageContainer } from '@/settings/components/SettingsPageContainer';
 import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
+import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
 import { SettingsTextInput } from '@/ui/input/components/SettingsTextInput';
 import { SubMenuTopBarContainer } from '@/ui/layout/page/components/SubMenuTopBarContainer';
 import { Table } from '@/ui/layout/table/components/Table';
@@ -33,6 +34,7 @@ import {
   Avatar,
   H2Title,
   IconChevronRight,
+  IconCopy,
   IconMail,
   IconReload,
   IconSearch,
@@ -149,8 +151,21 @@ export const SettingsWorkspaceMembers = () => {
 
   const { resendInvitation } = useResendWorkspaceInvitation();
   const { deleteWorkspaceInvitation } = useDeleteWorkspaceInvitation();
+  const { copyToClipboard } = useCopyToClipboard();
 
   const currentWorkspace = useRecoilValue(currentWorkspaceState);
+
+  const handleCopyInviteLink = (email: string, token?: string | null) => {
+    if (!currentWorkspace?.inviteHash || !token) {
+      enqueueErrorSnackBar({
+        message: t`Invite link not available`,
+        options: { duration: 2000 },
+      });
+      return;
+    }
+    const inviteLink = `${window.location.origin}/invite/${currentWorkspace.inviteHash}?inviteToken=${token}&email=${encodeURIComponent(email)}`;
+    copyToClipboard(inviteLink, t`Invite link copied to clipboard`);
+  };
 
   const workspaceInvitations = useRecoilValue(workspaceInvitationsState);
   const setWorkspaceInvitations = useSetRecoilState(workspaceInvitationsState);
@@ -308,6 +323,17 @@ export const SettingsWorkspaceMembers = () => {
                     </TableCell>
                     <TableCell align="right">
                       <StyledButtonContainer>
+                        <IconButton
+                          onClick={() => {
+                            handleCopyInviteLink(
+                              workspaceInvitation.email,
+                              workspaceInvitation.value,
+                            );
+                          }}
+                          variant="tertiary"
+                          size="medium"
+                          Icon={IconCopy}
+                        />
                         <IconButton
                           onClick={() => {
                             handleResendWorkspaceInvitation(

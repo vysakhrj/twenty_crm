@@ -4,6 +4,7 @@ import { type ObjectPermissions } from 'twenty-shared/types';
 describe('checkFieldPermissions', () => {
   const mockObjectPermissions: ObjectPermissions = {
     canReadObjectRecords: true,
+    canReadOwnObjectRecordsOnly: false,
     canUpdateObjectRecords: true,
     canSoftDeleteObjectRecords: true,
     canDestroyObjectRecords: true,

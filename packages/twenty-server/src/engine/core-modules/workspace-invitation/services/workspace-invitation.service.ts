@@ -144,9 +144,6 @@ export class WorkspaceInvitationService {
         type: AppTokenType.InvitationToken,
         deletedAt: IsNull(),
       },
-      select: {
-        value: false,
-      },
     });
 
     return appTokens.map(castAppTokenToWorkspaceInvitationUtil);

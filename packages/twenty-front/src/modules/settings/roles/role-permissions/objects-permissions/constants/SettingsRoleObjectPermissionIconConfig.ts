@@ -8,6 +8,7 @@ import {
   IconTrashOff,
   IconTrashX,
   IconTrashXOff,
+  IconUser,
 } from 'twenty-ui/display';
 
 type SettingsRoleObjectPermissionIconConfig = {
@@ -21,12 +22,20 @@ export type SettingsRoleObjectPermissionKey =
   | 'canSoftDeleteObjectRecords'
   | 'canDestroyObjectRecords';
 
+export type SettingsRolePermissionKey =
+  | SettingsRoleObjectPermissionKey
+  | 'canReadOwnObjectRecordsOnly';
+
 export const SETTINGS_ROLE_OBJECT_PERMISSION_ICON_CONFIG: Record<
-  SettingsRoleObjectPermissionKey,
+  SettingsRolePermissionKey,
   SettingsRoleObjectPermissionIconConfig
 > = {
   canReadObjectRecords: {
     Icon: IconEye,
+    IconForbidden: IconEyeOff,
+  },
+  canReadOwnObjectRecordsOnly: {
+    Icon: IconUser,
     IconForbidden: IconEyeOff,
   },
   canUpdateObjectRecords: {

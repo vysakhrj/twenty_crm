@@ -10,6 +10,7 @@ export const ROLE_FRAGMENT = gql`
     canAccessAllTools
     isEditable
     canReadAllObjectRecords
+    canReadOwnObjectRecordsOnly
     canUpdateAllObjectRecords
     canSoftDeleteAllObjectRecords
     canDestroyAllObjectRecords

@@ -13,6 +13,7 @@ import { SpreadsheetImportProvider } from '@/spreadsheet-import/provider/compone
 
 import { RecordIndexCalendarContainer } from '@/object-record/record-index/components/RecordIndexCalendarContainer';
 import { RecordIndexFiltersToContextStoreEffect } from '@/object-record/record-index/components/RecordIndexFiltersToContextStoreEffect';
+import { RoleBasedRecordFilterEffect } from '@/views/components/RoleBasedRecordFilterEffect';
 import { ViewBar } from '@/views/components/ViewBar';
 import { ViewType } from '@/views/types/ViewType';
 
@@ -62,6 +63,7 @@ export const RecordIndexContainer = () => {
           />
         </SpreadsheetImportProvider>
         <RecordIndexFiltersToContextStoreEffect />
+        <RoleBasedRecordFilterEffect />
         {recordIndexViewType === ViewType.Table && (
           <>
             <RecordIndexTableContainer recordTableId={recordIndexId} />

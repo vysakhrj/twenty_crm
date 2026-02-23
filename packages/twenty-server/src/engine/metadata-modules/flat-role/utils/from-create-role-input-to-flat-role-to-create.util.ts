@@ -35,6 +35,8 @@ export const fromCreateRoleInputToFlatRoleToCreate = ({
     canUpdateAllSettings: createRoleInput.canUpdateAllSettings ?? false,
     canAccessAllTools: createRoleInput.canAccessAllTools ?? false,
     canReadAllObjectRecords: createRoleInput.canReadAllObjectRecords ?? false,
+    canReadOwnObjectRecordsOnly:
+      createRoleInput.canReadOwnObjectRecordsOnly ?? false,
     canUpdateAllObjectRecords:
       createRoleInput.canUpdateAllObjectRecords ?? false,
     canSoftDeleteAllObjectRecords:

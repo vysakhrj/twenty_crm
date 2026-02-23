@@ -1,5 +1,6 @@
 import { useOpenAskAIPageInCommandMenu } from '@/command-menu/hooks/useOpenAskAIPageInCommandMenu';
 import { useOpenRecordsSearchPageInCommandMenu } from '@/command-menu/hooks/useOpenRecordsSearchPageInCommandMenu';
+import { isSimpleViewEnabledState } from '@/ui/layout/simple-view/states/isSimpleViewEnabledState';
 import { NavigationDrawerItem } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerItem';
 import { isNavigationDrawerExpandedState } from '@/ui/navigation/states/isNavigationDrawerExpanded';
 import { navigationDrawerExpandedMemorizedState } from '@/ui/navigation/states/navigationDrawerExpandedMemorizedState';
@@ -10,7 +11,12 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { SettingsPath } from 'twenty-shared/types';
 import { getSettingsPath } from 'twenty-shared/utils';
-import { IconSearch, IconSettings, IconSparkles } from 'twenty-ui/display';
+import {
+  IconEye,
+  IconSearch,
+  IconSettings,
+  IconSparkles,
+} from 'twenty-ui/display';
 import { useIsMobile } from 'twenty-ui/utilities';
 import { FeatureFlagKey } from '~/generated/graphql';
 
@@ -26,6 +32,7 @@ export const MainNavigationDrawerFixedItems = () => {
   const setNavigationDrawerExpandedMemorized = useSetRecoilState(
     navigationDrawerExpandedMemorizedState,
   );
+  const setIsSimpleViewEnabled = useSetRecoilState(isSimpleViewEnabledState);
 
   const navigate = useNavigate();
 
@@ -54,6 +61,11 @@ export const MainNavigationDrawerFixedItems = () => {
             mouseUpNavigation={true}
           />
         )}
+        <NavigationDrawerItem
+          label={t`Simple View`}
+          Icon={IconEye}
+          onClick={() => setIsSimpleViewEnabled(true)}
+        />
         <NavigationDrawerItem
           label={t`Settings`}
           to={getSettingsPath(SettingsPath.ProfilePage)}

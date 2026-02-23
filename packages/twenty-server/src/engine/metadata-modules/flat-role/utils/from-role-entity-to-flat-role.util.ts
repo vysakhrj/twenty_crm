@@ -12,6 +12,7 @@ export const fromRoleEntityToFlatRole = (role: RoleEntity): FlatRole => {
     canUpdateAllSettings: role.canUpdateAllSettings,
     canAccessAllTools: role.canAccessAllTools,
     canReadAllObjectRecords: role.canReadAllObjectRecords,
+    canReadOwnObjectRecordsOnly: role.canReadOwnObjectRecordsOnly,
     canUpdateAllObjectRecords: role.canUpdateAllObjectRecords,
     canSoftDeleteAllObjectRecords: role.canSoftDeleteAllObjectRecords,
     canDestroyAllObjectRecords: role.canDestroyAllObjectRecords,

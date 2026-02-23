@@ -1661,6 +1661,7 @@ export const Catalog: CatalogStory<Story, typeof WidgetRenderer> = {
             {
               objectMetadataId: companyObjectMetadataItem.id,
               canReadObjectRecords: false,
+              canReadOwnObjectRecordsOnly: false,
               canUpdateObjectRecords: false,
               canSoftDeleteObjectRecords: false,
               canDestroyObjectRecords: false,
@@ -1678,6 +1679,7 @@ export const Catalog: CatalogStory<Story, typeof WidgetRenderer> = {
             {
               objectMetadataId: companyObjectMetadataItem.id,
               canReadObjectRecords: true,
+              canReadOwnObjectRecordsOnly: false,
               canUpdateObjectRecords: true,
               canSoftDeleteObjectRecords: true,
               canDestroyObjectRecords: true,

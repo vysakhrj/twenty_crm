@@ -12,6 +12,7 @@ export const fromRoleEntityToRoleDto = (role: RoleEntity): RoleDTO => {
     icon: role.icon ?? undefined,
     isEditable: role.isEditable,
     canReadAllObjectRecords: role.canReadAllObjectRecords,
+    canReadOwnObjectRecordsOnly: role.canReadOwnObjectRecordsOnly,
     canUpdateAllObjectRecords: role.canUpdateAllObjectRecords,
     canSoftDeleteAllObjectRecords: role.canSoftDeleteAllObjectRecords,
     canDestroyAllObjectRecords: role.canDestroyAllObjectRecords,

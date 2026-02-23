@@ -331,6 +331,7 @@ export class WorkspaceSelectQueryBuilder<
   }
 
   private validatePermissions(): void {
+    this.applyOwnRecordsOnlyFilter();
     this.applyRowLevelPermissionPredicates();
     validateQueryIsPermittedOrThrow({
       expressionMap: this.expressionMap,
@@ -390,5 +391,71 @@ export class WorkspaceSelectQueryBuilder<
       authContext: this.authContext,
       featureFlagMap: this.featureFlagMap,
     });
+  }
+
+  private applyOwnRecordsOnlyFilter(): void {
+    if (this.shouldBypassPermissionChecks) {
+      return;
+    }
+
+    // Subqueries don't have entity metadata, skip permission predicates
+    if (this.expressionMap.mainAlias?.subQuery) {
+      return;
+    }
+
+    const mainAliasTarget = this.getMainAliasTarget();
+
+    const objectMetadata = getObjectMetadataFromEntityTarget(
+      mainAliasTarget,
+      this.internalContext,
+    );
+
+    const objectPermissions =
+      this.objectRecordsPermissions[objectMetadata.id ?? ''];
+
+    if (!objectPermissions?.canReadOwnObjectRecordsOnly) {
+      return;
+    }
+
+    // Get the current user's workspaceMemberId
+    const workspaceMemberId = this.authContext.workspaceMemberId;
+
+    if (!workspaceMemberId) {
+      return;
+    }
+
+    // Check if the object has a createdBy field (ACTOR type)
+    const createdByField = Object.values(
+      this.internalContext.flatFieldMetadataMaps,
+    ).find(
+      (field) =>
+        field.objectMetadataId === objectMetadata.id &&
+        field.name === 'createdBy',
+    );
+
+    const mainAlias = this.expressionMap.mainAlias?.name ?? objectMetadata.nameSingular;
+
+    if (createdByField) {
+      // Filter by createdBy.source = 'MANUAL' and createdBy.workspaceMemberId = current user
+      this.andWhere(
+        `("${mainAlias}"."createdBySource" = 'MANUAL' AND "${mainAlias}"."createdByWorkspaceMemberId" = :workspaceMemberId)`,
+        { workspaceMemberId },
+      );
+    } else {
+      // Fallback: check for assignee field (common in tasks)
+      const assigneeField = Object.values(
+        this.internalContext.flatFieldMetadataMaps,
+      ).find(
+        (field) =>
+          field.objectMetadataId === objectMetadata.id &&
+          field.name === 'assignee',
+      );
+
+      if (assigneeField) {
+        this.andWhere(`"${mainAlias}"."assigneeId" = :workspaceMemberId`, {
+          workspaceMemberId,
+        });
+      }
+    }
   }
 }

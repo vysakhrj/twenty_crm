@@ -4,6 +4,7 @@ import { type RowLevelPermissionPredicateGroup } from './RowLevelPermissionPredi
 
 export type ObjectPermissions = {
   canReadObjectRecords: boolean;
+  canReadOwnObjectRecordsOnly: boolean;
   canUpdateObjectRecords: boolean;
   canSoftDeleteObjectRecords: boolean;
   canDestroyObjectRecords: boolean;

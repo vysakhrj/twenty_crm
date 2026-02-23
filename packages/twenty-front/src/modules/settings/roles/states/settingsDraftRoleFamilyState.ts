@@ -14,6 +14,7 @@ export const settingsDraftRoleFamilyState = createFamilyState<
     icon: '',
     canDestroyAllObjectRecords: false,
     canReadAllObjectRecords: false,
+    canReadOwnObjectRecordsOnly: false,
     canSoftDeleteAllObjectRecords: false,
     canUpdateAllObjectRecords: false,
     canUpdateAllSettings: false,

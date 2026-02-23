@@ -39,6 +39,9 @@ export class RoleEntity extends SyncableEntity implements Required<RoleEntity> {
   canReadAllObjectRecords: boolean;
 
   @Column({ nullable: false, default: false })
+  canReadOwnObjectRecordsOnly: boolean;
+
+  @Column({ nullable: false, default: false })
   canUpdateAllObjectRecords: boolean;
 
   @Column({ nullable: false, default: false })

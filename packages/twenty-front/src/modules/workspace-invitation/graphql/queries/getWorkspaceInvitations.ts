@@ -6,6 +6,7 @@ export const GET_WORKSPACE_INVITATIONS = gql`
       id
       email
       expiresAt
+      value
     }
   }
 `;

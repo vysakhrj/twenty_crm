@@ -21,6 +21,7 @@ import { ViewBarRecordFilterEffect } from '@/views/components/ViewBarRecordFilte
 import { ViewBarRecordFilterGroupEffect } from '@/views/components/ViewBarRecordFilterGroupEffect';
 import { ViewBarRecordSortEffect } from '@/views/components/ViewBarRecordSortEffect';
 import { ViewBarFilterDropdownIds } from '@/views/constants/ViewBarFilterDropdownIds';
+import { TeamMemberFilterDropdown } from './TeamMemberFilterDropdown';
 import { UpdateViewButtonGroup } from './UpdateViewButtonGroup';
 import { ViewBarDetails } from './ViewBarDetails';
 
@@ -62,6 +63,7 @@ export const ViewBar = ({
         }
         rightComponent={
           <>
+            <TeamMemberFilterDropdown dropdownId="team-member-filter" />
             <ObjectFilterDropdownComponentInstanceContext.Provider
               value={{ instanceId: ViewBarFilterDropdownIds.MAIN }}
             >

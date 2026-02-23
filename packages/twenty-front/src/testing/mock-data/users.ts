@@ -196,6 +196,7 @@ export const mockedUserData: MockedUser = {
     objectsPermissions: generatedMockObjectMetadataItems.map((item) => ({
       objectMetadataId: item.id,
       canReadObjectRecords: true,
+      canReadOwnObjectRecordsOnly: false,
       canUpdateObjectRecords: true,
       canSoftDeleteObjectRecords: true,
       canDestroyObjectRecords: true,
@@ -228,6 +229,7 @@ export const mockedLimitedPermissionsUserData: MockedUser = {
       .map((item) => ({
         objectMetadataId: item.id,
         canReadObjectRecords: true,
+        canReadOwnObjectRecordsOnly: false,
         canUpdateObjectRecords: true,
         canSoftDeleteObjectRecords: true,
         canDestroyObjectRecords: true,
@@ -260,6 +262,7 @@ export const mockedOnboardingUserData = (
       objectPermissions: generatedMockObjectMetadataItems.map((item) => ({
         objectMetadataId: item.id,
         canReadObjectRecords: true,
+        canReadOwnObjectRecordsOnly: false,
         canUpdateObjectRecords: true,
         canSoftDeleteObjectRecords: true,
         canDestroyObjectRecords: true,

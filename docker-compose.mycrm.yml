@@ -1,0 +1,145 @@
+# MyCRM Docker Compose Configuration
+# Custom white-labeled CRM deployment
+#
+# Usage:
+#   1. Copy .env.production to .env and customize
+#   2. Build the image: docker-compose -f docker-compose.mycrm.yml build
+#   3. Start: docker-compose -f docker-compose.mycrm.yml up -d
+#   4. Initialize database: docker-compose -f docker-compose.mycrm.yml exec server yarn database:init:prod
+
+name: mycrm
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: packages/twenty-docker/twenty/Dockerfile
+      args:
+        REACT_APP_SERVER_BASE_URL: ${SERVER_URL:-http://localhost:3000}
+    volumes:
+      - server-local-data:/app/packages/twenty-server/.local-storage
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_PORT: 3000
+      NODE_ENV: production
+      PG_DATABASE_URL: ${PG_DATABASE_URL:-postgres://mycrm:mycrm@db:5432/mycrm}
+      SERVER_URL: ${SERVER_URL:-http://localhost:3000}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3001}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      APP_SECRET: ${APP_SECRET:-replace_me_with_a_random_string}
+
+      # Authentication
+      AUTH_PASSWORD_ENABLED: ${AUTH_PASSWORD_ENABLED:-true}
+      IS_MULTIWORKSPACE_ENABLED: ${IS_MULTIWORKSPACE_ENABLED:-false}
+      SIGN_IN_PREFILLED: ${SIGN_IN_PREFILLED:-false}
+
+      # Storage
+      STORAGE_TYPE: ${STORAGE_TYPE:-local}
+      STORAGE_LOCAL_PATH: ${STORAGE_LOCAL_PATH:-.local-storage}
+      STORAGE_S3_REGION: ${STORAGE_S3_REGION}
+      STORAGE_S3_NAME: ${STORAGE_S3_NAME}
+      STORAGE_S3_ENDPOINT: ${STORAGE_S3_ENDPOINT}
+
+      # Email
+      EMAIL_FROM_ADDRESS: ${EMAIL_FROM_ADDRESS:-noreply@mycrm.local}
+      EMAIL_FROM_NAME: ${EMAIL_FROM_NAME:-MyCRM}
+      EMAIL_SYSTEM_ADDRESS: ${EMAIL_SYSTEM_ADDRESS:-system@mycrm.local}
+      EMAIL_DRIVER: ${EMAIL_DRIVER:-logger}
+      EMAIL_SMTP_HOST: ${EMAIL_SMTP_HOST}
+      EMAIL_SMTP_PORT: ${EMAIL_SMTP_PORT}
+      EMAIL_SMTP_USER: ${EMAIL_SMTP_USER}
+      EMAIL_SMTP_PASSWORD: ${EMAIL_SMTP_PASSWORD}
+
+      # Disable unused features
+      MESSAGING_PROVIDER_GMAIL_ENABLED: false
+      CALENDAR_PROVIDER_GOOGLE_ENABLED: false
+      MESSAGING_PROVIDER_MICROSOFT_ENABLED: false
+      CALENDAR_PROVIDER_MICROSOFT_ENABLED: false
+      IS_BILLING_ENABLED: false
+
+      # Logging
+      LOGGER_DRIVER: ${LOGGER_DRIVER:-CONSOLE}
+      LOG_LEVELS: ${LOG_LEVELS:-error,warn,log}
+
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: curl --fail http://localhost:3000/healthz
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: always
+
+  worker:
+    build:
+      context: .
+      dockerfile: packages/twenty-docker/twenty/Dockerfile
+      args:
+        REACT_APP_SERVER_BASE_URL: ${SERVER_URL:-http://localhost:3000}
+    volumes:
+      - server-local-data:/app/packages/twenty-server/.local-storage
+    command: ["yarn", "worker:prod"]
+    environment:
+      NODE_ENV: production
+      PG_DATABASE_URL: ${PG_DATABASE_URL:-postgres://mycrm:mycrm@db:5432/mycrm}
+      SERVER_URL: ${SERVER_URL:-http://localhost:3000}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      DISABLE_DB_MIGRATIONS: "true"
+      DISABLE_CRON_JOBS_REGISTRATION: "true"
+      APP_SECRET: ${APP_SECRET:-replace_me_with_a_random_string}
+
+      # Storage
+      STORAGE_TYPE: ${STORAGE_TYPE:-local}
+      STORAGE_LOCAL_PATH: ${STORAGE_LOCAL_PATH:-.local-storage}
+      STORAGE_S3_REGION: ${STORAGE_S3_REGION}
+      STORAGE_S3_NAME: ${STORAGE_S3_NAME}
+      STORAGE_S3_ENDPOINT: ${STORAGE_S3_ENDPOINT}
+
+      # Email
+      EMAIL_FROM_ADDRESS: ${EMAIL_FROM_ADDRESS:-noreply@mycrm.local}
+      EMAIL_FROM_NAME: ${EMAIL_FROM_NAME:-MyCRM}
+      EMAIL_DRIVER: ${EMAIL_DRIVER:-logger}
+      EMAIL_SMTP_HOST: ${EMAIL_SMTP_HOST}
+      EMAIL_SMTP_PORT: ${EMAIL_SMTP_PORT}
+      EMAIL_SMTP_USER: ${EMAIL_SMTP_USER}
+      EMAIL_SMTP_PASSWORD: ${EMAIL_SMTP_PASSWORD}
+
+    depends_on:
+      db:
+        condition: service_healthy
+      server:
+        condition: service_healthy
+    restart: always
+
+  db:
+    image: postgres:16
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: mycrm
+      POSTGRES_USER: mycrm
+      POSTGRES_PASSWORD: ${PG_DATABASE_PASSWORD:-mycrm}
+    healthcheck:
+      test: pg_isready -U mycrm -h localhost -d mycrm
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: always
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    command: ["--maxmemory-policy", "noeviction"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  db-data:
+  server-local-data:

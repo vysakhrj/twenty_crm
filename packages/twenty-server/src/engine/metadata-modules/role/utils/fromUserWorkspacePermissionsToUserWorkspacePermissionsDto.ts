@@ -11,6 +11,7 @@ export const fromUserWorkspacePermissionsToUserWorkspacePermissionsDto = ({
     ([objectMetadataId, permissions]) => ({
       objectMetadataId,
       canReadObjectRecords: permissions.canReadObjectRecords,
+      canReadOwnObjectRecordsOnly: permissions.canReadOwnObjectRecordsOnly,
       canUpdateObjectRecords: permissions.canUpdateObjectRecords,
       canSoftDeleteObjectRecords: permissions.canSoftDeleteObjectRecords,
       canDestroyObjectRecords: permissions.canDestroyObjectRecords,

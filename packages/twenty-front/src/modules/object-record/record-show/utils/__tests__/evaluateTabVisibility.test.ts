@@ -45,6 +45,7 @@ const makeObjectPermissions = (
 ): ObjectPermissions => {
   return {
     canReadObjectRecords: true,
+    canReadOwnObjectRecordsOnly: false,
     canUpdateObjectRecords: true,
     canSoftDeleteObjectRecords: true,
     canDestroyObjectRecords: true,

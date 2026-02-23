@@ -14,6 +14,7 @@ const BASE_ROLE_MOCK: Role = {
   canAccessAllTools: false,
   canDestroyAllObjectRecords: true,
   canReadAllObjectRecords: true,
+  canReadOwnObjectRecordsOnly: false,
   canSoftDeleteAllObjectRecords: true,
   canUpdateAllObjectRecords: true,
   canUpdateAllSettings: true,

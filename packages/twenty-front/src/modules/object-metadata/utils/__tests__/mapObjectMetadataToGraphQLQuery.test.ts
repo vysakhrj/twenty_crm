@@ -33,6 +33,7 @@ describe('mapObjectMetadataToGraphQLQuery', () => {
       objectPermissionsByObjectMetadataId: {
         [personObjectMetadataItem.id]: {
           canReadObjectRecords: true,
+          canReadOwnObjectRecordsOnly: false,
           canUpdateObjectRecords: true,
           canSoftDeleteObjectRecords: true,
           canDestroyObjectRecords: true,
@@ -139,6 +140,7 @@ describe('mapObjectMetadataToGraphQLQuery', () => {
       objectPermissionsByObjectMetadataId: {
         [personObjectMetadataItem.id]: {
           canReadObjectRecords: true,
+          canReadOwnObjectRecordsOnly: false,
           canUpdateObjectRecords: true,
           canSoftDeleteObjectRecords: true,
           canDestroyObjectRecords: true,

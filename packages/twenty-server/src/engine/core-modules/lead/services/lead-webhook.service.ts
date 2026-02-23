@@ -592,10 +592,9 @@ export class LeadWebhookService {
       title: leadData.title,
     };
 
-    // Task uses bodyV2 (Rich Text V2) not body
+    // Task uses bodyV2 (Rich Text V2) - only set markdown, blocknote is auto-generated
     if (leadData.body) {
       taskPayload.bodyV2 = {
-        blocknote: leadData.body,
         markdown: leadData.body,
       };
     }

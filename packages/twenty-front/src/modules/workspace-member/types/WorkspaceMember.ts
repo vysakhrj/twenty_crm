@@ -33,4 +33,5 @@ export type WorkspaceInvitation = {
   id: string;
   email: string;
   expiresAt: string;
+  value?: string | null;
 };

@@ -134,6 +134,7 @@ export class WorkspaceRolesPermissionsCacheService extends WorkspaceCacheProvide
 
         objectRecordsPermissions[objectMetadataId] = {
           canReadObjectRecords: canRead,
+          canReadOwnObjectRecordsOnly: role.canReadOwnObjectRecordsOnly,
           canUpdateObjectRecords: canUpdate,
           canSoftDeleteObjectRecords: canSoftDelete,
           canDestroyObjectRecords: canDestroy,

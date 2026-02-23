@@ -48,6 +48,7 @@ describe('castAppTokenToWorkspaceInvitation', () => {
       type: AppTokenType.InvitationToken,
       context: { email: 'test@example.com' },
       expiresAt: new Date(),
+      value: 'test-token-value',
     } as AppTokenEntity;
 
     const invitation = castAppTokenToWorkspaceInvitationUtil(appToken);
@@ -56,6 +57,7 @@ describe('castAppTokenToWorkspaceInvitation', () => {
       id: '1',
       email: 'test@example.com',
       expiresAt: appToken.expiresAt,
+      value: 'test-token-value',
     });
   });
 });

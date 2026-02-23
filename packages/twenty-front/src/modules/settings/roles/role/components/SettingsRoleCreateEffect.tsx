@@ -44,6 +44,7 @@ export const SettingsRoleCreateEffect = ({
       canUpdateAllSettings: true,
       canAccessAllTools: true,
       canReadAllObjectRecords: true,
+      canReadOwnObjectRecordsOnly: false,
       canUpdateAllObjectRecords: true,
       canSoftDeleteAllObjectRecords: true,
       canDestroyAllObjectRecords: true,

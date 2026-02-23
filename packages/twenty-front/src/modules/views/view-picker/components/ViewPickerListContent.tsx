@@ -1,7 +1,8 @@
 import styled from '@emotion/styled';
 import { type DropResult } from '@hello-pangea/dnd';
-import { type MouseEvent, useCallback } from 'react';
+import { type MouseEvent, useCallback, useMemo } from 'react';
 
+import { useCurrentUserRole } from '@/auth/hooks/useCurrentUserRole';
 import { useContextStoreObjectMetadataItemOrThrow } from '@/context-store/hooks/useContextStoreObjectMetadataItemOrThrow';
 import { DraggableItem } from '@/ui/layout/draggable-list/components/DraggableItem';
 import { DraggableList } from '@/ui/layout/draggable-list/components/DraggableList';
@@ -35,6 +36,7 @@ export const ViewPickerListContent = () => {
   const { t } = useLingui();
 
   const { objectMetadataItem } = useContextStoreObjectMetadataItemOrThrow();
+  const { getObjectPermissions, isAdmin } = useCurrentUserRole();
 
   const viewsOnCurrentObject = useRecoilValue(
     coreViewsFromObjectMetadataItemFamilySelector({
@@ -42,11 +44,32 @@ export const ViewPickerListContent = () => {
     }),
   );
 
-  const workspaceViews = viewsOnCurrentObject.filter(
+  // Get permissions for this specific object
+  const objectPermissions = getObjectPermissions(objectMetadataItem.id);
+  const canReadOwnObjectRecordsOnly =
+    objectPermissions?.canReadOwnObjectRecordsOnly ?? false;
+
+  // Filter views based on role permissions
+  // If user can only read own records and is not admin, show only "Assigned to Me" type views
+  const filteredViews = useMemo(() => {
+    if (canReadOwnObjectRecordsOnly && !isAdmin) {
+      return viewsOnCurrentObject.filter((view) => {
+        const viewNameLower = view.name.toLowerCase();
+        return (
+          viewNameLower.includes('assigned to me') ||
+          viewNameLower.includes('my ') ||
+          viewNameLower === 'mine'
+        );
+      });
+    }
+    return viewsOnCurrentObject;
+  }, [viewsOnCurrentObject, canReadOwnObjectRecordsOnly, isAdmin]);
+
+  const workspaceViews = filteredViews.filter(
     (view) => view.visibility === ViewVisibility.WORKSPACE,
   );
 
-  const unlistedViews = viewsOnCurrentObject.filter(
+  const unlistedViews = filteredViews.filter(
     (view) => view.visibility === ViewVisibility.UNLISTED,
   );
 

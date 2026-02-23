@@ -3928,6 +3928,7 @@ export type Role = {
   canBeAssignedToUsers: Scalars['Boolean'];
   canDestroyAllObjectRecords: Scalars['Boolean'];
   canReadAllObjectRecords: Scalars['Boolean'];
+  canReadOwnObjectRecordsOnly: Scalars['Boolean'];
   canSoftDeleteAllObjectRecords: Scalars['Boolean'];
   canUpdateAllObjectRecords: Scalars['Boolean'];
   canUpdateAllSettings: Scalars['Boolean'];

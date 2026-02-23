@@ -74,6 +74,7 @@ export default defineConfig(({ command, mode }) => {
 
     server: {
       port: port,
+      allowedHosts: ['.ngrok-free.app', '.ngrok.io'],
       ...(VITE_HOST ? { host: VITE_HOST } : {}),
       ...(SSL_KEY_PATH && SSL_CERT_PATH
         ? {
@@ -91,6 +92,41 @@ export default defineConfig(({ command, mode }) => {
           searchForWorkspaceRoot(process.cwd()),
           '**/@blocknote/core/src/fonts/**',
         ],
+      },
+      // Proxy API requests to backend when using --host or in dev mode
+      proxy: {
+        '/api': {
+          target: REACT_APP_SERVER_BASE_URL || 'http://localhost:3000',
+          changeOrigin: true,
+        },
+        '/rest': {
+          target: REACT_APP_SERVER_BASE_URL || 'http://localhost:3000',
+          changeOrigin: true,
+        },
+        '/graphql': {
+          target: REACT_APP_SERVER_BASE_URL || 'http://localhost:3000',
+          changeOrigin: true,
+        },
+        '/metadata': {
+          target: REACT_APP_SERVER_BASE_URL || 'http://localhost:3000',
+          changeOrigin: true,
+        },
+        '/files': {
+          target: REACT_APP_SERVER_BASE_URL || 'http://localhost:3000',
+          changeOrigin: true,
+        },
+        '/auth': {
+          target: REACT_APP_SERVER_BASE_URL || 'http://localhost:3000',
+          changeOrigin: true,
+        },
+        '/client-config': {
+          target: REACT_APP_SERVER_BASE_URL || 'http://localhost:3000',
+          changeOrigin: true,
+        },
+        '/webhooks': {
+          target: REACT_APP_SERVER_BASE_URL || 'http://localhost:3000',
+          changeOrigin: true,
+        },
       },
     },
 

@@ -58,6 +58,26 @@ export const SettingsRolePermissionsObjectsSection = ({
                 canUpdateAllObjectRecords: value,
                 canSoftDeleteAllObjectRecords: value,
                 canDestroyAllObjectRecords: value,
+                canReadOwnObjectRecordsOnly: false,
+              }
+            : {}),
+        });
+      },
+    },
+    {
+      key: 'canReadOwnObjectRecordsOnly',
+      label: t`View Own Records Only`,
+      description: t`When enabled, users can only see records they created`,
+      grantedBy: 0,
+      revokedBy: 0,
+      value: settingsDraftRole.canReadOwnObjectRecordsOnly,
+      setValue: (value: boolean) => {
+        setSettingsDraftRole({
+          ...settingsDraftRole,
+          canReadOwnObjectRecordsOnly: value,
+          ...(value === true
+            ? {
+                canReadAllObjectRecords: true,
               }
             : {}),
         });

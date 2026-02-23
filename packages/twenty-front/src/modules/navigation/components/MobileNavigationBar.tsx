@@ -6,12 +6,14 @@ import { contextStoreCurrentObjectMetadataItemIdComponentState } from '@/context
 import { useDefaultHomePagePath } from '@/navigation/hooks/useDefaultHomePagePath';
 import { useOpenSettingsMenu } from '@/navigation/hooks/useOpenSettings';
 import { useFilteredObjectMetadataItems } from '@/object-metadata/hooks/useFilteredObjectMetadataItems';
+import { isSimpleViewEnabledState } from '@/ui/layout/simple-view/states/isSimpleViewEnabledState';
 import { isNavigationDrawerExpandedState } from '@/ui/navigation/states/isNavigationDrawerExpanded';
 import { useRecoilComponentState } from '@/ui/utilities/state/component-state/hooks/useRecoilComponentState';
 import { useNavigate } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import {
   type IconComponent,
+  IconEye,
   IconList,
   IconSearch,
   IconSettings,
@@ -20,7 +22,12 @@ import { NavigationBar } from 'twenty-ui/navigation';
 import { useIsSettingsPage } from '@/navigation/hooks/useIsSettingsPage';
 import { currentMobileNavigationDrawerState } from '@/navigation/states/currentMobileNavigationDrawerState';
 
-type NavigationBarItemName = 'main' | 'search' | 'tasks' | 'settings';
+type NavigationBarItemName =
+  | 'main'
+  | 'search'
+  | 'simple'
+  | 'tasks'
+  | 'settings';
 
 export const MobileNavigationBar = () => {
   const navigate = useNavigate();
@@ -36,6 +43,7 @@ export const MobileNavigationBar = () => {
   const { openSettingsMenu } = useOpenSettingsMenu();
   const { alphaSortedActiveNonSystemObjectMetadataItems } =
     useFilteredObjectMetadataItems();
+  const setIsSimpleViewEnabled = useSetRecoilState(isSimpleViewEnabledState);
 
   const [, setContextStoreCurrentObjectMetadataItemId] =
     useRecoilComponentState(
@@ -89,6 +97,15 @@ export const MobileNavigationBar = () => {
         }
 
         openRecordsSearchPage();
+      },
+    },
+    {
+      name: 'simple',
+      Icon: IconEye,
+      onClick: () => {
+        closeCommandMenu();
+        setIsNavigationDrawerExpanded(false);
+        setIsSimpleViewEnabled(true);
       },
     },
     {

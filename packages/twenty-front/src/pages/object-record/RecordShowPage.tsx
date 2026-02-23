@@ -1,4 +1,5 @@
 import { useParams } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
 
 import { RecordShowActionMenu } from '@/action-menu/components/RecordShowActionMenu';
 import { ActionMenuComponentInstanceContext } from '@/action-menu/states/contexts/ActionMenuComponentInstanceContext';
@@ -13,6 +14,8 @@ import { useRecordShowPage } from '@/object-record/record-show/hooks/useRecordSh
 import { computeRecordShowComponentInstanceId } from '@/object-record/record-show/utils/computeRecordShowComponentInstanceId';
 import { PageHeaderToggleCommandMenuButton } from '@/ui/layout/page-header/components/PageHeaderToggleCommandMenuButton';
 import { PageContainer } from '@/ui/layout/page/components/PageContainer';
+import { SimpleRecordDetailPage } from '@/ui/layout/simple-view/components/SimpleRecordDetailPage';
+import { isSimpleViewEnabledState } from '@/ui/layout/simple-view/states/isSimpleViewEnabledState';
 import { RecordShowPageHeader } from '~/pages/object-record/RecordShowPageHeader';
 import { RecordShowPageTitle } from '~/pages/object-record/RecordShowPageTitle';
 
@@ -26,6 +29,17 @@ export const RecordShowPage = () => {
     parameters.objectNameSingular ?? '',
     parameters.objectRecordId ?? '',
   );
+
+  const isSimpleViewEnabled = useRecoilValue(isSimpleViewEnabledState);
+
+  if (isSimpleViewEnabled) {
+    return (
+      <SimpleRecordDetailPage
+        objectNameSingular={objectNameSingular}
+        objectRecordId={objectRecordId}
+      />
+    );
+  }
 
   const recordShowComponentInstanceId =
     computeRecordShowComponentInstanceId(objectRecordId);

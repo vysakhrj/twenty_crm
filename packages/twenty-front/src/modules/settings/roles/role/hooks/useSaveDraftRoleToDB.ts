@@ -29,6 +29,7 @@ const ROLE_BASIC_KEYS: Array<keyof Role> = [
   'canUpdateAllSettings',
   'canAccessAllTools',
   'canReadAllObjectRecords',
+  'canReadOwnObjectRecordsOnly',
   'canUpdateAllObjectRecords',
   'canSoftDeleteAllObjectRecords',
   'canDestroyAllObjectRecords',
@@ -130,6 +131,8 @@ export const useSaveDraftRoleToDB = ({
           canUpdateAllSettings: settingsDraftRole.canUpdateAllSettings,
           canAccessAllTools: settingsDraftRole.canAccessAllTools,
           canReadAllObjectRecords: settingsDraftRole.canReadAllObjectRecords,
+          canReadOwnObjectRecordsOnly:
+            settingsDraftRole.canReadOwnObjectRecordsOnly,
           canUpdateAllObjectRecords:
             settingsDraftRole.canUpdateAllObjectRecords,
           canSoftDeleteAllObjectRecords:
@@ -187,6 +190,8 @@ export const useSaveDraftRoleToDB = ({
               canAccessAllTools: settingsDraftRole.canAccessAllTools,
               canReadAllObjectRecords:
                 settingsDraftRole.canReadAllObjectRecords,
+              canReadOwnObjectRecordsOnly:
+                settingsDraftRole.canReadOwnObjectRecordsOnly,
               canUpdateAllObjectRecords:
                 settingsDraftRole.canUpdateAllObjectRecords,
               canSoftDeleteAllObjectRecords:

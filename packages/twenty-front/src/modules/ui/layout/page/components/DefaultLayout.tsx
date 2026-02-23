@@ -1,3 +1,5 @@
+import { useRecoilValue } from 'recoil';
+
 import { AuthModal } from '@/auth/components/AuthModal';
 import { AppErrorBoundary } from '@/error-handler/components/AppErrorBoundary';
 import { AppFullScreenErrorFallback } from '@/error-handler/components/AppFullScreenErrorFallback';
@@ -13,6 +15,8 @@ import { SignInBackgroundMockPage } from '@/sign-in-background-mock/components/S
 import { useShowFullscreen } from '@/ui/layout/fullscreen/hooks/useShowFullscreen';
 import { useShowAuthModal } from '@/ui/layout/hooks/useShowAuthModal';
 import { NAVIGATION_DRAWER_CONSTRAINTS } from '@/ui/layout/resizable-panel/constants/NavigationDrawerConstraints';
+import { SimpleViewLayout } from '@/ui/layout/simple-view/components/SimpleViewLayout';
+import { isSimpleViewEnabledState } from '@/ui/layout/simple-view/states/isSimpleViewEnabledState';
 import { useIsMobile } from '@/ui/utilities/responsive/hooks/useIsMobile';
 import { Global, css, useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
@@ -63,6 +67,30 @@ export const DefaultLayout = () => {
   const windowsWidth = useScreenSize().width;
   const showAuthModal = useShowAuthModal();
   const useShowFullScreen = useShowFullscreen();
+  const isSimpleViewEnabled = useRecoilValue(isSimpleViewEnabledState);
+
+  // When simple view is enabled and not on auth/settings pages, use simplified layout
+  const shouldUseSimpleView =
+    isSimpleViewEnabled && !showAuthModal && !isSettingsPage;
+
+  if (shouldUseSimpleView) {
+    return (
+      <>
+        <Global
+          styles={css`
+            body {
+              background: ${theme.background.tertiary};
+            }
+          `}
+        />
+        <StyledLayout>
+          <AppErrorBoundary FallbackComponent={AppFullScreenErrorFallback}>
+            <SimpleViewLayout />
+          </AppErrorBoundary>
+        </StyledLayout>
+      </>
+    );
+  }
 
   return (
     <>

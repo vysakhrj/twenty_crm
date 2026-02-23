@@ -16,6 +16,9 @@ export class ObjectPermissionDTO {
   canReadObjectRecords?: boolean;
 
   @Field({ nullable: true })
+  canReadOwnObjectRecordsOnly?: boolean;
+
+  @Field({ nullable: true })
   canUpdateObjectRecords?: boolean;
 
   @Field({ nullable: true })

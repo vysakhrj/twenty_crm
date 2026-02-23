@@ -81,6 +81,9 @@ export class RoleDTO {
   canReadAllObjectRecords: boolean;
 
   @Field({ nullable: false })
+  canReadOwnObjectRecordsOnly: boolean;
+
+  @Field({ nullable: false })
   canUpdateAllObjectRecords: boolean;
 
   @Field({ nullable: false })

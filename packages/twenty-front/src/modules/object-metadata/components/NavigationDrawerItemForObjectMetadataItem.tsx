@@ -1,3 +1,4 @@
+import { useCurrentUserRole } from '@/auth/hooks/useCurrentUserRole';
 import { MAIN_CONTEXT_STORE_INSTANCE_ID } from '@/context-store/constants/MainContextStoreInstanceId';
 import { contextStoreCurrentViewIdComponentState } from '@/context-store/states/contextStoreCurrentViewIdComponentState';
 import { lastVisitedViewPerObjectMetadataItemState } from '@/navigation/states/lastVisitedViewPerObjectMetadataItemState';
@@ -28,6 +29,13 @@ export const NavigationDrawerItemForObjectMetadataItem = ({
     }),
   );
 
+  const { getObjectPermissions, isAdmin } = useCurrentUserRole();
+
+  // Get permissions for this specific object
+  const objectPermissions = getObjectPermissions(objectMetadataItem.id);
+  const canReadOwnObjectRecordsOnly =
+    objectPermissions?.canReadOwnObjectRecordsOnly ?? false;
+
   const contextStoreCurrentViewId = useRecoilComponentValue(
     contextStoreCurrentViewIdComponentState,
     MAIN_CONTEXT_STORE_INSTANCE_ID,
@@ -43,10 +51,21 @@ export const NavigationDrawerItemForObjectMetadataItem = ({
   const { getIcon } = useIcons();
   const currentPath = useLocation().pathname;
 
+  // Show all views - role-based filtering is applied at data level by RoleBasedRecordFilterEffect
+  // This ensures users can use different view types (list, kanban) while still only seeing their data
+  const filteredViews = views;
+
+  // Determine the default view ID for navigation
+  // For restricted users, use the first allowed view instead of last visited
+  const defaultViewId =
+    canReadOwnObjectRecordsOnly && !isAdmin && filteredViews.length > 0
+      ? filteredViews[0]?.id
+      : lastVisitedViewId;
+
   const navigationPath = getAppPath(
     AppPath.RecordIndexPage,
     { objectNamePlural: objectMetadataItem.namePlural },
-    lastVisitedViewId ? { viewId: lastVisitedViewId } : undefined,
+    defaultViewId ? { viewId: defaultViewId } : undefined,
   );
 
   const isActive =
@@ -61,9 +80,9 @@ export const NavigationDrawerItemForObjectMetadataItem = ({
       }) + '/',
     );
 
-  const shouldSubItemsBeDisplayed = isActive && views.length > 1;
+  const shouldSubItemsBeDisplayed = isActive && filteredViews.length > 1;
 
-  const sortedObjectMetadataViews = [...views].sort(
+  const sortedObjectMetadataViews = [...filteredViews].sort(
     (viewA, viewB) => viewA.position - viewB.position,
   );
 
