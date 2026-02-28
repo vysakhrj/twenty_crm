@@ -21,6 +21,8 @@ const StyledContainer = styled.div`
   grid-template-rows: auto 1fr auto;
   grid-template-columns: minmax(0, 1fr);
   height: 100%;
+  padding-left: ${({ theme }) => theme.spacing(4)};
+  padding-right: ${({ theme }) => theme.spacing(4)};
 `;
 
 type PageLayoutLeftPanelProps = {

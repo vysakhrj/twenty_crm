@@ -10,6 +10,7 @@ import { useLastAuthenticatedWorkspaceDomain } from '@/domain-manager/hooks/useL
 import { useInitializeFormatPreferences } from '@/localization/hooks/useInitializeFormatPreferences';
 import { coreViewsState } from '@/views/states/coreViewState';
 import { workspaceAuthBypassProvidersState } from '@/workspace/states/workspaceAuthBypassProvidersState';
+import { useApolloClient } from '@apollo/client';
 import { useCallback } from 'react';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { SOURCE_LOCALE, type APP_LOCALES } from 'twenty-shared/translations';
@@ -22,8 +23,34 @@ import {
 } from '~/generated-metadata/graphql';
 import { getWorkspaceUrl } from '~/utils/getWorkspaceUrl';
 import { dynamicActivate } from '~/utils/i18n/dynamicActivate';
+import { UPSERT_FCM_TOKEN } from '@/users/graphql/mutations/upsertFcmToken';
+
+const FCM_TOKEN_STORAGE_KEY = 'fcmToken';
+const FCM_DEVICE_ID_STORAGE_KEY = 'fcmDeviceId';
+
+const createRandomId = () =>
+  typeof crypto.randomUUID === 'function'
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+const getLocalStorageValue = (key: string) => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  return window.localStorage.getItem(key);
+};
+
+const setLocalStorageValue = (key: string, value: string) => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  window.localStorage.setItem(key, value);
+};
 
 export const useLoadCurrentUser = () => {
+  const apolloClient = useApolloClient();
   const setCurrentUser = useSetRecoilState(currentUserState);
   const setAvailableWorkspaces = useSetRecoilState(availableWorkspacesState);
   const setCurrentWorkspaceMember = useSetRecoilState(
@@ -47,6 +74,46 @@ export const useLoadCurrentUser = () => {
 
   const [getCurrentUser] = useGetCurrentUserLazyQuery();
   const [findAllCoreViews] = useFindAllCoreViewsLazyQuery();
+
+  const registerStoredFcmToken = useCallback(
+    async (workspaceId: string) => {
+      const token = getLocalStorageValue(FCM_TOKEN_STORAGE_KEY);
+
+      if (!token) {
+        return;
+      }
+
+      let deviceId = getLocalStorageValue(FCM_DEVICE_ID_STORAGE_KEY);
+
+      if (!deviceId) {
+        deviceId = createRandomId();
+        setLocalStorageValue(FCM_DEVICE_ID_STORAGE_KEY, deviceId);
+      }
+
+      const sessionCacheKey = `fcmTokenRegistered:${workspaceId}:${deviceId}:${token}`;
+
+      if (typeof window !== 'undefined') {
+        if (window.sessionStorage.getItem(sessionCacheKey) === '1') {
+          return;
+        }
+      }
+
+      await apolloClient.mutate({
+        mutation: UPSERT_FCM_TOKEN,
+        variables: {
+          input: {
+            deviceId,
+            token,
+          },
+        },
+      });
+
+      if (typeof window !== 'undefined') {
+        window.sessionStorage.setItem(sessionCacheKey, '1');
+      }
+    },
+    [apolloClient],
+  );
 
   const loadCurrentUser = useCallback(async () => {
     const currentUserResult = await getCurrentUser({
@@ -132,6 +199,8 @@ export const useLoadCurrentUser = () => {
         workspaceId: workspace.id,
         workspaceUrl: getWorkspaceUrl(workspace.workspaceUrls),
       });
+
+      await registerStoredFcmToken(workspace.id);
     }
 
     if (isDefined(coreViewsResult.data?.getCoreViews)) {
@@ -158,6 +227,7 @@ export const useLoadCurrentUser = () => {
     setCoreViews,
     authProviders,
     setWorkspaceAuthBypassProviders,
+    registerStoredFcmToken,
   ]);
 
   return {

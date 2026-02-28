@@ -244,6 +244,13 @@
       },
       "defaultConfiguration": "seed"
     },
+    "workspace:seed:export": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/twenty-server",
+        "command": "npx ts-node -P tsconfig.json ./scripts/export-workspace-seed.ts --name sfs-seed"
+      }
+    },
     "clickhouse:migrate": {
       "executor": "nx:run-commands",
       "options": {

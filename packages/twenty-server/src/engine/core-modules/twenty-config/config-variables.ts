@@ -79,6 +79,23 @@ export class ConfigVariables {
   OUTBOUND_HTTP_SAFE_MODE_ENABLED = true;
 
   @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.OTHER,
+    description: 'Enable or disable Firebase Cloud Messaging push notifications',
+    type: ConfigVariableType.BOOLEAN,
+  })
+  @IsOptional()
+  FCM_NOTIFICATIONS_ENABLED = false;
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.OTHER,
+    description: 'Server key used to send Firebase Cloud Messaging push notifications',
+    type: ConfigVariableType.STRING,
+    isSensitive: true,
+  })
+  @IsOptionalOrEmptyString()
+  FCM_SERVER_KEY = '';
+
+  @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.TOKENS_DURATION,
     description: 'Duration for which the email verification token is valid',
     type: ConfigVariableType.STRING,

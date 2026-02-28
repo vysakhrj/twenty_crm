@@ -10,6 +10,7 @@
     "command:prod": "node dist/command/command",
     "worker:prod": "node dist/queue-worker/queue-worker",
     "database:init:prod": "npx ts-node ./scripts/setup-db.ts && yarn database:migrate:prod",
+    "workspace:seed:export": "npx ts-node -P tsconfig.json ./scripts/export-workspace-seed.ts",
     "database:migrate:prod": "npx -y typeorm migration:run -d dist/database/typeorm/core/core.datasource",
     "clickhouse:migrate:prod": "node dist/database/clickHouse/migrations/run-migrations.js",
     "typeorm": "../../node_modules/typeorm/.bin/typeorm"

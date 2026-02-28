@@ -9,6 +9,7 @@ Twenty is an open-source CRM built with modern technologies in a monorepo struct
 ## Key Commands
 
 ### Development
+
 ```bash
 # Start development environment (frontend + backend + worker)
 yarn start
@@ -20,6 +21,7 @@ npx nx run twenty-server:worker  # Start background worker
 ```
 
 ### Testing
+
 ```bash
 # Run tests
 npx nx test twenty-front      # Frontend unit tests
@@ -35,6 +37,7 @@ When testing the UI end to end, click on "Continue with Email" and use the prefi
 ```
 
 ### Code Quality
+
 ```bash
 # Linting (diff with main - fastest)
 npx nx lint:diff-with-main twenty-front           # Lint only files changed vs main
@@ -56,6 +59,7 @@ npx nx fmt twenty-server
 ```
 
 ### Build
+
 ```bash
 # Build packages
 npx nx build twenty-front
@@ -63,6 +67,7 @@ npx nx build twenty-server
 ```
 
 ### Database Operations
+
 ```bash
 # Database management
 npx nx database:reset twenty-server         # Reset database
@@ -77,6 +82,7 @@ npx nx run twenty-server:command upgrade
 ```
 
 ### GraphQL
+
 ```bash
 # Generate GraphQL types
 npx nx run twenty-front:graphql:generate
@@ -85,11 +91,13 @@ npx nx run twenty-front:graphql:generate
 ## Architecture Overview
 
 ### Tech Stack
+
 - **Frontend**: React 18, TypeScript, Recoil (state management), Emotion (styling), Vite
 - **Backend**: NestJS, TypeORM, PostgreSQL, Redis, GraphQL (with GraphQL Yoga)
 - **Monorepo**: Nx workspace managed with Yarn 4
 
 ### Package Structure
+
 ```
 packages/
 ├── twenty-front/          # React frontend application
@@ -103,6 +111,7 @@ packages/
 ```
 
 ### Key Development Principles
+
 - **Functional components only** (no class components)
 - **Named exports only** (no default exports)
 - **Types over interfaces** (except when extending third-party interfaces)
@@ -111,11 +120,13 @@ packages/
 - **Event handlers preferred over useEffect** for state updates
 
 ### State Management
+
 - **Recoil** for global state management
 - Component-specific state with React hooks
 - GraphQL cache managed by Apollo Client
 
 ### Backend Architecture
+
 - **NestJS modules** for feature organization
 - **TypeORM** for database ORM with PostgreSQL
 - **GraphQL** API with code-first approach
@@ -123,6 +134,7 @@ packages/
 - **BullMQ** for background job processing
 
 ### Database
+
 - **PostgreSQL** as primary database
 - **Redis** for caching and sessions
 - **TypeORM migrations** for schema management
@@ -133,25 +145,53 @@ packages/
 IMPORTANT: Use Context7 for code generation, setup or configuration steps, or library/API documentation. Automatically use the Context7 MCP tools to resolve library IDs and get library docs without waiting for explicit requests.
 
 ### Before Making Changes
+
 1. Always run linting and type checking after code changes
 2. Test changes with relevant test suites
 3. Ensure database migrations are properly structured
 4. Check that GraphQL schema changes are backward compatible
 
 ### Code Style Notes
+
 - Use **Emotion** for styling with styled-components pattern
 - Follow **Nx** workspace conventions for imports
 - Use **Lingui** for internationalization
 - Components should be in their own directories with tests and stories
 
 ### Testing Strategy
+
 - **Unit tests** with Jest for both frontend and backend
 - **Integration tests** for critical backend workflows
 - **Storybook** for component development and testing
 - **E2E tests** with Playwright for critical user flows
 
 ## Important Files
+
 - `nx.json` - Nx workspace configuration with task definitions
 - `tsconfig.base.json` - Base TypeScript configuration
 - `package.json` - Root package with workspace definitions
 - `.cursor/rules/` - Development guidelines and best practices
+
+<!-- nx configuration start-->
+<!-- Leave the start & end comments to automatically receive updates. -->
+
+## General Guidelines for working with Nx
+
+- For navigating/exploring the workspace, invoke the `nx-workspace` skill first - it has patterns for querying projects, targets, and dependencies
+- When running tasks (for example build, lint, test, e2e, etc.), always prefer running the task through `nx` (i.e. `nx run`, `nx run-many`, `nx affected`) instead of using the underlying tooling directly
+- Prefix nx commands with the workspace's package manager (e.g., `pnpm nx build`, `npm exec nx test`) - avoids using globally installed CLI
+- You have access to the Nx MCP server and its tools, use them to help the user
+- For Nx plugin best practices, check `node_modules/@nx/<plugin>/PLUGIN.md`. Not all plugins have this file - proceed without it if unavailable.
+- NEVER guess CLI flags - always check nx_docs or `--help` first when unsure
+
+## Scaffolding & Generators
+
+- For scaffolding tasks (creating apps, libs, project structure, setup), ALWAYS invoke the `nx-generate` skill FIRST before exploring or calling MCP tools
+
+## When to use nx_docs
+
+- USE for: advanced config options, unfamiliar flags, migration guides, plugin configuration, edge cases
+- DON'T USE for: basic generator syntax (`nx g @nx/react:app`), standard commands, things you already know
+- The `nx-generate` skill handles generator discovery internally - don't call nx_docs just to look up generator syntax
+
+<!-- nx configuration end-->

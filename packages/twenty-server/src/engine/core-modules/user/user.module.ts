@@ -17,9 +17,11 @@ import { UserWorkspaceEntity } from 'src/engine/core-modules/user-workspace/user
 import { UserWorkspaceModule } from 'src/engine/core-modules/user-workspace/user-workspace.module';
 import { WorkspaceFlatWorkspaceMemberMapCacheService } from 'src/engine/core-modules/user/services/workspace-flat-workspace-member-map-cache.service';
 import { WorkspaceMemberTranspiler } from 'src/engine/core-modules/user/services/workspace-member-transpiler.service';
+import { UserFcmTokenService } from 'src/engine/core-modules/user/services/user-fcm-token.service';
 import { UserVarsModule } from 'src/engine/core-modules/user/user-vars/user-vars.module';
 import { UserEntity } from 'src/engine/core-modules/user/user.entity';
 import { UserResolver } from 'src/engine/core-modules/user/user.resolver';
+import { UserFcmTokenResolver } from 'src/engine/core-modules/user/user-fcm-token.resolver';
 import { WorkspaceModule } from 'src/engine/core-modules/workspace/workspace.module';
 import { DataSourceModule } from 'src/engine/metadata-modules/data-source/data-source.module';
 import { ObjectMetadataEntity } from 'src/engine/metadata-modules/object-metadata/object-metadata.entity';
@@ -58,10 +60,12 @@ import { UserService } from './services/user.service';
     WorkspaceDomainsModule,
     WorkspaceCacheModule,
   ],
-  exports: [UserService, WorkspaceMemberTranspiler],
+  exports: [UserService, WorkspaceMemberTranspiler, UserFcmTokenService],
   providers: [
     UserService,
+    UserFcmTokenService,
     UserResolver,
+    UserFcmTokenResolver,
     WorkspaceMemberTranspiler,
     WorkspaceFlatWorkspaceMemberMapCacheService,
     GlobalWorkspaceMemberListener,

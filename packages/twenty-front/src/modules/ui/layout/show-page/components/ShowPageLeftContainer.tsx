@@ -23,6 +23,9 @@ const StyledInnerContainer = styled.div<{ isMobile: boolean }>`
   flex-direction: column;
   width: ${({ isMobile }) =>
     isMobile ? `100%` : `${PAGE_LAYOUT_LEFT_PANEL_CONTAINER_WIDTH}px`};
+  padding-left: ${({ theme }) => theme.spacing(4)};
+  padding-right: ${({ theme }) => theme.spacing(4)};
+  box-sizing: border-box;
 `;
 
 const StyledIntermediateContainer = styled.div`
