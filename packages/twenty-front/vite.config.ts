@@ -24,6 +24,8 @@ export default defineConfig(({ command, mode }) => {
     REACT_APP_SERVER_BASE_URL,
     VITE_BUILD_SOURCEMAP,
     VITE_DISABLE_TYPESCRIPT_CHECKER,
+    VITE_MAIN_CHUNK_SIZE_LIMIT_MB,
+    VITE_OTHER_CHUNK_SIZE_LIMIT_MB,
     VITE_HOST,
     SSL_CERT_PATH,
     SSL_KEY_PATH,
@@ -44,8 +46,21 @@ export default defineConfig(({ command, mode }) => {
   // Please don't increase this limit for main index chunk
   // If it gets too big then find modules in the code base
   // that can be loaded lazily, there are more!
-  const MAIN_CHUNK_SIZE_LIMIT = 6.5 * 1024 * 1024; // 6.5MB for main index chunk
-  const OTHER_CHUNK_SIZE_LIMIT = 5 * 1024 * 1024; // 5MB for other chunks
+  const mainChunkSizeLimitMb = Number.parseFloat(
+    VITE_MAIN_CHUNK_SIZE_LIMIT_MB ?? '',
+  );
+  const otherChunkSizeLimitMb = Number.parseFloat(
+    VITE_OTHER_CHUNK_SIZE_LIMIT_MB ?? '',
+  );
+
+  const MAIN_CHUNK_SIZE_LIMIT =
+    Number.isFinite(mainChunkSizeLimitMb) && mainChunkSizeLimitMb > 0
+      ? mainChunkSizeLimitMb * 1024 * 1024
+      : 6.5 * 1024 * 1024; // 6.5MB for main index chunk
+  const OTHER_CHUNK_SIZE_LIMIT =
+    Number.isFinite(otherChunkSizeLimitMb) && otherChunkSizeLimitMb > 0
+      ? otherChunkSizeLimitMb * 1024 * 1024
+      : 5 * 1024 * 1024; // 5MB for other chunks
 
   const checkers: Checkers = {
     overlay: false,
