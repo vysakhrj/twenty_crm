@@ -345,6 +345,18 @@ export const PERSON_STANDARD_FIELD_IDS = {
   calendarEventParticipants: '20202020-52ee-45e9-a702-b64b3753e3a9',
   timelineActivities: '20202020-a43e-4873-9c23-e522de906ce5',
   searchVector: '57d1d7ad-fa10-44fc-82f3-ad0959ec2534',
+  leads: '20202020-584c-4d4e-89c7-54ac2fb14d4b',
+} as const;
+
+export const LEAD_STANDARD_FIELD_IDS = {
+  title: '20202020-c386-4cb8-bb6b-09e5b5e92791',
+  bodyV2: '20202020-5bb1-4bf9-8a9e-8e10bf58ab2',
+  dueAt: '20202020-fe00-41eb-962c-5cb0b453fcf4',
+  status: '20202020-71bd-49fa-8ac6-7bb831b252e1',
+  createdBy: '20202020-2b05-49ac-a568-587966bf5498',
+  updatedBy: 'a9f7c619-f5ac-434e-9675-f09285fb2913',
+  assignee: '20202020-076b-4f43-b907-f20523c27640',
+  person: '20202020-d9a1-4e86-a017-88e2350d0bfd',
 } as const;
 
 export const TASK_STANDARD_FIELD_IDS = {
@@ -502,6 +514,7 @@ export const WORKSPACE_MEMBER_STANDARD_FIELD_IDS = {
   authoredActivities: '20202020-f139-4f13-a82f-a65a8d290a74',
   assignedActivities: '20202020-5c97-42b6-8ca9-c07622cbb33f',
   assignedTasks: '20202020-61dc-4a1c-99e8-38ebf8d2bbeb',
+  assignedLeads: '20202020-72ed-4b2d-0af9-49fc9e9d3ccf',
   favorites: '20202020-f3c1-4faf-b343-cf7681038757',
   accountOwnerForCompanies: '20202020-dc29-4bd4-a3c1-29eafa324bee',
   authoredAttachments: '20202020-000f-4947-917f-1b09851024fe',
@@ -519,6 +532,12 @@ export const WORKSPACE_MEMBER_STANDARD_FIELD_IDS = {
   searchVector: '20202020-46d0-4e7f-bc26-74c0edaeb619',
   calendarStartDay: '20202020-92d0-1d7f-a126-25ededa6b142',
   numberFormat: '20202020-7f40-4e7f-b126-11c0eda6b141',
+  availabilityStartTime: '20202020-1a11-4f7f-b126-11c0eda6b142',
+  availabilityEndTime: '20202020-5e55-4f7f-b126-11c0eda6b146',
+  availabilityHours: '20202020-6f66-4f7f-b126-11c0eda6b147',
+  availableDays: '20202020-2b22-4f7f-b126-11c0eda6b143',
+  leaveStartDate: '20202020-3c33-4f7f-b126-11c0eda6b144',
+  leaveEndDate: '20202020-4d44-4f7f-b126-11c0eda6b145',
 } as const;
 export const CUSTOM_OBJECT_STANDARD_FIELD_IDS = {
   name: '20202020-ba07-4ffd-ba63-009491f5749c',
@@ -573,6 +592,7 @@ export const STANDARD_OBJECT_FIELD_IDS = {
   noteTarget: NOTE_TARGET_STANDARD_FIELD_IDS,
   opportunity: OPPORTUNITY_STANDARD_FIELD_IDS,
   person: PERSON_STANDARD_FIELD_IDS,
+  lead: LEAD_STANDARD_FIELD_IDS,
   task: TASK_STANDARD_FIELD_IDS,
   taskTarget: TASK_TARGET_STANDARD_FIELD_IDS,
   timelineActivity: TIMELINE_ACTIVITY_STANDARD_FIELD_IDS,

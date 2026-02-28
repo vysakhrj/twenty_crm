@@ -49,19 +49,11 @@ export const ViewPickerListContent = () => {
   const canReadOwnObjectRecordsOnly =
     objectPermissions?.canReadOwnObjectRecordsOnly ?? false;
 
-  // Filter views based on role permissions
-  // If user can only read own records and is not admin, show only "Assigned to Me" type views
   const filteredViews = useMemo(() => {
     if (canReadOwnObjectRecordsOnly && !isAdmin) {
-      return viewsOnCurrentObject.filter((view) => {
-        const viewNameLower = view.name.toLowerCase();
-        return (
-          viewNameLower.includes('assigned to me') ||
-          viewNameLower.includes('my ') ||
-          viewNameLower === 'mine'
-        );
-      });
+      return viewsOnCurrentObject.slice(0, 1);
     }
+
     return viewsOnCurrentObject;
   }, [viewsOnCurrentObject, canReadOwnObjectRecordsOnly, isAdmin]);
 

@@ -1,6 +1,7 @@
 import { SummaryCard } from '@/object-record/record-show/components/SummaryCard';
 import { PageLayoutContent } from '@/page-layout/components/PageLayoutContent';
 import { PageLayoutContentProvider } from '@/page-layout/contexts/PageLayoutContentContext';
+import { RecordDetailNotesSection } from '@/page-layout/components/RecordDetailNotesSection';
 import { useCurrentPageLayout } from '@/page-layout/hooks/useCurrentPageLayout';
 import { usePageLayoutTabWithVisibleWidgetsOrThrow } from '@/page-layout/hooks/usePageLayoutTabWithVisibleWidgetsOrThrow';
 import { getTabLayoutMode } from '@/page-layout/utils/getTabLayoutMode';
@@ -17,7 +18,7 @@ const StyledContainer = styled.div`
   border-top-left-radius: 8px;
   box-sizing: border-box;
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto 1fr auto;
   grid-template-columns: minmax(0, 1fr);
   height: 100%;
 `;
@@ -63,6 +64,7 @@ export const PageLayoutLeftPanel = ({
           defaultEnableYScroll={true}
         >
           <PageLayoutContent />
+          <RecordDetailNotesSection />
         </ScrollWrapper>
       </PageLayoutContentProvider>
     </StyledContainer>

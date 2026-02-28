@@ -14,6 +14,7 @@ import { STANDARD_ERROR_MESSAGE } from 'src/engine/api/common/common-query-runne
 import { type GroupByField } from 'src/engine/api/graphql/graphql-query-runner/group-by/resolvers/types/group-by-field.types';
 import { isGroupByDateField } from 'src/engine/api/graphql/graphql-query-runner/group-by/resolvers/utils/is-group-by-date-field.util';
 import { isGroupByRelationField } from 'src/engine/api/graphql/graphql-query-runner/group-by/resolvers/utils/is-group-by-relation-field.util';
+import { normalizeTimeZoneForPostgres } from 'src/engine/api/graphql/graphql-query-runner/group-by/resolvers/utils/normalize-timezone-for-postgres.util';
 
 export const getGroupByExpression = ({
   groupByField,
@@ -49,12 +50,14 @@ export const getGroupByExpression = ({
     );
   }
 
+  const timeZoneForPostgres = normalizeTimeZoneForPostgres(
+    groupByField.timeZone ?? '',
+  );
   const timeZoneAsDateTruncParameter = shouldUseTimeZone
-    ? `, '${groupByField.timeZone}'`
+    ? `, '${timeZoneForPostgres}'`
     : '';
-
   const timeZoneAsToCharParameter = shouldUseTimeZone
-    ? ` AT TIME ZONE '${groupByField.timeZone}'`
+    ? ` AT TIME ZONE '${timeZoneForPostgres}'`
     : '';
 
   switch (dateGranularity) {

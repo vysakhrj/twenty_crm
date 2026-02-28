@@ -5,6 +5,7 @@ import { FieldsCard } from '@/object-record/record-show/components/FieldsCard';
 import { SummaryCard } from '@/object-record/record-show/components/SummaryCard';
 import { type RecordLayout } from '@/object-record/record-show/types/RecordLayout';
 import { getCardComponent } from '@/object-record/record-show/utils/getCardComponent';
+import { RecordDetailNotesSection } from '@/page-layout/components/RecordDetailNotesSection';
 import { RightDrawerFooter } from '@/ui/layout/right-drawer/components/RightDrawerFooter';
 import { ShowPageLeftContainer } from '@/ui/layout/show-page/components/ShowPageLeftContainer';
 import { getShowPageTabListComponentId } from '@/ui/layout/show-page/utils/getShowPageTabListComponentId';
@@ -51,6 +52,8 @@ const StyledContentContainer = styled.div<{ isInRightDrawer: boolean }>`
   background: ${({ theme }) => theme.background.primary};
   padding-bottom: ${({ theme, isInRightDrawer }) =>
     isInRightDrawer ? theme.spacing(16) : 0};
+  padding-left: ${({ theme }) => theme.spacing(4)};
+  padding-right: ${({ theme }) => theme.spacing(4)};
 `;
 
 type ShowPageSubContainerProps = {
@@ -123,6 +126,7 @@ export const ShowPageSubContainer = ({
         <ShowPageLeftContainer>
           {summaryCard}
           {fieldsCard}
+          <RecordDetailNotesSection />
         </ShowPageLeftContainer>
       )}
       <StyledShowPageRightContainer>
@@ -138,6 +142,7 @@ export const ShowPageSubContainer = ({
         {(isMobile || isInRightDrawer) && !isInCommandMenu && summaryCard}
         <StyledContentContainer isInRightDrawer={isInRightDrawer}>
           {renderActiveTabContent()}
+          {(isMobile || isInRightDrawer) && <RecordDetailNotesSection />}
         </StyledContentContainer>
         {isInRightDrawer && (
           <RightDrawerFooter

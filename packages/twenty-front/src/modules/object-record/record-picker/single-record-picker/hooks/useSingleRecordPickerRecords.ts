@@ -6,9 +6,11 @@ import { useRecoilComponentValue } from '@/ui/utilities/state/component-state/ho
 export const useSingleRecordPickerRecords = ({
   objectNameSingulars,
   excludedRecordIds = [],
+  restrictToRecordId,
 }: {
   objectNameSingulars: string[];
   excludedRecordIds?: string[];
+  restrictToRecordId?: string;
 }) => {
   const recordPickerSearchFilter = useRecoilComponentValue(
     singleRecordPickerSearchFilterComponentState,
@@ -22,6 +24,7 @@ export const useSingleRecordPickerRecords = ({
     selectedIds: selectedRecordId ? [selectedRecordId] : [],
     excludedRecordIds: excludedRecordIds,
     objectNameSingulars,
+    restrictToRecordId,
   });
 
   return { pickableMorphItems, loading };

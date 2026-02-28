@@ -12,6 +12,7 @@ type FormRichTextV2FieldInputProps = {
   readonly?: boolean;
   placeholder?: string;
   VariablePicker?: VariablePickerComponent;
+  variant?: 'default' | 'inline';
 };
 
 const RICH_TEXT_V2_EDITOR_MIN_HEIGHT = 340;
@@ -39,6 +40,7 @@ export const FormRichTextV2FieldInput = ({
   onChange,
   readonly,
   VariablePicker,
+  variant = 'default',
 }: FormRichTextV2FieldInputProps) => {
   const handleChange = (value: string) => {
     onChange({
@@ -59,6 +61,7 @@ export const FormRichTextV2FieldInput = ({
       VariablePicker={VariablePicker}
       minHeight={RICH_TEXT_V2_EDITOR_MIN_HEIGHT}
       maxWidth={RICH_TEXT_V2_EDITOR_MAX_WIDTH}
+      variant={variant}
     />
   );
 };

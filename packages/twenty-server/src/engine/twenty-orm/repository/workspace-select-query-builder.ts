@@ -1,8 +1,8 @@
 import { type ObjectsPermissions } from 'twenty-shared/types';
 import {
-  type EntityTarget,
-  type ObjectLiteral,
-  SelectQueryBuilder,
+    type EntityTarget,
+    type ObjectLiteral,
+    SelectQueryBuilder,
 } from 'typeorm';
 import { type QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 
@@ -12,13 +12,13 @@ import { type WorkspaceInternalContext } from 'src/engine/twenty-orm/interfaces/
 import { type AuthContext } from 'src/engine/core-modules/auth/types/auth-context.type';
 import { FeatureFlagKey } from 'src/engine/core-modules/feature-flag/enums/feature-flag-key.enum';
 import {
-  PermissionsException,
-  PermissionsExceptionCode,
+    PermissionsException,
+    PermissionsExceptionCode,
 } from 'src/engine/metadata-modules/permissions/permissions.exception';
 import { computeTwentyORMException } from 'src/engine/twenty-orm/error-handling/compute-twenty-orm-exception';
 import {
-  TwentyORMException,
-  TwentyORMExceptionCode,
+    TwentyORMException,
+    TwentyORMExceptionCode,
 } from 'src/engine/twenty-orm/exceptions/twenty-orm.exception';
 import { validateQueryIsPermittedOrThrow } from 'src/engine/twenty-orm/repository/permissions.utils';
 import { WorkspaceDeleteQueryBuilder } from 'src/engine/twenty-orm/repository/workspace-delete-query-builder';
@@ -398,7 +398,6 @@ export class WorkspaceSelectQueryBuilder<
       return;
     }
 
-    // Subqueries don't have entity metadata, skip permission predicates
     if (this.expressionMap.mainAlias?.subQuery) {
       return;
     }
@@ -417,45 +416,31 @@ export class WorkspaceSelectQueryBuilder<
       return;
     }
 
-    // Get the current user's workspaceMemberId
     const workspaceMemberId = this.authContext.workspaceMemberId;
 
     if (!workspaceMemberId) {
       return;
     }
 
-    // Check if the object has a createdBy field (ACTOR type)
-    const createdByField = Object.values(
-      this.internalContext.flatFieldMetadataMaps,
-    ).find(
-      (field) =>
-        field.objectMetadataId === objectMetadata.id &&
-        field.name === 'createdBy',
+    const allFields = Object.values(
+      this.internalContext.flatFieldMetadataMaps.byId,
     );
 
-    const mainAlias = this.expressionMap.mainAlias?.name ?? objectMetadata.nameSingular;
+    const assigneeField = allFields.find(
+      (field) =>
+        field?.objectMetadataId === objectMetadata.id &&
+        field?.name === 'assignee',
+    );
 
-    if (createdByField) {
-      // Filter by createdBy.source = 'MANUAL' and createdBy.workspaceMemberId = current user
-      this.andWhere(
-        `("${mainAlias}"."createdBySource" = 'MANUAL' AND "${mainAlias}"."createdByWorkspaceMemberId" = :workspaceMemberId)`,
-        { workspaceMemberId },
-      );
-    } else {
-      // Fallback: check for assignee field (common in tasks)
-      const assigneeField = Object.values(
-        this.internalContext.flatFieldMetadataMaps,
-      ).find(
-        (field) =>
-          field.objectMetadataId === objectMetadata.id &&
-          field.name === 'assignee',
-      );
-
-      if (assigneeField) {
-        this.andWhere(`"${mainAlias}"."assigneeId" = :workspaceMemberId`, {
-          workspaceMemberId,
-        });
-      }
+    if (!assigneeField) {
+      return;
     }
+
+    const mainAlias =
+      this.expressionMap.mainAlias?.name ?? objectMetadata.nameSingular;
+
+    this.andWhere(`"${mainAlias}"."assigneeId" = :workspaceMemberId`, {
+      workspaceMemberId,
+    });
   }
 }

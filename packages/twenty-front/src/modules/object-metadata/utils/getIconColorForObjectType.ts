@@ -12,6 +12,8 @@ export const getIconColorForObjectType = ({
       return theme.color.yellow;
     case 'task':
       return theme.color.blue;
+    case 'lead':
+      return theme.color.green;
     default:
       return 'currentColor';
   }

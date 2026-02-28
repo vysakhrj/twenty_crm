@@ -1,6 +1,7 @@
 import { useNavigatePageLayoutCommandMenu } from '@/command-menu/pages/page-layout/hooks/useNavigatePageLayoutCommandMenu';
 import { CommandMenuPages } from '@/command-menu/types/CommandMenuPages';
 import { PageLayoutLeftPanel } from '@/page-layout/components/PageLayoutLeftPanel';
+import { RecordDetailNotesSection } from '@/page-layout/components/RecordDetailNotesSection';
 import { PageLayoutTabList } from '@/page-layout/components/PageLayoutTabList';
 import { PageLayoutTabListEffect } from '@/page-layout/components/PageLayoutTabListEffect';
 import { PAGE_LAYOUT_LEFT_PANEL_CONTAINER_WIDTH } from '@/page-layout/constants/PageLayoutLeftPanelContainerWidth';
@@ -24,6 +25,7 @@ import styled from '@emotion/styled';
 import { t } from '@lingui/core/macro';
 import { isDefined } from 'twenty-shared/utils';
 import { useIsMobile } from 'twenty-ui/utilities';
+import { PageLayoutType } from '~/generated/graphql';
 
 const StyledContainer = styled.div<{ hasPinnedTab: boolean }>`
   display: grid;
@@ -46,6 +48,8 @@ const StyledPageLayoutTabList = styled(PageLayoutTabList)`
 
 const StyledScrollWrapper = styled(ScrollWrapper)`
   flex: 1;
+  padding-left: ${({ theme }) => theme.spacing(4)};
+  padding-right: ${({ theme }) => theme.spacing(4)};
 `;
 
 export const PageLayoutRendererContent = () => {
@@ -137,6 +141,10 @@ export const PageLayoutRendererContent = () => {
           {isDefined(activeTabId) && (
             <PageLayoutMainContent tabId={activeTabId} />
           )}
+          {(isInRightDrawer || isMobile) &&
+            currentPageLayout.type === PageLayoutType.RECORD_PAGE && (
+              <RecordDetailNotesSection />
+            )}
         </StyledScrollWrapper>
       </StyledTabsAndDashboardContainer>
     </StyledContainer>

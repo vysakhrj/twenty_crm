@@ -9,8 +9,8 @@ import { useUpdateOneRecord } from '@/object-record/hooks/useUpdateOneRecord';
 import { SimpleRecordDetailActionButtons } from '@/ui/layout/simple-view/components/SimpleRecordDetailActionButtons';
 import { SimpleRecordDetailNotes } from '@/ui/layout/simple-view/components/SimpleRecordDetailNotes';
 import {
-  SimpleRecordDetailSection,
-  type SectionField,
+    SimpleRecordDetailSection,
+    type SectionField,
 } from '@/ui/layout/simple-view/components/SimpleRecordDetailSection';
 import { SimpleRecordDetailStageSelect } from '@/ui/layout/simple-view/components/SimpleRecordDetailStageSelect';
 import { FieldMetadataType } from 'twenty-shared/types';
@@ -685,6 +685,7 @@ export const SimpleRecordDetailPage = ({
         )}
 
         <SimpleRecordDetailNotes
+          objectMetadataItem={objectMetadataItem}
           objectNameSingular={objectNameSingular}
           objectRecordId={objectRecordId}
           record={record}

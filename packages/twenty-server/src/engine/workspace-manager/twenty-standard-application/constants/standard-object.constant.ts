@@ -12,6 +12,7 @@ import {
   DASHBOARD_STANDARD_FIELD_IDS,
   FAVORITE_FOLDER_STANDARD_FIELD_IDS,
   FAVORITE_STANDARD_FIELD_IDS,
+  LEAD_STANDARD_FIELD_IDS,
   MESSAGE_CHANNEL_MESSAGE_ASSOCIATION_STANDARD_FIELD_IDS,
   MESSAGE_CHANNEL_STANDARD_FIELD_IDS,
   MESSAGE_FOLDER_STANDARD_FIELD_IDS,
@@ -1276,6 +1277,7 @@ export const STANDARD_OBJECTS = {
       taskTargets: {
         universalIdentifier: PERSON_STANDARD_FIELD_IDS.taskTargets,
       },
+      leads: { universalIdentifier: PERSON_STANDARD_FIELD_IDS.leads },
       noteTargets: {
         universalIdentifier: PERSON_STANDARD_FIELD_IDS.noteTargets,
       },
@@ -1341,6 +1343,68 @@ export const STANDARD_OBJECTS = {
           },
           xLink: {
             universalIdentifier: '20202020-af02-4a02-8a02-ae0a1ea11af9',
+          },
+        },
+      },
+    },
+  },
+  lead: {
+    universalIdentifier: STANDARD_OBJECT_IDS.lead,
+    fields: {
+      id: { universalIdentifier: '20202020-b02a-4151-8a51-79abcdefabcd' },
+      createdAt: {
+        universalIdentifier: '20202020-b02b-4152-9b52-8abcdefabcde',
+      },
+      updatedAt: {
+        universalIdentifier: '20202020-b02c-4153-8c53-9bcdefabcdef',
+      },
+      deletedAt: {
+        universalIdentifier: '20202020-b02d-4154-9d54-acdefabcdefa',
+      },
+      title: { universalIdentifier: LEAD_STANDARD_FIELD_IDS.title },
+      bodyV2: { universalIdentifier: LEAD_STANDARD_FIELD_IDS.bodyV2 },
+      dueAt: { universalIdentifier: LEAD_STANDARD_FIELD_IDS.dueAt },
+      status: { universalIdentifier: LEAD_STANDARD_FIELD_IDS.status },
+      createdBy: { universalIdentifier: LEAD_STANDARD_FIELD_IDS.createdBy },
+      updatedBy: { universalIdentifier: LEAD_STANDARD_FIELD_IDS.updatedBy },
+      assignee: { universalIdentifier: LEAD_STANDARD_FIELD_IDS.assignee },
+      person: { universalIdentifier: LEAD_STANDARD_FIELD_IDS.person },
+    },
+    indexes: {
+      assigneeIdIndex: {
+        universalIdentifier: '0406d1e5-2448-4c9f-1d9e-46b7c58c9c47',
+      },
+      personIdIndex: {
+        universalIdentifier: '1517e2f6-3559-4d1b-2f0a-57c8e69d0e69',
+      },
+    },
+    views: {
+      allLeads: {
+        universalIdentifier: '20202020-a008-4a08-8a08-ba5ca661ab00',
+        viewFields: {
+          title: {
+            universalIdentifier: '20202020-af08-4a08-8a08-ba5ca661ab08',
+          },
+          status: {
+            universalIdentifier: '20202020-af08-4a08-8a08-ba5ca661ab09',
+          },
+          createdBy: {
+            universalIdentifier: '20202020-af08-4a08-8a08-ba5ca661ab0a',
+          },
+          dueAt: {
+            universalIdentifier: '20202020-af08-4a08-8a08-ba5ca661ab0b',
+          },
+          assignee: {
+            universalIdentifier: '20202020-af08-4a08-8a08-ba5ca661ab0c',
+          },
+          person: {
+            universalIdentifier: '20202020-af08-4a08-8a08-ba5ca661ab0d',
+          },
+          bodyV2: {
+            universalIdentifier: '20202020-af08-4a08-8a08-ba5ca661ab0e',
+          },
+          createdAt: {
+            universalIdentifier: '20202020-af08-4a08-8a08-ba5ca661ab0f',
           },
         },
       },
@@ -1945,6 +2009,9 @@ export const STANDARD_OBJECTS = {
       assignedTasks: {
         universalIdentifier: WORKSPACE_MEMBER_STANDARD_FIELD_IDS.assignedTasks,
       },
+      assignedLeads: {
+        universalIdentifier: WORKSPACE_MEMBER_STANDARD_FIELD_IDS.assignedLeads,
+      },
       ownedOpportunities: {
         universalIdentifier: '20202020-9e4d-4b3a-8c1f-6d7e8f9a0b1c',
       },
@@ -1993,6 +2060,27 @@ export const STANDARD_OBJECTS = {
       numberFormat: {
         universalIdentifier: WORKSPACE_MEMBER_STANDARD_FIELD_IDS.numberFormat,
       },
+      availabilityStartTime: {
+        universalIdentifier:
+          WORKSPACE_MEMBER_STANDARD_FIELD_IDS.availabilityStartTime,
+      },
+      availabilityEndTime: {
+        universalIdentifier:
+          WORKSPACE_MEMBER_STANDARD_FIELD_IDS.availabilityEndTime,
+      },
+      availabilityHours: {
+        universalIdentifier:
+          WORKSPACE_MEMBER_STANDARD_FIELD_IDS.availabilityHours,
+      },
+      availableDays: {
+        universalIdentifier: WORKSPACE_MEMBER_STANDARD_FIELD_IDS.availableDays,
+      },
+      leaveStartDate: {
+        universalIdentifier: WORKSPACE_MEMBER_STANDARD_FIELD_IDS.leaveStartDate,
+      },
+      leaveEndDate: {
+        universalIdentifier: WORKSPACE_MEMBER_STANDARD_FIELD_IDS.leaveEndDate,
+      },
     },
     indexes: {
       userEmailUniqueIndex: {
@@ -2032,6 +2120,15 @@ export const STANDARD_OBJECTS = {
           },
           createdAt: {
             universalIdentifier: '20202020-ef01-4e01-8e01-a0bcaeabe1f8',
+          },
+          availabilityStartTime: {
+            universalIdentifier: '20202020-ef01-4e01-8e01-a0bcaeabe1f9',
+          },
+          availabilityEndTime: {
+            universalIdentifier: '20202020-ef01-4e01-8e01-a0bcaeabe1fb',
+          },
+          availableDays: {
+            universalIdentifier: '20202020-ef01-4e01-8e01-a0bcaeabe1fa',
           },
         },
       },

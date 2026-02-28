@@ -85,7 +85,9 @@ npx nx run twenty-server:test:integration:with-db-reset # Run integration tests
 npx nx run twenty-server:typeorm migration:generate src/database/typeorm/core/migrations/[name] -d src/database/typeorm/core/core.datasource.ts
 
 # Workspace
-npx nx run twenty-server:command workspace:sync-metadata -f  # Sync metadata
+npx nx run twenty-server:command upgrade              # Upgrade workspaces to latest version
+npx nx run twenty-server:command workspace:seed:dev  # Seed dev workspaces (development only)
+npx nx run twenty-server:command cache:flush         # Flush cache (e.g. after DB reset)
 ```
 
 ## Usage Guidelines

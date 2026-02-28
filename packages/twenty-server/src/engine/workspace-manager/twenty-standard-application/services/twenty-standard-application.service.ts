@@ -131,6 +131,7 @@ export class TwentyStandardApplicationService {
     const flatViews = [
       STANDARD_OBJECTS.company.views.allCompanies.universalIdentifier,
       STANDARD_OBJECTS.dashboard.views.allDashboards.universalIdentifier,
+      STANDARD_OBJECTS.lead.views.allLeads.universalIdentifier,
       STANDARD_OBJECTS.note.views.allNotes.universalIdentifier,
       STANDARD_OBJECTS.opportunity.views.allOpportunities.universalIdentifier,
       STANDARD_OBJECTS.person.views.allPeople.universalIdentifier,

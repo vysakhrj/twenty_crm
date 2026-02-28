@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { useDebouncedCallback } from 'use-debounce';
 
+import { useCurrentUserRole } from '@/auth/hooks/useCurrentUserRole';
 import { CoreObjectNameSingular } from '@/object-metadata/types/CoreObjectNameSingular';
 import { useFindOneRecord } from '@/object-record/hooks/useFindOneRecord';
 import { useImpersonationAuth } from '@/settings/admin-panel/hooks/useImpersonationAuth';
@@ -55,12 +56,16 @@ export const SettingsWorkspaceMember = () => {
   const isImpersonating = useRecoilValue(isImpersonatingState);
   const canImpersonate =
     useHasPermissionFlag(PermissionFlagType.IMPERSONATE) && !isImpersonating;
+  const { isAdmin } = useCurrentUserRole();
 
   const {
     roles,
     allRoles,
     loading: rolesLoading,
   } = useWorkspaceMemberRoles(workspaceMemberId);
+  const isSalesMember = roles.some((role) =>
+    role.label.toLowerCase().includes('sales'),
+  );
 
   const { record: member, loading } = useFindOneRecord<WorkspaceMember>({
     objectNameSingular: CoreObjectNameSingular.WorkspaceMember,
@@ -71,6 +76,10 @@ export const SettingsWorkspaceMember = () => {
       name: { firstName: true, lastName: true },
       avatarUrl: true,
       userEmail: true,
+      availabilityHours: true,
+      availableDays: true,
+      leaveStartDate: true,
+      leaveEndDate: true,
     },
   });
 
@@ -205,6 +214,8 @@ export const SettingsWorkspaceMember = () => {
                 onImpersonate={canImpersonate ? handleImpersonate : undefined}
                 onNameChange={debouncedUpdateName}
                 onDelete={() => openModal(DELETE_MEMBER_MODAL_ID)}
+                isSalesMember={isSalesMember}
+                canManageSalesSettings={isAdmin}
               />
             )}
 

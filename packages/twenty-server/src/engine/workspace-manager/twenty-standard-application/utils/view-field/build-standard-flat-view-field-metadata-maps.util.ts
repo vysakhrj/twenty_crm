@@ -10,6 +10,7 @@ import { computeStandardMessageThreadViewFields } from 'src/engine/workspace-man
 import { computeStandardMessageViewFields } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field/compute-standard-message-view-fields.util';
 import { computeStandardNoteViewFields } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field/compute-standard-note-view-fields.util';
 import { computeStandardOpportunityViewFields } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field/compute-standard-opportunity-view-fields.util';
+import { computeStandardLeadViewFields } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field/compute-standard-lead-view-fields.util';
 import { computeStandardPersonViewFields } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field/compute-standard-person-view-fields.util';
 import { computeStandardTaskViewFields } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field/compute-standard-task-view-fields.util';
 import { computeStandardWorkflowRunViewFields } from 'src/engine/workspace-manager/twenty-standard-application/utils/view-field/compute-standard-workflow-run-view-fields.util';
@@ -29,6 +30,7 @@ const STANDARD_FLAT_VIEW_FIELD_METADATA_BUILDERS_BY_OBJECT_NAME = {
   note: computeStandardNoteViewFields,
   opportunity: computeStandardOpportunityViewFields,
   person: computeStandardPersonViewFields,
+  lead: computeStandardLeadViewFields,
   task: computeStandardTaskViewFields,
   workflow: computeStandardWorkflowViewFields,
   workflowRun: computeStandardWorkflowRunViewFields,

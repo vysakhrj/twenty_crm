@@ -8,7 +8,10 @@ import { type RecordPickerPickableMorphItem } from '@/object-record/record-picke
 import { useAvailableComponentInstanceIdOrThrow } from '@/ui/utilities/state/component-state/hooks/useAvailableComponentInstanceIdOrThrow';
 import { useRecoilCallback } from 'recoil';
 import { CustomError, isDefined } from 'twenty-shared/utils';
-import { type SearchQuery } from '~/generated/graphql';
+import {
+  type ObjectRecordFilterInput,
+  type SearchQuery,
+} from '~/generated/graphql';
 
 export const useSingleRecordPickerPerformSearch = ({
   selectedIds,
@@ -16,12 +19,14 @@ export const useSingleRecordPickerPerformSearch = ({
   excludedRecordIds = [],
   objectNameSingulars,
   searchFilter,
+  restrictToRecordId,
 }: {
   selectedIds: string[];
   limit?: number;
   excludedRecordIds?: string[];
   objectNameSingulars: string[];
   searchFilter?: string;
+  restrictToRecordId?: string;
 }): {
   pickableMorphItems: RecordPickerPickableMorphItem[];
   loading: boolean;
@@ -57,11 +62,32 @@ export const useSingleRecordPickerPerformSearch = ({
   );
 
   const selectedIdsFilter = { id: { in: selectedIds } };
+  const recordRestrictionFilter = restrictToRecordId
+    ? ({ id: { eq: restrictToRecordId } } satisfies ObjectRecordFilterInput)
+    : undefined;
+
+  const buildFilter = (baseFilter?: ObjectRecordFilterInput) => {
+    if (!isDefined(baseFilter) && !isDefined(recordRestrictionFilter)) {
+      return undefined;
+    }
+
+    if (!isDefined(baseFilter)) {
+      return recordRestrictionFilter;
+    }
+
+    if (!isDefined(recordRestrictionFilter)) {
+      return baseFilter;
+    }
+
+    return {
+      and: [baseFilter, recordRestrictionFilter],
+    } satisfies ObjectRecordFilterInput;
+  };
 
   const { loading: selectedRecordsLoading, searchRecords: selectedRecords } =
     useObjectRecordSearchRecords({
       objectNameSingulars,
-      filter: selectedIdsFilter,
+      filter: buildFilter(selectedIdsFilter),
       skip: !selectedIds.length,
       searchInput: '',
       onCompleted: onSearchRecordsCompleted,
@@ -72,7 +98,7 @@ export const useSingleRecordPickerPerformSearch = ({
     searchRecords: filteredSelectedRecords,
   } = useObjectRecordSearchRecords({
     objectNameSingulars,
-    filter: selectedIdsFilter,
+    filter: buildFilter(selectedIdsFilter),
     skip: !selectedIds.length,
     searchInput: searchFilter,
     onCompleted: onSearchRecordsCompleted,
@@ -85,7 +111,7 @@ export const useSingleRecordPickerPerformSearch = ({
   const { loading: recordsToSelectLoading, searchRecords: recordsToSelect } =
     useObjectRecordSearchRecords({
       objectNameSingulars,
-      filter: notFilter,
+      filter: buildFilter(notFilter),
       limit: limit ?? DEFAULT_SEARCH_REQUEST_LIMIT,
       searchInput: searchFilter,
       fetchPolicy: 'cache-and-network',

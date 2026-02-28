@@ -22,6 +22,7 @@ import { IconPlus } from 'twenty-ui/display';
 
 export type SingleRecordPickerMenuItemsWithSearchProps = {
   excludedRecordIds?: string[];
+  restrictToRecordId?: string;
   onCreate?: ((searchInput?: string) => void) | (() => void);
   objectNameSingulars: string[];
   recordPickerInstanceId?: string;
@@ -36,6 +37,7 @@ export const SingleRecordPickerMenuItemsWithSearch = ({
   EmptyIcon,
   emptyLabel,
   excludedRecordIds,
+  restrictToRecordId,
   onCancel,
   onCreate,
   onMorphItemSelected,
@@ -57,6 +59,7 @@ export const SingleRecordPickerMenuItemsWithSearch = ({
   const { pickableMorphItems, loading } = useSingleRecordPickerRecords({
     objectNameSingulars,
     excludedRecordIds,
+    restrictToRecordId,
   });
 
   const { objectMetadataItems: allObjectMetadataItems } =

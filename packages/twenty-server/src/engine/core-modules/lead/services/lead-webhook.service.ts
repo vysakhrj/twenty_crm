@@ -1,6 +1,13 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  Logger,
+  NotFoundException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 import { isDefined } from 'twenty-shared/utils';
 
@@ -8,10 +15,41 @@ import { CommonCreateOneQueryRunnerService } from 'src/engine/api/common/common-
 import { WorkspaceAuthContext } from 'src/engine/api/common/interfaces/workspace-auth-context.interface';
 import { AuthenticatedRequest } from 'src/engine/api/rest/types/authenticated-request';
 import { CommonApiContextBuilderService } from 'src/engine/core-modules/record-crud/services/common-api-context-builder.service';
+import { UserWorkspaceEntity } from 'src/engine/core-modules/user-workspace/user-workspace.entity';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
+import { ADMIN_ROLE } from 'src/engine/metadata-modules/role/constants/admin-role';
+import { RoleEntity } from 'src/engine/metadata-modules/role/role.entity';
+import { UserRoleService } from 'src/engine/metadata-modules/user-role/user-role.service';
 import { GlobalWorkspaceOrmManager } from 'src/engine/twenty-orm/global-workspace-datasource/global-workspace-orm.manager';
 import { WorkspaceMemberWorkspaceEntity } from 'src/modules/workspace-member/standard-objects/workspace-member.workspace-entity';
 import { CreateLeadWithPersonDto } from '../controllers/lead-webhook.controller';
+
+type SalesAvailabilityUpdateInput = {
+  availabilityStartTime?: string;
+  availabilityEndTime?: string;
+  availableDays?: string[];
+};
+
+type SalesLeaveUpdateInput = {
+  leaveDate?: string;
+  leaveStartDate?: string;
+  leaveEndDate?: string;
+  clearLeave?: boolean;
+};
+
+const WEEKDAY_KEYS = [
+  'MONDAY',
+  'TUESDAY',
+  'WEDNESDAY',
+  'THURSDAY',
+  'FRIDAY',
+  'SATURDAY',
+  'SUNDAY',
+] as const;
+
+type WeekdayKey = (typeof WEEKDAY_KEYS)[number];
+
+const TIME_24H_REGEX = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
 @Injectable()
 export class LeadWebhookService {
@@ -21,8 +59,13 @@ export class LeadWebhookService {
     private readonly commonApiContextBuilder: CommonApiContextBuilderService,
     private readonly commonCreateOneQueryRunnerService: CommonCreateOneQueryRunnerService,
     private readonly globalWorkspaceOrmManager: GlobalWorkspaceOrmManager,
+    private readonly userRoleService: UserRoleService,
     @InjectRepository(WorkspaceEntity)
     private readonly workspaceRepository: Repository<WorkspaceEntity>,
+    @InjectRepository(RoleEntity)
+    private readonly roleRepository: Repository<RoleEntity>,
+    @InjectRepository(UserWorkspaceEntity)
+    private readonly userWorkspaceRepository: Repository<UserWorkspaceEntity>,
   ) {}
 
   async createLeadWithPerson(
@@ -43,60 +86,53 @@ export class LeadWebhookService {
     // Use the request itself as auth context (it contains user/apiKey info)
     const authContext = request as unknown as WorkspaceAuthContext;
 
-    // Step 1: Get assignee using load balancing (fewest tasks, exclude System Admin)
+    // Step 1: Get assignee by round-robin among active members (no load balancing)
     const { assigneeId, memberCount, currentIndex, allMembers } =
       await this.getAssigneeByLoadBalance(workspaceId, authContext);
 
-    // Step 2: Find or create Person (needed for customerId on lead)
-    // Search by email or phone number
-    let person: any | null = null;
+    // Step 2: Find or create Customer (by email or phone; reuse existing if match)
+    let customer: any | null = null;
     const hasPersonData = body.person && (
       body.person.name ||
       body.person.emails?.[0]?.email ||
       body.person.phones?.[0]?.number
     );
     if (hasPersonData) {
-      person = await this.findOrCreatePerson(body.person, authContext);
+      customer = await this.findOrCreateCustomer(body.person, authContext);
     }
 
-    // Step 3: Find or create Origin record (needed for originsId on lead)
+    // Step 3: Find or create Origin record (needed for originId on lead)
     let origin: any | null = null;
     if (body.origin) {
       origin = await this.findOrCreateOrigin(body.origin, authContext);
     }
 
-    // Step 4: Create Lead/Task with all relations set directly
-    // Relations use plural FK names: customersId, originsId, propertiesId
+    // Step 4: Compute lead title (auto-increment SFS-N)
+    const title = await this.generateNextLeadTitle(authContext);
+
+    // Step 4b: Compute due date (fallback = today + 2 days if not provided)
+    const dueDate =
+      body.dueDate ??
+      new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString();
+
+    // Step 5: Create Lead with assignee, customer, origin, property
     const lead = await this.createLead(
       {
-        title: body.title,
+        title,
         body: body.body,
-        status: body.status || 'New',
-        dueDate: body.dueDate,
+        dueDate,
         assigneeId,
-        customerId: person?.id || null,
+        customerId: customer?.id || null,
         originId: origin?.id || null,
         propertyId: body.propertyId || null,
       },
       authContext,
     );
 
-    // Step 5: Create TaskTarget to link Task, Person, Origin, and Property
-    let taskTarget: any | null = null;
-    if (person || origin || body.propertyId) {
-      taskTarget = await this.createTaskTarget(
-        lead.id,
-        person?.id || null,
-        origin?.id || null,
-        body.propertyId || null,
-        authContext,
-      );
-    }
-
     return {
       lead,
-      person,
-      taskTarget,
+      person: customer,
+      taskTarget: null,
       origin,
       debug: {
         roundRobin: {
@@ -105,11 +141,700 @@ export class LeadWebhookService {
           selectedAssigneeId: assigneeId,
           allMembers,
         },
-        note: 'Using Task object as workaround. Lead object not accessible via API. Customer/Property/Source fields cannot be populated until Lead object is fixed.',
       },
     };
   }
 
+  async updateSalesAvailability(
+    workspaceId: string,
+    workspaceMemberId: string,
+    input: SalesAvailabilityUpdateInput,
+    authContext: WorkspaceAuthContext,
+  ) {
+    await this.assertManagerOrSuperAdmin(workspaceId, authContext);
+
+    const salesMemberIds = await this.getSalesWorkspaceMemberIds(
+      workspaceId,
+      authContext,
+    );
+
+    if (!salesMemberIds.includes(workspaceMemberId)) {
+      throw new NotFoundException(
+        `Sales workspace member ${workspaceMemberId} not found`,
+      );
+    }
+
+    const updates: Partial<WorkspaceMemberWorkspaceEntity> = {};
+
+    if (isDefined(input.availabilityStartTime)) {
+      if (!this.isValidAvailabilityTime(input.availabilityStartTime, false)) {
+        throw new BadRequestException(
+          'availabilityStartTime must use HH:mm format between 00:00 and 23:59',
+        );
+      }
+
+      updates.availabilityStartTime = input.availabilityStartTime;
+    }
+
+    if (isDefined(input.availabilityEndTime)) {
+      if (!this.isValidAvailabilityTime(input.availabilityEndTime, true)) {
+        throw new BadRequestException(
+          'availabilityEndTime must use HH:mm format between 00:00 and 24:00',
+        );
+      }
+
+      updates.availabilityEndTime = input.availabilityEndTime;
+    }
+
+    if (isDefined(input.availableDays)) {
+      const normalizedDays = input.availableDays.map((day) =>
+        String(day).toUpperCase(),
+      );
+
+      const hasInvalidDay = normalizedDays.some(
+        (day) => !WEEKDAY_KEYS.includes(day as WeekdayKey),
+      );
+
+      if (normalizedDays.length === 0 || hasInvalidDay) {
+        throw new BadRequestException(
+          `availableDays must contain valid weekdays: ${WEEKDAY_KEYS.join(', ')}`,
+        );
+      }
+
+      updates.availableDays = normalizedDays;
+    }
+
+    if (!Object.keys(updates).length) {
+      throw new BadRequestException(
+        'Provide at least one field to update (availabilityStartTime, availabilityEndTime or availableDays)',
+      );
+    }
+
+    return this.globalWorkspaceOrmManager.executeInWorkspaceContext(
+      authContext,
+      async () => {
+        const workspaceMemberRepository =
+          await this.globalWorkspaceOrmManager.getRepository<WorkspaceMemberWorkspaceEntity>(
+            workspaceId,
+            'workspaceMember',
+            { shouldBypassPermissionChecks: true },
+          );
+
+        const existingMember = await workspaceMemberRepository.findOne({
+          where: { id: workspaceMemberId },
+        });
+
+        if (!existingMember) {
+          throw new NotFoundException(
+            `Workspace member ${workspaceMemberId} not found`,
+          );
+        }
+
+        const startTime =
+          updates.availabilityStartTime ??
+          existingMember.availabilityStartTime ??
+          '00:00';
+        const endTime =
+          updates.availabilityEndTime ??
+          existingMember.availabilityEndTime ??
+          this.getEndTimeFromAvailabilityHours(existingMember.availabilityHours);
+
+        const startMinutes = this.parseAvailabilityTimeToMinutes(startTime, false);
+        const endMinutes = this.parseAvailabilityTimeToMinutes(endTime, true);
+
+        if (startMinutes >= endMinutes) {
+          throw new BadRequestException(
+            'availabilityStartTime must be earlier than availabilityEndTime',
+          );
+        }
+
+        try {
+          await workspaceMemberRepository.update({ id: workspaceMemberId }, updates);
+        } catch (error) {
+          const missingFields = this.getMissingWorkspaceMemberMetadataFields(error);
+
+          if (missingFields.size === 0) {
+            throw error;
+          }
+
+          const fallbackUpdates: Partial<WorkspaceMemberWorkspaceEntity> = {
+            ...updates,
+          };
+
+          for (const missingField of missingFields) {
+            delete fallbackUpdates[missingField];
+          }
+
+          const isTimeFieldMissing =
+            missingFields.has('availabilityStartTime') ||
+            missingFields.has('availabilityEndTime');
+
+          if (isTimeFieldMissing) {
+            if (startTime !== '00:00') {
+              throw new BadRequestException(
+                'This workspace does not support custom start time yet. Use 00:00 as start time.',
+              );
+            }
+
+            if (endMinutes % 60 !== 0) {
+              throw new BadRequestException(
+                'End time must be on whole-hour boundaries for this workspace (e.g. 18:00).',
+              );
+            }
+
+            fallbackUpdates.availabilityHours = endMinutes / 60;
+            delete fallbackUpdates.availabilityStartTime;
+            delete fallbackUpdates.availabilityEndTime;
+          }
+
+          if (Object.keys(fallbackUpdates).length > 0) {
+            try {
+              await workspaceMemberRepository.update(
+                { id: workspaceMemberId },
+                fallbackUpdates,
+              );
+            } catch (secondError) {
+              const secondMissingFields =
+                this.getMissingWorkspaceMemberMetadataFields(secondError);
+
+              if (secondMissingFields.size === 0) {
+                throw secondError;
+              }
+
+              for (const missingField of secondMissingFields) {
+                delete fallbackUpdates[missingField];
+              }
+
+              if (Object.keys(fallbackUpdates).length > 0) {
+                await workspaceMemberRepository.update(
+                  { id: workspaceMemberId },
+                  fallbackUpdates,
+                );
+              }
+            }
+          }
+        }
+
+        const updatedMember = await workspaceMemberRepository.findOne({
+          where: { id: workspaceMemberId },
+        });
+
+        if (!updatedMember) {
+          throw new NotFoundException(
+            `Workspace member ${workspaceMemberId} not found`,
+          );
+        }
+
+        return {
+          workspaceMemberId: updatedMember.id,
+          availabilityStartTime: this.getAvailabilityStartTime(updatedMember),
+          availabilityEndTime: this.getAvailabilityEndTime(updatedMember),
+          availableDays: this.getAvailableDays(updatedMember),
+          status: this.computeAvailabilityStatus(updatedMember),
+        };
+      },
+    );
+  }
+
+  async updateSalesLeave(
+    workspaceId: string,
+    workspaceMemberId: string,
+    input: SalesLeaveUpdateInput,
+    authContext: WorkspaceAuthContext,
+  ) {
+    await this.assertManagerOrSuperAdmin(workspaceId, authContext);
+
+    const salesMemberIds = await this.getSalesWorkspaceMemberIds(
+      workspaceId,
+      authContext,
+    );
+
+    if (!salesMemberIds.includes(workspaceMemberId)) {
+      throw new NotFoundException(
+        `Sales workspace member ${workspaceMemberId} not found`,
+      );
+    }
+
+    let leaveStartDate: string | null = null;
+    let leaveEndDate: string | null = null;
+
+    if (!input.clearLeave) {
+      if (input.leaveDate) {
+        const date = new Date(input.leaveDate);
+
+        if (Number.isNaN(date.getTime())) {
+          throw new BadRequestException(
+            'leaveDate must be a valid ISO date string',
+          );
+        }
+
+        const leaveStart = new Date(date);
+        leaveStart.setUTCHours(0, 0, 0, 0);
+        const leaveEnd = new Date(date);
+        leaveEnd.setUTCHours(23, 59, 59, 999);
+
+        leaveStartDate = leaveStart.toISOString();
+        leaveEndDate = leaveEnd.toISOString();
+      } else {
+        if (!input.leaveStartDate || !input.leaveEndDate) {
+          throw new BadRequestException(
+            'Provide leaveDate or both leaveStartDate and leaveEndDate',
+          );
+        }
+
+        const leaveStart = new Date(input.leaveStartDate);
+        const leaveEnd = new Date(input.leaveEndDate);
+
+        if (
+          Number.isNaN(leaveStart.getTime()) ||
+          Number.isNaN(leaveEnd.getTime())
+        ) {
+          throw new BadRequestException(
+            'leaveStartDate and leaveEndDate must be valid ISO date strings',
+          );
+        }
+
+        if (leaveEnd < leaveStart) {
+          throw new BadRequestException(
+            'leaveEndDate must be greater than or equal to leaveStartDate',
+          );
+        }
+
+        leaveStartDate = leaveStart.toISOString();
+        leaveEndDate = leaveEnd.toISOString();
+      }
+    }
+
+    return this.globalWorkspaceOrmManager.executeInWorkspaceContext(
+      authContext,
+      async () => {
+        const workspaceMemberRepository =
+          await this.globalWorkspaceOrmManager.getRepository<WorkspaceMemberWorkspaceEntity>(
+            workspaceId,
+            'workspaceMember',
+            { shouldBypassPermissionChecks: true },
+          );
+
+        await workspaceMemberRepository.update(
+          { id: workspaceMemberId },
+          { leaveStartDate, leaveEndDate },
+        );
+
+        const updatedMember = await workspaceMemberRepository.findOne({
+          where: { id: workspaceMemberId },
+        });
+
+        if (!updatedMember) {
+          throw new NotFoundException(
+            `Workspace member ${workspaceMemberId} not found`,
+          );
+        }
+
+        return {
+          workspaceMemberId: updatedMember.id,
+          leaveStartDate: updatedMember.leaveStartDate,
+          leaveEndDate: updatedMember.leaveEndDate,
+          status: this.computeAvailabilityStatus(updatedMember),
+        };
+      },
+    );
+  }
+
+  async getSalesUsersStatus(
+    workspaceId: string,
+    authContext: WorkspaceAuthContext,
+  ) {
+    await this.assertManagerOrSuperAdmin(workspaceId, authContext);
+
+    return this.globalWorkspaceOrmManager.executeInWorkspaceContext(
+      authContext,
+      async () => {
+        const salesMemberIds = await this.getSalesWorkspaceMemberIds(
+          workspaceId,
+          authContext,
+        );
+
+        if (salesMemberIds.length === 0) {
+          return [];
+        }
+
+        const workspaceMemberRepository =
+          await this.globalWorkspaceOrmManager.getRepository<WorkspaceMemberWorkspaceEntity>(
+            workspaceId,
+            'workspaceMember',
+            { shouldBypassPermissionChecks: true },
+          );
+
+        const members = await workspaceMemberRepository.find({
+          where: { id: In(salesMemberIds) },
+        });
+
+        return members.map((member) => ({
+          workspaceMemberId: member.id,
+          name: `${member.name?.firstName ?? ''} ${member.name?.lastName ?? ''}`.trim(),
+          availabilityStartTime: this.getAvailabilityStartTime(member),
+          availabilityEndTime: this.getAvailabilityEndTime(member),
+          availableDays: this.getAvailableDays(member),
+          leaveStartDate: member.leaveStartDate ?? null,
+          leaveEndDate: member.leaveEndDate ?? null,
+          status: this.computeAvailabilityStatus(member),
+        }));
+      },
+    );
+  }
+
+  private async assertManagerOrSuperAdmin(
+    workspaceId: string,
+    authContext: WorkspaceAuthContext,
+  ): Promise<void> {
+    const userWorkspaceId = authContext.userWorkspaceId;
+
+    if (!userWorkspaceId) {
+      throw new ForbiddenException('Only workspace users can perform this action');
+    }
+
+    const rolesByUserWorkspace =
+      await this.userRoleService.getRolesByUserWorkspaces({
+        userWorkspaceIds: [userWorkspaceId],
+        workspaceId,
+      });
+
+    const currentRole = rolesByUserWorkspace.get(userWorkspaceId)?.[0];
+
+    if (!currentRole) {
+      throw new ForbiddenException('Current role could not be resolved');
+    }
+
+    const normalizedLabel = currentRole.label.toLowerCase();
+    const hasManagerOrAdminLabel =
+      normalizedLabel.includes('manager') ||
+      normalizedLabel.includes('admin') ||
+      normalizedLabel.includes('superadmin') ||
+      normalizedLabel.includes('super admin');
+
+    const isPrivileged =
+      currentRole.standardId === ADMIN_ROLE.standardId ||
+      currentRole.canUpdateAllSettings ||
+      hasManagerOrAdminLabel;
+
+    if (!isPrivileged) {
+      throw new ForbiddenException(
+        'Only manager or super admin roles can update sales availability',
+      );
+    }
+  }
+
+  private async getSalesWorkspaceMemberIds(
+    workspaceId: string,
+    authContext: WorkspaceAuthContext,
+  ): Promise<string[]> {
+    const salesRoles = await this.roleRepository.find({
+      where: {
+        workspaceId,
+      },
+    });
+
+    const salesRoleIds = salesRoles
+      .filter((role) => role.label.toLowerCase().includes('sales'))
+      .map((role) => role.id);
+
+    if (salesRoleIds.length === 0) {
+      return [];
+    }
+
+    const userWorkspaceIdsByRole = await Promise.all(
+      salesRoleIds.map((roleId) =>
+        this.userRoleService.getUserWorkspaceIdsAssignedToRole(roleId, workspaceId),
+      ),
+    );
+
+    const userWorkspaceIds = Array.from(new Set(userWorkspaceIdsByRole.flat()));
+
+    if (userWorkspaceIds.length === 0) {
+      return [];
+    }
+
+    const userWorkspaces = await this.userWorkspaceRepository.find({
+      where: { id: In(userWorkspaceIds) },
+    });
+
+    const userIds = userWorkspaces.map((userWorkspace) => userWorkspace.userId);
+
+    if (userIds.length === 0) {
+      return [];
+    }
+
+    return this.globalWorkspaceOrmManager.executeInWorkspaceContext(
+      authContext,
+      async () => {
+        const workspaceMemberRepository =
+          await this.globalWorkspaceOrmManager.getRepository<WorkspaceMemberWorkspaceEntity>(
+            workspaceId,
+            'workspaceMember',
+            { shouldBypassPermissionChecks: true },
+          );
+
+        const members = await workspaceMemberRepository.find({
+          where: {
+            userId: In(userIds),
+          },
+        });
+
+        return members.map((member) => member.id);
+      },
+    );
+  }
+
+  private async getManagerWorkspaceMemberIds(
+    workspaceId: string,
+    authContext: WorkspaceAuthContext,
+  ): Promise<string[]> {
+    const roles = await this.roleRepository.find({
+      where: { workspaceId },
+    });
+
+    const managerRoleIds = roles
+      .filter((role) => {
+        const normalizedLabel = role.label.toLowerCase();
+        const hasManagerOrAdminLabel =
+          normalizedLabel.includes('manager') ||
+          normalizedLabel.includes('admin') ||
+          normalizedLabel.includes('superadmin') ||
+          normalizedLabel.includes('super admin');
+
+        return (
+          role.standardId === ADMIN_ROLE.standardId ||
+          role.canUpdateAllSettings ||
+          hasManagerOrAdminLabel
+        );
+      })
+      .map((role) => role.id);
+
+    if (managerRoleIds.length === 0) {
+      return [];
+    }
+
+    const userWorkspaceIdsByRole = await Promise.all(
+      managerRoleIds.map((roleId) =>
+        this.userRoleService.getUserWorkspaceIdsAssignedToRole(roleId, workspaceId),
+      ),
+    );
+
+    const userWorkspaceIds = Array.from(new Set(userWorkspaceIdsByRole.flat()));
+
+    if (userWorkspaceIds.length === 0) {
+      return [];
+    }
+
+    const userWorkspaces = await this.userWorkspaceRepository.find({
+      where: { id: In(userWorkspaceIds) },
+    });
+
+    const userIds = userWorkspaces.map((userWorkspace) => userWorkspace.userId);
+
+    if (userIds.length === 0) {
+      return [];
+    }
+
+    return this.globalWorkspaceOrmManager.executeInWorkspaceContext(
+      authContext,
+      async () => {
+        const workspaceMemberRepository =
+          await this.globalWorkspaceOrmManager.getRepository<WorkspaceMemberWorkspaceEntity>(
+            workspaceId,
+            'workspaceMember',
+            { shouldBypassPermissionChecks: true },
+          );
+
+        const members = await workspaceMemberRepository.find({
+          where: {
+            userId: In(userIds),
+          },
+        });
+
+        return members.map((member) => member.id);
+      },
+    );
+  }
+
+  private getAvailabilityStartTime(
+    member: WorkspaceMemberWorkspaceEntity,
+  ): string {
+    return member.availabilityStartTime ?? '00:00';
+  }
+
+  private getAvailabilityEndTime(member: WorkspaceMemberWorkspaceEntity): string {
+    return (
+      member.availabilityEndTime ??
+      this.getEndTimeFromAvailabilityHours(member.availabilityHours)
+    );
+  }
+
+  private getEndTimeFromAvailabilityHours(availabilityHours: number | null | undefined) {
+    const hours = Number.isFinite(availabilityHours) ? Number(availabilityHours) : 24;
+    const boundedHours = Math.min(24, Math.max(1, Math.round(hours)));
+
+    return `${String(boundedHours).padStart(2, '0')}:00`;
+  }
+
+  private getAvailableDays(member: WorkspaceMemberWorkspaceEntity): string[] {
+    return member.availableDays?.length
+      ? member.availableDays
+      : [...WEEKDAY_KEYS];
+  }
+
+  private computeAvailabilityStatus(member: WorkspaceMemberWorkspaceEntity): {
+    status: 'ACTIVE' | 'INACTIVE';
+    reason: 'AVAILABLE' | 'LEAVE' | 'UNAVAILABLE_DAY' | 'UNAVAILABLE_HOURS';
+  } {
+    const now = new Date();
+    const weekday = this.getWeekdayFromDate(now);
+
+    const availableDays = this.getAvailableDays(member);
+    const isAvailableToday = availableDays.includes(weekday);
+
+    const leaveStartTimestamp = member.leaveStartDate
+      ? new Date(member.leaveStartDate).getTime()
+      : Number.NaN;
+    const leaveEndTimestamp = member.leaveEndDate
+      ? new Date(member.leaveEndDate).getTime()
+      : Number.NaN;
+    const hasLeaveWindow =
+      !Number.isNaN(leaveStartTimestamp) && !Number.isNaN(leaveEndTimestamp);
+    const isOnLeave =
+      hasLeaveWindow &&
+      now.getTime() >= leaveStartTimestamp &&
+      now.getTime() <= leaveEndTimestamp;
+
+    if (isOnLeave) {
+      return { status: 'INACTIVE', reason: 'LEAVE' };
+    }
+
+    if (!isAvailableToday) {
+      return { status: 'INACTIVE', reason: 'UNAVAILABLE_DAY' };
+    }
+
+    const availabilityStartTime = this.getAvailabilityStartTime(member);
+    const availabilityEndTime = this.getAvailabilityEndTime(member);
+    const startMinutes = this.parseAvailabilityTimeToMinutes(
+      availabilityStartTime,
+      false,
+    );
+    const endMinutes = this.parseAvailabilityTimeToMinutes(
+      availabilityEndTime,
+      true,
+    );
+    const currentMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
+    const isWithinTimeWindow =
+      currentMinutes >= startMinutes && currentMinutes < endMinutes;
+
+    if (!isWithinTimeWindow) {
+      return { status: 'INACTIVE', reason: 'UNAVAILABLE_HOURS' };
+    }
+
+    return { status: 'ACTIVE', reason: 'AVAILABLE' };
+  }
+
+  private isValidAvailabilityTime(value: string, allow24HourBoundary: boolean) {
+    if (allow24HourBoundary && value === '24:00') {
+      return true;
+    }
+
+    return TIME_24H_REGEX.test(value);
+  }
+
+  private parseAvailabilityTimeToMinutes(
+    value: string,
+    allow24HourBoundary: boolean,
+  ): number {
+    if (allow24HourBoundary && value === '24:00') {
+      return 24 * 60;
+    }
+
+    if (!TIME_24H_REGEX.test(value)) {
+      return allow24HourBoundary ? 24 * 60 : 0;
+    }
+
+    const [hours, minutes] = value.split(':').map(Number);
+
+    return hours * 60 + minutes;
+  }
+
+  private getMissingWorkspaceMemberMetadataFields(
+    error: unknown,
+  ): Set<keyof WorkspaceMemberWorkspaceEntity> {
+    const getMessagesArray = (value: unknown) =>
+      Array.isArray(value) ? value.filter((entry) => typeof entry === 'string') : [];
+
+    const errorObject =
+      typeof error === 'object' && error !== null
+        ? (error as Record<string, unknown>)
+        : null;
+    const responseObject =
+      errorObject && typeof errorObject.response === 'object' && errorObject.response !== null
+        ? (errorObject.response as Record<string, unknown>)
+        : null;
+
+    const rawMessage =
+      error instanceof Error
+        ? error.message
+        : typeof error === 'string'
+          ? error
+          : '';
+
+    const flattenedMessages = [
+      rawMessage,
+      ...getMessagesArray(responseObject?.messages),
+      ...getMessagesArray(errorObject?.messages),
+      (() => {
+        try {
+          return JSON.stringify(error);
+        } catch {
+          return '';
+        }
+      })(),
+    ]
+      .filter(Boolean)
+      .join(' ');
+
+    const missingFields = new Set<keyof WorkspaceMemberWorkspaceEntity>();
+
+    if (flattenedMessages.includes('availabilityStartTime')) {
+      missingFields.add('availabilityStartTime');
+    }
+
+    if (flattenedMessages.includes('availabilityEndTime')) {
+      missingFields.add('availabilityEndTime');
+    }
+
+    if (flattenedMessages.includes('availabilityHours')) {
+      missingFields.add('availabilityHours');
+    }
+
+    if (flattenedMessages.includes('availableDays')) {
+      missingFields.add('availableDays');
+    }
+
+    return missingFields;
+  }
+
+  private getWeekdayFromDate(date: Date): WeekdayKey {
+    const dateDay = date.getUTCDay();
+
+    const weekdayByIndex: Record<number, WeekdayKey> = {
+      0: 'SUNDAY',
+      1: 'MONDAY',
+      2: 'TUESDAY',
+      3: 'WEDNESDAY',
+      4: 'THURSDAY',
+      5: 'FRIDAY',
+      6: 'SATURDAY',
+    };
+
+    return weekdayByIndex[dateDay];
+  }
+
+  // Assigns leads round-robin among active members only. Does not balance by current lead count.
   private async getAssigneeByLoadBalance(
     workspaceId: string,
     authContext: WorkspaceAuthContext,
@@ -117,7 +842,7 @@ export class LeadWebhookService {
     assigneeId: string | null;
     memberCount: number;
     currentIndex: number;
-    allMembers: Array<{ id: string; name: string; taskCount: number }>;
+    allMembers: Array<{ id: string; name: string; leadCount: number }>;
   }> {
     try {
       // Get workspace entity from core schema
@@ -130,8 +855,8 @@ export class LeadWebhookService {
         return { assigneeId: null, memberCount: 0, currentIndex: -1, allMembers: [] };
       }
 
-      // Get all workspace members and their task counts
-      const { members, taskCounts } =
+      // Get all workspace members, their lead counts, and total lead count for round-robin
+      const { members, leadCounts, totalLeadCount } =
         await this.globalWorkspaceOrmManager.executeInWorkspaceContext(
           authContext,
           async () => {
@@ -144,29 +869,33 @@ export class LeadWebhookService {
 
             const allMembers = await workspaceMemberRepository.find();
 
-            // Get task repository to count tasks per assignee
-            const taskRepository =
+            const leadRepository =
               await this.globalWorkspaceOrmManager.getRepository(
                 workspaceId,
-                'task',
+                'lead',
                 { shouldBypassPermissionChecks: true },
               );
 
-            // Count tasks for each member
+            const totalCount = await leadRepository.count();
+
             const counts: Record<string, number> = {};
             for (const member of allMembers) {
-              const count = await taskRepository.count({
+              const count = await leadRepository.count({
                 where: { assigneeId: member.id },
               });
               counts[member.id] = count;
             }
 
-            return { members: allMembers, taskCounts: counts };
+            return {
+              members: allMembers,
+              leadCounts: counts,
+              totalLeadCount: totalCount,
+            };
           },
         );
 
       this.logger.log(
-        `[Load Balance] Found ${members?.length || 0} workspace members`,
+        `[Lead Assignment] Found ${members?.length || 0} workspace members`,
       );
 
       if (!Array.isArray(members) || members.length === 0) {
@@ -176,111 +905,165 @@ export class LeadWebhookService {
         return { assigneeId: null, memberCount: 0, currentIndex: -1, allMembers: [] };
       }
 
-      // Filter out System Admin and build member info with task counts
-      const eligibleMembers = members
+      const salesMemberIds = await this.getSalesWorkspaceMemberIds(
+        workspaceId,
+        authContext,
+      );
+      const shouldRestrictToSalesMembers = salesMemberIds.length > 0;
+
+      const baseEligibleMembers = members
         .filter((member) => {
           const fullName = `${member.name?.firstName || ''} ${member.name?.lastName || ''}`.trim();
-          // Exclude "System Admin" or members with no name
-          return fullName.toLowerCase() !== 'system admin' && fullName !== '';
+          const availabilityStatus = this.computeAvailabilityStatus(member);
+
+          // Exclude "System Admin", unnamed members, and currently inactive members.
+          return (
+            fullName.toLowerCase() !== 'system admin' &&
+            fullName !== '' &&
+            availabilityStatus.status === 'ACTIVE'
+          );
         })
         .map((member) => ({
           id: member.id,
           name: `${member.name?.firstName || ''} ${member.name?.lastName || ''}`.trim(),
-          taskCount: taskCounts[member.id] || 0,
+          leadCount: leadCounts[member.id] || 0,
+          availabilityStartTime: this.getAvailabilityStartTime(member),
+          availabilityEndTime: this.getAvailabilityEndTime(member),
+          availableDays: this.getAvailableDays(member),
         }));
 
+      const eligibleSalesMembers = shouldRestrictToSalesMembers
+        ? baseEligibleMembers.filter((member) => salesMemberIds.includes(member.id))
+        : baseEligibleMembers;
+
       // Log all members for debugging
-      this.logger.log(`[Load Balance] Eligible members (excluding System Admin):`);
-      eligibleMembers.forEach((member) => {
+      this.logger.log(
+        `[Lead Assignment] Eligible members (active, excluding System Admin):`,
+      );
+      baseEligibleMembers.forEach((member) => {
         this.logger.log(
-          `  - ${member.name}: ${member.taskCount} tasks`,
+          `  - ${member.name}: ${member.leadCount} leads, ${member.availabilityStartTime}-${member.availabilityEndTime}`,
         );
       });
 
-      if (eligibleMembers.length === 0) {
-        this.logger.warn(
-          `No eligible members found (all are System Admin or unnamed)`,
+      let selectedPool = eligibleSalesMembers;
+      let selectedPoolLabel = shouldRestrictToSalesMembers ? 'sales' : 'all';
+
+      if (shouldRestrictToSalesMembers && eligibleSalesMembers.length === 0) {
+        const managerMemberIds = await this.getManagerWorkspaceMemberIds(
+          workspaceId,
+          authContext,
         );
-        return { assigneeId: null, memberCount: 0, currentIndex: -1, allMembers: eligibleMembers };
+
+        const eligibleManagerMembers = baseEligibleMembers.filter((member) =>
+          managerMemberIds.includes(member.id),
+        );
+
+        if (eligibleManagerMembers.length > 0) {
+          selectedPool = eligibleManagerMembers;
+          selectedPoolLabel = 'manager';
+          this.logger.warn(
+            `[Lead Assignment] No available sales members. Falling back to available managers.`,
+          );
+        } else {
+          this.logger.warn(
+            `[Lead Assignment] No available sales members and no available managers.`,
+          );
+          throw new ServiceUnavailableException(
+            'No sales team members are currently available to accept leads, and no manager is currently available. ' +
+              'Try again later or update team availability and leave in Settings.',
+          );
+        }
       }
 
-      // Find member with fewest tasks (load balancing)
-      const sortedMembers = [...eligibleMembers].sort(
-        (a, b) => a.taskCount - b.taskCount,
+      if (selectedPool.length === 0) {
+        throw new ServiceUnavailableException(
+          'No team members are currently available to accept leads. ' +
+            'Try again later or update team availability and leave in Settings.',
+        );
+      }
+
+      // Equal distribution among active members: stable order by id, then round-robin by total lead count
+      const orderedPool = [...selectedPool].sort((a, b) =>
+        a.id.localeCompare(b.id),
       );
-      const selectedMember = sortedMembers[0];
+      const roundRobinIndex = totalLeadCount % orderedPool.length;
+      const selectedMember = orderedPool[roundRobinIndex];
 
       this.logger.log(
-        `[Load Balance] Selected ${selectedMember.name} (${selectedMember.taskCount} tasks - lowest)`,
+        `[Lead Assignment] Selected ${selectedMember.name} (round-robin ${roundRobinIndex + 1}/${orderedPool.length}) from ${selectedPoolLabel}`,
       );
 
       return {
         assigneeId: selectedMember.id,
-        memberCount: eligibleMembers.length,
-        currentIndex: eligibleMembers.findIndex((m) => m.id === selectedMember.id),
-        allMembers: eligibleMembers,
+        memberCount: selectedPool.length,
+        currentIndex: selectedPool.findIndex((m) => m.id === selectedMember.id),
+        allMembers: selectedPool,
       };
     } catch (error) {
-      this.logger.error('Failed to get assignee via load balance', error);
+      if (error instanceof ServiceUnavailableException) {
+        throw error;
+      }
+
+      this.logger.error('Failed to get assignee from active pool', error);
       return { assigneeId: null, memberCount: 0, currentIndex: -1, allMembers: [] };
     }
   }
 
-  private async findOrCreatePerson(
+  private async findOrCreateCustomer(
     personData: CreateLeadWithPersonDto['person'],
     authContext: WorkspaceAuthContext,
   ): Promise<any> {
     const primaryEmail = personData?.emails?.[0]?.email;
     const primaryPhone = personData?.phones?.[0]?.number;
 
-    // Try to find existing person by email first
     if (primaryEmail) {
-      const existingPerson = await this.findPersonByEmail(primaryEmail, authContext);
-      if (existingPerson) {
-        this.logger.log(`[FindOrCreatePerson] Found existing person by email: ${primaryEmail}, id: ${existingPerson.id}`);
-        return existingPerson;
+      const existing = await this.findCustomerByEmail(primaryEmail, authContext);
+      if (existing) {
+        this.logger.log(
+          `[FindOrCreateCustomer] Found existing customer by email: ${primaryEmail}, id: ${existing.id}`,
+        );
+        return existing;
       }
     }
 
-    // Try to find existing person by phone number
     if (primaryPhone) {
-      const existingPerson = await this.findPersonByPhone(primaryPhone, authContext);
-      if (existingPerson) {
-        this.logger.log(`[FindOrCreatePerson] Found existing person by phone: ${primaryPhone}, id: ${existingPerson.id}`);
-        return existingPerson;
+      const existing = await this.findCustomerByPhone(primaryPhone, authContext);
+      if (existing) {
+        this.logger.log(
+          `[FindOrCreateCustomer] Found existing customer by phone: ${primaryPhone}, id: ${existing.id}`,
+        );
+        return existing;
       }
     }
 
-    // Person not found, create a new one
-    this.logger.log(`[FindOrCreatePerson] Creating new person with email: ${primaryEmail || 'none'}, phone: ${primaryPhone || 'none'}`);
+    this.logger.log(
+      `[FindOrCreateCustomer] Creating new customer with email: ${primaryEmail || 'none'}, phone: ${primaryPhone || 'none'}`,
+    );
 
     const { queryRunnerContext, selectedFields } =
       await this.commonApiContextBuilder.build({
         authContext,
-        objectName: 'person',
+        objectName: 'customer',
       });
 
-    // Build person payload using standard Person fields
-    const personPayload: any = {};
+    const customerPayload: Record<string, unknown> = {};
 
     if (personData?.name) {
-      personPayload.name = {
-        firstName: personData.name.firstName || '',
-        lastName: personData.name.lastName || '',
-      };
+      const firstName = personData.name.firstName?.trim() || '';
+      const lastName = personData.name.lastName?.trim() || '';
+      customerPayload.name = [firstName, lastName].filter(Boolean).join(' ') || null;
     }
 
     if (personData?.emails && personData.emails.length > 0) {
-      // Standard person emails format: { primaryEmail, additionalEmails }
-      personPayload.emails = {
+      customerPayload.emails = {
         primaryEmail: personData.emails[0].email,
         additionalEmails: personData.emails.slice(1).map((e) => e.email),
       };
     }
 
     if (personData?.phones && personData.phones.length > 0) {
-      // Standard person phones format: { primaryPhoneNumber, primaryPhoneCountryCode, additionalPhones }
-      personPayload.phones = {
+      customerPayload.phones = {
         primaryPhoneNumber: personData.phones[0].number,
         primaryPhoneCountryCode: '',
         additionalPhones: personData.phones
@@ -289,63 +1072,53 @@ export class LeadWebhookService {
       };
     }
 
-    if (personData?.jobTitle) {
-      personPayload.jobTitle = personData.jobTitle;
-    }
-
-    if (personData?.city) {
-      personPayload.city = personData.city;
-    }
-
-    const createdPerson = await this.commonCreateOneQueryRunnerService.execute(
+    const createdCustomer = await this.commonCreateOneQueryRunnerService.execute(
       {
-        data: personPayload,
+        data: customerPayload,
         selectedFields,
       },
       queryRunnerContext,
     );
 
-    this.logger.log(`[FindOrCreatePerson] Created new person: ${createdPerson.id}`);
+    this.logger.log(
+      `[FindOrCreateCustomer] Created new customer: ${createdCustomer.id}`,
+    );
 
-    return createdPerson;
+    return createdCustomer;
   }
 
-  private async findPersonByEmail(
+  private async findCustomerByEmail(
     email: string,
     authContext: WorkspaceAuthContext,
   ): Promise<any | null> {
     try {
       const workspaceId = authContext.workspace.id;
 
-      const existingPerson =
+      const existing =
         await this.globalWorkspaceOrmManager.executeInWorkspaceContext(
           authContext,
           async () => {
-            const personRepository =
+            const customerRepository =
               await this.globalWorkspaceOrmManager.getRepository(
                 workspaceId,
-                'person',
+                'customer',
                 { shouldBypassPermissionChecks: true },
               );
 
-            // Search for person with matching primary email
-            // The emails field is a composite type with primaryEmail
-            const persons = await personRepository.find();
+            const customers = await customerRepository.find();
+            const emailLower = email.toLowerCase();
 
-            // Find person with matching email (check primaryEmail in the emails composite field)
-            const found = persons.find((person: any) => {
-              const personEmails = person.emails;
-              if (!personEmails) return false;
+            const found = customers.find((customer: any) => {
+              const emails = customer.emails ?? customer.email;
+              if (!emails) return false;
 
-              // Check primaryEmail
-              if (personEmails.primaryEmail?.toLowerCase() === email.toLowerCase()) {
-                return true;
-              }
+              const primary = emails.primaryEmail ?? emails.primary;
+              if (primary?.toLowerCase() === emailLower) return true;
 
-              // Check additionalEmails
-              if (Array.isArray(personEmails.additionalEmails)) {
-                return personEmails.additionalEmails.some(
-                  (e: string) => e.toLowerCase() === email.toLowerCase(),
+              const additional = emails.additionalEmails ?? emails.additional;
+              if (Array.isArray(additional)) {
+                return additional.some(
+                  (e: string) => e?.toLowerCase() === emailLower,
                 );
               }
 
@@ -356,55 +1129,61 @@ export class LeadWebhookService {
           },
         );
 
-      return existingPerson;
+      return existing;
     } catch (error: any) {
-      this.logger.error(`[FindPersonByEmail] Failed: ${error?.message || error}`);
+      this.logger.error(
+        `[FindCustomerByEmail] Failed: ${error?.message || error}`,
+      );
       return null;
     }
   }
 
-  private async findPersonByPhone(
+  private async findCustomerByPhone(
     phone: string,
     authContext: WorkspaceAuthContext,
   ): Promise<any | null> {
     try {
       const workspaceId = authContext.workspace.id;
 
-      // Normalize phone number (remove spaces, dashes, etc.)
       const normalizedPhone = phone.replace(/[\s\-\(\)]/g, '');
 
-      const existingPerson =
+      const existing =
         await this.globalWorkspaceOrmManager.executeInWorkspaceContext(
           authContext,
           async () => {
-            const personRepository =
+            const customerRepository =
               await this.globalWorkspaceOrmManager.getRepository(
                 workspaceId,
-                'person',
+                'customer',
                 { shouldBypassPermissionChecks: true },
               );
 
-            const persons = await personRepository.find();
+            const customers = await customerRepository.find();
 
-            // Find person with matching phone number
-            const found = persons.find((person: any) => {
-              const personPhones = person.phones;
-              if (!personPhones) return false;
+            const found = customers.find((customer: any) => {
+              const phones = customer.phones ?? customer.phone;
+              if (!phones) return false;
 
-              // Normalize and check primaryPhoneNumber
-              const primaryPhone = personPhones.primaryPhoneNumber?.replace(/[\s\-\(\)]/g, '');
-              if (primaryPhone && primaryPhone.includes(normalizedPhone)) {
+              const primary =
+                phones.primaryPhoneNumber ?? phones.primary;
+              const primaryNorm = primary?.replace(/[\s\-\(\)]/g, '');
+              if (primaryNorm && primaryNorm.includes(normalizedPhone)) {
                 return true;
               }
-              if (primaryPhone && normalizedPhone.includes(primaryPhone)) {
+              if (primaryNorm && normalizedPhone.includes(primaryNorm)) {
                 return true;
               }
 
-              // Check additionalPhones
-              if (Array.isArray(personPhones.additionalPhones)) {
-                return personPhones.additionalPhones.some((p: any) => {
-                  const num = (p.number || p)?.replace(/[\s\-\(\)]/g, '');
-                  return num && (num.includes(normalizedPhone) || normalizedPhone.includes(num));
+              const additional =
+                phones.additionalPhones ?? phones.additional;
+              if (Array.isArray(additional)) {
+                return additional.some((p: any) => {
+                  const num = (p?.number ?? p)?.replace(/[\s\-\(\)]/g, '');
+                  return (
+                    num &&
+                    (num.includes(normalizedPhone) ||
+                      normalizedPhone.includes(num))
+                  );
                 });
               }
 
@@ -415,9 +1194,11 @@ export class LeadWebhookService {
           },
         );
 
-      return existingPerson;
+      return existing;
     } catch (error: any) {
-      this.logger.error(`[FindPersonByPhone] Failed: ${error?.message || error}`);
+      this.logger.error(
+        `[FindCustomerByPhone] Failed: ${error?.message || error}`,
+      );
       return null;
     }
   }
@@ -571,7 +1352,6 @@ export class LeadWebhookService {
     leadData: {
       title: string;
       body?: string;
-      status: string;
       dueDate?: string;
       assigneeId?: string | null;
       customerId?: string | null;
@@ -580,69 +1360,126 @@ export class LeadWebhookService {
     },
     authContext: WorkspaceAuthContext,
   ): Promise<any> {
-    // Using 'task' object - the Leads object has relations configured on Task
-    const { queryRunnerContext, selectedFields } =
+    const {
+      queryRunnerContext,
+      selectedFields,
+      flatObjectMetadata,
+      flatFieldMetadataMaps,
+    } =
       await this.commonApiContextBuilder.build({
         authContext,
-        objectName: 'task',
+        objectName: 'lead',
       });
 
-    // Build task payload
-    const taskPayload: any = {
-      title: leadData.title,
+    const statusField = Object.values(flatFieldMetadataMaps.byId).find(
+      (field: any) =>
+        field.objectMetadataId === flatObjectMetadata.id &&
+        field.name === 'status',
+    );
+
+    let statusValue: string | undefined;
+
+    if (
+      statusField &&
+      Array.isArray(statusField.options) &&
+      statusField.options.length > 0
+    ) {
+      const options = statusField.options as Array<{
+        value: string;
+        label?: string;
+      }>;
+
+      const preferredOption = options.find((option) => {
+        const valueLower = option.value.toLowerCase();
+        const labelLower = option.label?.toLowerCase();
+
+        return valueLower === 'new' || labelLower === 'new';
+      });
+
+      statusValue = (preferredOption ?? options[0]).value;
+    }
+
+    const leadPayload: Record<string, unknown> = {
+      name: leadData.title,
     };
 
-    // Task uses bodyV2 (Rich Text V2) - only set markdown, blocknote is auto-generated
+    if (isDefined(statusValue)) {
+      leadPayload.status = statusValue;
+    }
+
     if (leadData.body) {
-      taskPayload.bodyV2 = {
+      // Plain text body (existing field)
+      leadPayload.body = leadData.body;
+      // Rich-text notes field (RICH_TEXT_V2) mirroring Task body
+      leadPayload.notes = {
         markdown: leadData.body,
       };
     }
 
-    // Task status uses: TODO, IN_PROGRESS, DONE (not custom statuses)
-    if (leadData.status) {
-      const statusMap: Record<string, string> = {
-        New: 'TODO',
-        'In Progress': 'IN_PROGRESS',
-        Done: 'DONE',
-        Completed: 'DONE',
-      };
-      taskPayload.status = statusMap[leadData.status] || 'TODO';
-    }
-
     if (leadData.dueDate) {
-      taskPayload.dueAt = leadData.dueDate;
+      leadPayload.dueDate = leadData.dueDate;
     }
 
-    // Task uses assignee relation
     if (leadData.assigneeId) {
-      taskPayload.assigneeId = leadData.assigneeId;
+      leadPayload.assigneeId = leadData.assigneeId;
     }
 
-    // Link to customer (person)
     if (leadData.customerId) {
-      taskPayload.customerId = leadData.customerId;
+      leadPayload.customerId = leadData.customerId;
     }
 
-    // Origins relation -> originsId (or try origin/originId)
     if (leadData.originId) {
-      taskPayload.originId = leadData.originId;
+      leadPayload.originId = leadData.originId;
     }
 
     if (leadData.propertyId) {
-      taskPayload.propertyId = leadData.propertyId;
+      leadPayload.propertyId = leadData.propertyId;
     }
 
-    const createdTask = await this.commonCreateOneQueryRunnerService.execute(
+    const createdLead = await this.commonCreateOneQueryRunnerService.execute(
       {
-        data: taskPayload,
+        data: leadPayload,
         selectedFields,
       },
       queryRunnerContext,
     );
 
-    this.logger.log(`[CreateLead] Created: ${JSON.stringify(createdTask)}`);
+    this.logger.log(`[CreateLead] Created: ${JSON.stringify(createdLead)}`);
 
-    return createdTask;
+    return createdLead;
+  }
+
+  private async generateNextLeadTitle(
+    authContext: WorkspaceAuthContext,
+  ): Promise<string> {
+    try {
+      const workspaceId = authContext.workspace.id;
+
+      const nextIndex = await this.globalWorkspaceOrmManager.executeInWorkspaceContext(
+        authContext,
+        async () => {
+          const leadRepository =
+            await this.globalWorkspaceOrmManager.getRepository(
+              workspaceId,
+              'lead',
+              { shouldBypassPermissionChecks: true },
+            );
+
+          const existingCount = await leadRepository.count({
+
+          });
+
+          return existingCount + 1;
+        },
+      );
+
+      return `SFS-${nextIndex}`;
+    } catch (error) {
+      this.logger.error(
+        '[GenerateNextLeadTitle] Failed, falling back to SFS-1',
+        error,
+      );
+      return 'SFS-1';
+    }
   }
 }

@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 import { MemberEmailField } from '@/settings/members/components/MemberEmailField';
 import { MemberNameFields } from '@/settings/members/components/MemberNameFields';
+import { MemberSalesAvailabilitySection } from '@/settings/members/components/MemberSalesAvailabilitySection';
 import { WorkspaceMemberPictureUploader } from '@/settings/workspace-member/components/WorkspaceMemberPictureUploader';
 import { type WorkspaceMember } from '@/workspace-member/types/WorkspaceMember';
 import { t } from '@lingui/core/macro';
@@ -15,6 +16,8 @@ type MemberInfosTabProps = {
   onNameChange: (firstName: string, lastName: string) => void;
   onImpersonate?: () => void;
   onDelete: () => void;
+  isSalesMember: boolean;
+  canManageSalesSettings: boolean;
 };
 
 const StyledNameRow = styled.div`
@@ -33,6 +36,8 @@ export const MemberInfosTab = ({
   onNameChange,
   onImpersonate,
   onDelete,
+  isSalesMember,
+  canManageSalesSettings,
 }: MemberInfosTabProps) => {
   const [firstName, setFirstName] = useState(member.name.firstName);
   const [lastName, setLastName] = useState(member.name.lastName);
@@ -81,6 +86,12 @@ export const MemberInfosTab = ({
         />
         <MemberEmailField email={member.userEmail} />
       </Section>
+
+      <MemberSalesAvailabilitySection
+        member={member}
+        isSalesMember={isSalesMember}
+        canEdit={canManageSalesSettings}
+      />
 
       <Section>
         <H2Title

@@ -4,6 +4,7 @@ import { useRelationField } from '@/object-record/record-field/ui/meta-types/hoo
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { getFieldMetadataItemById } from '@/object-metadata/utils/getFieldMetadataItemById';
+import { useObjectPermissionsForObject } from '@/object-record/hooks/useObjectPermissionsForObject';
 import { useAddNewRecordAndOpenRightDrawer } from '@/object-record/record-field/ui/meta-types/input/hooks/useAddNewRecordAndOpenRightDrawer';
 import { RecordFieldComponentInstanceContext } from '@/object-record/record-field/ui/states/contexts/RecordFieldComponentInstanceContext';
 import { recordFieldInputLayoutDirectionComponentState } from '@/object-record/record-field/ui/states/recordFieldInputLayoutDirectionComponentState';
@@ -12,6 +13,7 @@ import { SingleRecordPicker } from '@/object-record/record-picker/single-record-
 import { singleRecordPickerSelectedIdComponentState } from '@/object-record/record-picker/single-record-picker/states/singleRecordPickerSelectedIdComponentState';
 import { type RecordPickerPickableMorphItem } from '@/object-record/record-picker/types/RecordPickerPickableMorphItem';
 import { type ObjectRecord } from '@/object-record/types/ObjectRecord';
+import { useCurrentUserRole } from '@/auth/hooks/useCurrentUserRole';
 import { useAvailableComponentInstanceIdOrThrow } from '@/ui/utilities/state/component-state/hooks/useAvailableComponentInstanceIdOrThrow';
 import { useRecoilComponentValue } from '@/ui/utilities/state/component-state/hooks/useRecoilComponentValue';
 import { useSetRecoilComponentState } from '@/ui/utilities/state/component-state/hooks/useSetRecoilComponentState';
@@ -23,6 +25,7 @@ import { IconForbid } from 'twenty-ui/display';
 export const RelationManyToOneFieldInput = () => {
   const { t } = useLingui();
   const { fieldDefinition, recordId } = useRelationField<ObjectRecord>();
+  const { currentWorkspaceMemberId } = useCurrentUserRole();
 
   const { objectMetadataItems } = useObjectMetadataItems();
   const { fieldMetadataItem, objectMetadataItem } = getFieldMetadataItemById({
@@ -35,6 +38,13 @@ export const RelationManyToOneFieldInput = () => {
       'FIELD_METADATA_ITEM_OR_OBJECT_METADATA_ITEM_NOT_FOUND',
     );
   }
+  const objectPermissions = useObjectPermissionsForObject(objectMetadataItem.id);
+
+  const shouldRestrictToCurrentWorkspaceMember =
+    fieldMetadataItem.name === 'assignee' &&
+    fieldDefinition.metadata.relationObjectMetadataNameSingular ===
+      'workspaceMember' &&
+    objectPermissions.canReadOwnObjectRecordsOnly;
   const { onSubmit, onCancel } = useContext(FieldInputEventContext);
 
   const instanceId = useAvailableComponentInstanceIdOrThrow(
@@ -119,6 +129,11 @@ export const RelationManyToOneFieldInput = () => {
       objectNameSingulars={[
         fieldDefinition.metadata.relationObjectMetadataNameSingular,
       ]}
+      restrictToRecordId={
+        shouldRestrictToCurrentWorkspaceMember
+          ? currentWorkspaceMemberId
+          : undefined
+      }
       recordPickerInstanceId={instanceId}
       layoutDirection={
         layoutDirection === 'downward'

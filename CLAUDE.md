@@ -72,8 +72,8 @@ npx nx run twenty-server:database:migrate:prod # Run migrations
 # Generate migration
 npx nx run twenty-server:typeorm migration:generate src/database/typeorm/core/migrations/common/[name] -d src/database/typeorm/core/core.datasource.ts
 
-# Sync metadata
-npx nx run twenty-server:command workspace:sync-metadata
+# Upgrade workspaces (applies version migrations)
+npx nx run twenty-server:command upgrade
 ```
 
 ### GraphQL

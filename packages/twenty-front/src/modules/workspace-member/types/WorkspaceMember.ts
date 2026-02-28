@@ -26,6 +26,12 @@ export type WorkspaceMember = {
   timeFormat?: WorkspaceMemberTimeFormatEnum | null;
   numberFormat?: WorkspaceMemberNumberFormatEnum | null;
   calendarStartDay?: number | null;
+  availabilityHours?: number | null;
+  availabilityStartTime?: string | null;
+  availabilityEndTime?: string | null;
+  availableDays?: string[] | null;
+  leaveStartDate?: string | null;
+  leaveEndDate?: string | null;
 };
 
 export type WorkspaceInvitation = {

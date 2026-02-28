@@ -28,9 +28,34 @@ export class DataSeedWorkspaceCommand extends CommandRunner {
       for (const workspaceId of this.workspaceIds) {
         await this.devSeederService.seedDev(workspaceId);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(error);
-      this.logger.error(error.stack);
+      if (error instanceof Error) {
+        this.logger.error(error.stack);
+      }
+      const err = error as {
+        errors?: { metadata?: Error; workspaceSchema?: Error };
+        failedWorkspaceMigrationBuildResult?: unknown;
+      };
+      if (err.errors) {
+        if (err.errors.metadata) {
+          this.logger.error('Underlying metadata error:', err.errors.metadata);
+          this.logger.error(err.errors.metadata.stack);
+        }
+        if (err.errors.workspaceSchema) {
+          this.logger.error(
+            'Underlying workspaceSchema error:',
+            err.errors.workspaceSchema,
+          );
+          this.logger.error(err.errors.workspaceSchema.stack);
+        }
+      }
+      if (err.failedWorkspaceMigrationBuildResult) {
+        this.logger.error(
+          'Validation report:',
+          JSON.stringify(err.failedWorkspaceMigrationBuildResult, null, 2),
+        );
+      }
     }
   }
 }

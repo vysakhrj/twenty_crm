@@ -9,7 +9,7 @@ import {
   type RestrictedFieldsPermissions,
 } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
-import { Repository } from 'typeorm';
+import { type Repository } from 'typeorm';
 
 import { WorkspaceCacheProvider } from 'src/engine/workspace-cache/interfaces/workspace-cache-provider.service';
 
@@ -132,6 +132,37 @@ export class WorkspaceRolesPermissionsCacheService extends WorkspaceCacheProvide
           }
         }
 
+        const hasRowLevelRestrictionsForObject =
+          role.rowLevelPermissionPredicates.some(
+            (predicate) => predicate.objectMetadataId === objectMetadataId,
+          ) ||
+          role.rowLevelPermissionPredicateGroups.some(
+            (group) => group.objectMetadataId === objectMetadataId,
+          );
+        const isOwnRecordsOnlyLeadRole =
+          role.canReadOwnObjectRecordsOnly &&
+          objectMetadata.nameSingular === 'lead';
+
+        if (
+          (role.canReadOwnObjectRecordsOnly ||
+            hasRowLevelRestrictionsForObject ||
+            isOwnRecordsOnlyLeadRole) &&
+          canRead &&
+          !canUpdate
+        ) {
+          canUpdate = true;
+        }
+
+        if (isOwnRecordsOnlyLeadRole) {
+          for (const fieldId of Object.keys(restrictedFields)) {
+            restrictedFields[fieldId] = {
+              ...restrictedFields[fieldId],
+              canRead: true,
+              canUpdate: true,
+            };
+          }
+        }
+
         objectRecordsPermissions[objectMetadataId] = {
           canReadObjectRecords: canRead,
           canReadOwnObjectRecordsOnly: role.canReadOwnObjectRecordsOnly,
@@ -169,6 +200,7 @@ export class WorkspaceRolesPermissionsCacheService extends WorkspaceCacheProvide
       },
       select: [
         'id',
+        'nameSingular',
         'isSystem',
         'standardId',
         'labelIdentifierFieldMetadataId',

@@ -1,10 +1,12 @@
 import { type ColumnType } from 'typeorm';
 
+import { QUOTED_STRING_REGEX } from 'twenty-shared/constants';
+
 import { type FieldMetadataDefaultSerializableValue } from 'src/engine/metadata-modules/field-metadata/interfaces/field-metadata-default-value.interface';
 
 import {
-  FieldMetadataException,
-  FieldMetadataExceptionCode,
+    FieldMetadataException,
+    FieldMetadataExceptionCode,
 } from 'src/engine/metadata-modules/field-metadata/field-metadata.exception';
 import { isFunctionDefaultValue } from 'src/engine/metadata-modules/field-metadata/utils/is-function-default-value.util';
 import { serializeFunctionDefaultValue } from 'src/engine/metadata-modules/field-metadata/utils/serialize-function-default-value.util';
@@ -77,7 +79,13 @@ export const serializeDefaultValue = ({
 
       if (Array.isArray(defaultValue)) {
         const arrayValues = defaultValue
-          .map((val) => `'${removeSqlDDLInjection(val)}'`)
+          .map((val) => {
+            const rawVal =
+              typeof val === 'string' && QUOTED_STRING_REGEX.test(val)
+                ? val.replace(QUOTED_STRING_REGEX, '$1')
+                : String(val);
+            return `'${removeSqlDDLInjection(rawVal)}'`;
+          })
           .join(',');
 
         return `ARRAY[${arrayValues}]${castSuffix}[]`;

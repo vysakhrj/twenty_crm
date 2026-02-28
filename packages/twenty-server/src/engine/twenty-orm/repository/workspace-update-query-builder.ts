@@ -3,10 +3,10 @@ import { QUERY_MAX_RECORDS } from 'twenty-shared/constants';
 import { type ObjectsPermissions } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 import {
-  UpdateQueryBuilder,
-  type EntityTarget,
-  type ObjectLiteral,
-  type UpdateResult,
+    UpdateQueryBuilder,
+    type EntityTarget,
+    type ObjectLiteral,
+    type UpdateResult,
 } from 'typeorm';
 import { type QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import { type WhereClause } from 'typeorm/query-builder/WhereClause';
@@ -23,8 +23,8 @@ import { type RelationDisconnectQueryFieldsByEntityIndex } from 'src/engine/twen
 import { type WorkspaceEntityManager } from 'src/engine/twenty-orm/entity-manager/workspace-entity-manager';
 import { computeTwentyORMException } from 'src/engine/twenty-orm/error-handling/compute-twenty-orm-exception';
 import {
-  TwentyORMException,
-  TwentyORMExceptionCode,
+    TwentyORMException,
+    TwentyORMExceptionCode,
 } from 'src/engine/twenty-orm/exceptions/twenty-orm.exception';
 import { RelationNestedQueries } from 'src/engine/twenty-orm/relation-nested-queries/relation-nested-queries';
 import { validateQueryIsPermittedOrThrow } from 'src/engine/twenty-orm/repository/permissions.utils';
@@ -175,6 +175,7 @@ export class WorkspaceUpdateQueryBuilder<
         this.internalContext.flatFieldMetadataMaps,
       );
 
+      this.applyOwnRecordsOnlyFilter();
       this.applyRowLevelPermissionPredicates();
 
       const valuesSet = this.expressionMap.valuesSet ?? {};
@@ -352,6 +353,7 @@ export class WorkspaceUpdateQueryBuilder<
         this.expressionMap.valuesSet = input.partialEntity;
         this.where({ id: input.criteria });
 
+        this.applyOwnRecordsOnlyFilter();
         this.applyRowLevelPermissionPredicates();
 
         const beforeRecord = beforeRecordById.get(input.criteria);
@@ -538,6 +540,55 @@ export class WorkspaceUpdateQueryBuilder<
     }));
 
     return this;
+  }
+
+  private applyOwnRecordsOnlyFilter(): void {
+    if (this.shouldBypassPermissionChecks) {
+      return;
+    }
+
+    const mainAliasTarget = this.getMainAliasTarget();
+
+    const objectMetadata = getObjectMetadataFromEntityTarget(
+      mainAliasTarget,
+      this.internalContext,
+    );
+
+    const objectPermissions =
+      this.objectRecordsPermissions[objectMetadata.id ?? ''];
+
+    if (!objectPermissions?.canReadOwnObjectRecordsOnly) {
+      return;
+    }
+
+    const workspaceMemberId = this.authContext.workspaceMemberId;
+
+    if (!workspaceMemberId) {
+      return;
+    }
+
+    const allFields = Object.values(
+      this.internalContext.flatFieldMetadataMaps.byId,
+    );
+
+    const assigneeField = allFields.find(
+      (field) =>
+        field?.objectMetadataId === objectMetadata.id &&
+        field?.name === 'assignee',
+    );
+
+    if (!assigneeField) {
+      return;
+    }
+
+    const tableName = computeTableName(
+      objectMetadata.nameSingular,
+      objectMetadata.isCustom,
+    );
+
+    this.andWhere(`"${tableName}"."assigneeId" = :workspaceMemberId`, {
+      workspaceMemberId,
+    });
   }
 
   private applyRowLevelPermissionPredicates(): void {

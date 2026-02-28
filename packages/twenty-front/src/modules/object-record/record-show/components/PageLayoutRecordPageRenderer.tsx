@@ -34,6 +34,8 @@ const StyledContentContainer = styled.div<{ isInRightDrawer: boolean }>`
   background: ${({ theme }) => theme.background.primary};
   padding-bottom: ${({ theme, isInRightDrawer }) =>
     isInRightDrawer ? theme.spacing(16) : 0};
+  padding-left: ${({ theme }) => theme.spacing(4)};
+  padding-right: ${({ theme }) => theme.spacing(4)};
 `;
 
 export const PageLayoutRecordPageRenderer = ({

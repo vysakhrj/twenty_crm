@@ -45,8 +45,9 @@ export const TeamMemberFilterDropdown = ({
   const canReadOwnObjectRecordsOnly =
     objectPermissions?.canReadOwnObjectRecordsOnly ?? false;
 
-  // Only show for tasks and for managers/admins (not for members who see own records only)
-  if (objectMetadataItem.nameSingular !== 'task') {
+  const supportedObjects = ['task', 'lead'];
+
+  if (!supportedObjects.includes(objectMetadataItem.nameSingular)) {
     return null;
   }
 
@@ -65,6 +66,10 @@ export const TeamMemberFilterDropdown = ({
   const currentAssigneeFilter = currentRecordFilters.find(
     (filter) => filter.fieldMetadataId === assigneeField.id,
   );
+
+  const objectLabelPlural = objectMetadataItem.labelPlural ?? 'Tasks';
+  const allRecordsLabel = `All ${objectLabelPlural}`;
+  const myRecordsLabel = `My ${objectLabelPlural}`;
 
   const handleSelectMember = (memberId: string | null) => {
     // Remove existing assignee filter
@@ -105,14 +110,14 @@ export const TeamMemberFilterDropdown = ({
 
   const getSelectedMemberName = () => {
     if (!isDefined(currentAssigneeFilter)) {
-      return t`All Tasks`;
+      return allRecordsLabel;
     }
 
     try {
       const filterValue = JSON.parse(currentAssigneeFilter.value);
 
       if (filterValue.isCurrentWorkspaceMemberSelected) {
-        return t`My Tasks`;
+        return myRecordsLabel;
       }
 
       const selectedMemberId = filterValue.selectedRecordIds?.[0];
@@ -150,12 +155,12 @@ export const TeamMemberFilterDropdown = ({
             <DropdownMenuItemsContainer>
               <MenuItem
                 LeftIcon={IconUsers}
-                text={t`All Tasks`}
+                text={allRecordsLabel}
                 onClick={() => handleSelectMember(null)}
               />
               <MenuItem
                 LeftIcon={IconUser}
-                text={t`My Tasks`}
+                text={myRecordsLabel}
                 onClick={() => handleSelectMember(currentWorkspaceMemberId ?? '')}
               />
               {workspaceMembers

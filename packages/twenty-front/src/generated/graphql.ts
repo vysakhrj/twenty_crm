@@ -1019,6 +1019,7 @@ export type CreateRoleInput = {
   canBeAssignedToUsers?: InputMaybe<Scalars['Boolean']>;
   canDestroyAllObjectRecords?: InputMaybe<Scalars['Boolean']>;
   canReadAllObjectRecords?: InputMaybe<Scalars['Boolean']>;
+  canReadOwnObjectRecordsOnly?: InputMaybe<Scalars['Boolean']>;
   canSoftDeleteAllObjectRecords?: InputMaybe<Scalars['Boolean']>;
   canUpdateAllObjectRecords?: InputMaybe<Scalars['Boolean']>;
   canUpdateAllSettings?: InputMaybe<Scalars['Boolean']>;
@@ -3154,6 +3155,7 @@ export type ObjectPermission = {
   __typename?: 'ObjectPermission';
   canDestroyObjectRecords?: Maybe<Scalars['Boolean']>;
   canReadObjectRecords?: Maybe<Scalars['Boolean']>;
+  canReadOwnObjectRecordsOnly?: Maybe<Scalars['Boolean']>;
   canSoftDeleteObjectRecords?: Maybe<Scalars['Boolean']>;
   canUpdateObjectRecords?: Maybe<Scalars['Boolean']>;
   objectMetadataId: Scalars['UUID'];
@@ -4631,6 +4633,7 @@ export type UpdateRolePayload = {
   canBeAssignedToUsers?: InputMaybe<Scalars['Boolean']>;
   canDestroyAllObjectRecords?: InputMaybe<Scalars['Boolean']>;
   canReadAllObjectRecords?: InputMaybe<Scalars['Boolean']>;
+  canReadOwnObjectRecordsOnly?: InputMaybe<Scalars['Boolean']>;
   canSoftDeleteAllObjectRecords?: InputMaybe<Scalars['Boolean']>;
   canUpdateAllObjectRecords?: InputMaybe<Scalars['Boolean']>;
   canUpdateAllSettings?: InputMaybe<Scalars['Boolean']>;
@@ -5240,6 +5243,7 @@ export type WorkspaceInvitation = {
   email: Scalars['String'];
   expiresAt: Scalars['DateTime'];
   id: Scalars['UUID'];
+  value?: Maybe<Scalars['String']>;
 };
 
 export type WorkspaceInviteHashValidOutput = {

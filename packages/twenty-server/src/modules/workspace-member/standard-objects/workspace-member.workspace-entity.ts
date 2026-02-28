@@ -88,4 +88,10 @@ export class WorkspaceMemberWorkspaceEntity extends BaseWorkspaceEntity {
   ownedOpportunities: Relation<OpportunityWorkspaceEntity[]>;
   searchVector: string;
   numberFormat: string;
+  availabilityHours: number;
+  availabilityStartTime: string;
+  availabilityEndTime: string;
+  availableDays: string[];
+  leaveStartDate: string | null;
+  leaveEndDate: string | null;
 }

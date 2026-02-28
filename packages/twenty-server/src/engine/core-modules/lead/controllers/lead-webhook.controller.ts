@@ -1,7 +1,10 @@
 import {
   Body,
   Controller,
+  Get,
   Logger,
+  Param,
+  Patch,
   Post,
   Req,
   Res,
@@ -19,9 +22,7 @@ import { LeadWebhookService } from '../services/lead-webhook.service';
 
 export type CreateLeadWithPersonDto = {
   // Lead fields
-  title: string;
   body?: string;
-  status?: string;
   dueDate?: string;
   // Origin tracking (e.g., "website", "zapier", "meta_instagram", "meta_facebook", "google_ads")
   origin?: string;
@@ -54,6 +55,19 @@ export type CreateLeadWithPersonDto = {
   };
 };
 
+export type UpdateSalesAvailabilityDto = {
+  availabilityStartTime?: string;
+  availabilityEndTime?: string;
+  availableDays?: string[];
+};
+
+export type UpdateSalesLeaveDto = {
+  leaveDate?: string;
+  leaveStartDate?: string;
+  leaveEndDate?: string;
+  clearLeave?: boolean;
+};
+
 @Controller('api/lead/create-with-person')
 @UseGuards(JwtAuthGuard, WorkspaceAuthGuard, CustomPermissionGuard)
 @UseFilters(RestApiExceptionFilter)
@@ -62,6 +76,67 @@ export class LeadWebhookController {
 
   constructor(private readonly leadWebhookService: LeadWebhookService) {}
 
+  private getWorkspaceIdOrThrow(request: AuthenticatedRequest): string {
+    if (!request.workspaceId) {
+      throw new Error('workspaceId is required in the request');
+    }
+
+    return request.workspaceId;
+  }
+
+  @Get('sales-users/status')
+  async getSalesUsersStatus(@Req() request: AuthenticatedRequest, @Res() res: Response) {
+    const workspaceId = this.getWorkspaceIdOrThrow(request);
+
+    const salesUsers = await this.leadWebhookService.getSalesUsersStatus(
+      workspaceId,
+      request,
+    );
+
+    res.status(200).send({ data: salesUsers });
+  }
+
+  @Patch('sales-users/:workspaceMemberId/availability')
+  async updateSalesAvailability(
+    @Param('workspaceMemberId') workspaceMemberId: string,
+    @Body() body: UpdateSalesAvailabilityDto,
+    @Req() request: AuthenticatedRequest,
+    @Res() res: Response,
+  ) {
+    const workspaceId = this.getWorkspaceIdOrThrow(request);
+
+    const result = await this.leadWebhookService.updateSalesAvailability(
+      workspaceId,
+      workspaceMemberId,
+      body,
+      request,
+    );
+
+    res.status(200).send({ data: result });
+  }
+
+  @Patch('sales-users/:workspaceMemberId/leave')
+  async updateSalesLeave(
+    @Param('workspaceMemberId') workspaceMemberId: string,
+    @Body() body: UpdateSalesLeaveDto,
+    @Req() request: AuthenticatedRequest,
+    @Res() res: Response,
+  ) {
+    const workspaceId = this.getWorkspaceIdOrThrow(request);
+
+    const result = await this.leadWebhookService.updateSalesLeave(
+      workspaceId,
+      workspaceMemberId,
+      body,
+      request,
+    );
+
+    res.status(200).send({ data: result });
+  }
+
+  // Returns 503 only when no assignee is available:
+  // - If sales roles exist: tries available sales members first, then available managers.
+  // - If none exist: tries any available workspace members.
   @Post()
   async createLeadWithPerson(
     @Body() body: CreateLeadWithPersonDto,

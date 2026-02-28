@@ -1,4 +1,9 @@
-import { IconCheckbox, type IconComponent, IconNotes } from 'twenty-ui/display';
+import {
+  IconCheckbox,
+  type IconComponent,
+  IconNotes,
+  IconUserPlus,
+} from 'twenty-ui/display';
 export const getIconForObjectType = (
   objectType: string,
 ): IconComponent | undefined => {
@@ -7,6 +12,8 @@ export const getIconForObjectType = (
       return IconNotes;
     case 'task':
       return IconCheckbox;
+    case 'lead':
+      return IconUserPlus;
     default:
       return undefined;
   }

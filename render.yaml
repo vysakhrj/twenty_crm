@@ -1,0 +1,47 @@
+# Render Blueprint: Twenty CRM (Web Service + PostgreSQL + Redis)
+# After syncing, set SERVER_URL / FRONTEND_URL / REACT_APP_SERVER_BASE_URL to your
+# web service URL (e.g. https://twenty-crm.onrender.com) and set REDIS_URL from
+# the Key Value service's internal URL in the dashboard.
+
+databases:
+  - name: twenty-db
+    databaseName: mycrm
+    region: virginia
+    plan: starter
+
+services:
+  - type: web
+    runtime: docker
+    name: twenty_crm
+    region: virginia
+    dockerfilePath: packages/twenty-docker/twenty/Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PG_DATABASE_URL
+        fromDatabase:
+          name: twenty-db
+          property: connectionString
+      - key: REDIS_URL
+        sync: false
+      - key: SERVER_URL
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: REACT_APP_SERVER_BASE_URL
+        sync: false
+      - key: APP_SECRET
+        generateValue: true
+      - key: STORAGE_TYPE
+        value: local
+
+  - type: keyvalue
+    name: twenty-redis
+    region: virginia
+    plan: starter
+    ipAllowList:
+      - source: 0.0.0.0/0
+        description: allow-internal
+    maxmemoryPolicy: noeviction

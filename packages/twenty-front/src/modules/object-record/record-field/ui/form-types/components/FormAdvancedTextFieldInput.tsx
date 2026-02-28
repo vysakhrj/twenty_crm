@@ -34,10 +34,18 @@ const StyledAdvancedTextFieldFieldContainer = styled.div`
   flex-grow: 1;
 `;
 
-const StyledAdvancedTextFieldInnerContainer = styled.div`
+const StyledAdvancedTextFieldInnerContainer = styled.div<{
+  variant?: 'default' | 'inline';
+}>`
   flex-grow: 1;
-  background-color: ${({ theme }) => theme.background.transparent.lighter};
-  border: 1px solid ${({ theme }) => theme.border.color.medium};
+  background-color: ${({ theme, variant }) =>
+    variant === 'inline'
+      ? 'transparent'
+      : theme.background.transparent.lighter};
+  border: ${({ theme, variant }) =>
+    variant === 'inline'
+      ? `1px solid ${theme.border.color.light}`
+      : `1px solid ${theme.border.color.medium}`};
   border-radius: ${({ theme }) => theme.border.radius.sm};
 
   box-sizing: border-box;
@@ -90,6 +98,7 @@ type FormAdvancedTextFieldInputProps = {
   minHeight: number;
   maxWidth: number;
   contentType?: AdvancedTextEditorContentType;
+  variant?: 'default' | 'inline';
 };
 
 export const FormAdvancedTextFieldInput = ({
@@ -108,6 +117,7 @@ export const FormAdvancedTextFieldInput = ({
   minHeight,
   maxWidth,
   contentType = 'json',
+  variant = 'default',
 }: FormAdvancedTextFieldInputProps) => {
   const instanceId = useId();
   const isMobile = useIsMobile();
@@ -214,7 +224,7 @@ export const FormAdvancedTextFieldInput = ({
         {label ? <InputLabel>{label}</InputLabel> : null}
 
         <StyledAdvancedTextFieldFieldContainer>
-          <StyledAdvancedTextFieldInnerContainer>
+          <StyledAdvancedTextFieldInnerContainer variant={variant}>
             {!isFullScreen && (
               <AdvancedTextEditor
                 editor={editor}
@@ -224,7 +234,7 @@ export const FormAdvancedTextFieldInput = ({
               />
             )}
 
-            {enableFullScreen && (
+            {enableFullScreen && variant !== 'inline' && (
               <StyledEditorActionButtonContainer>
                 {!readonly && !isFullScreen && (
                   <StyledFullScreenButtonContainer

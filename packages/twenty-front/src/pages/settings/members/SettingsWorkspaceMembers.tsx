@@ -2,15 +2,17 @@ import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { isNonEmptyArray } from '@sniptt/guards';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { useDebounce } from 'use-debounce';
 
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
+import { useCurrentUserRole } from '@/auth/hooks/useCurrentUserRole';
 import { CoreObjectNameSingular } from '@/object-metadata/types/CoreObjectNameSingular';
 import { useFindManyRecords } from '@/object-record/hooks/useFindManyRecords';
+import { useSalesAvailability } from '@/settings/members/hooks/useSalesAvailability';
 import { SettingsPageContainer } from '@/settings/components/SettingsPageContainer';
 import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
@@ -118,6 +120,12 @@ export const SettingsWorkspaceMembers = () => {
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [searchFilter, setSearchFilter] = useState('');
   const currentWorkspaceMember = useRecoilValue(currentWorkspaceMemberState);
+  const { isAdmin } = useCurrentUserRole();
+  const {
+    salesStatusesByMemberId,
+    fetchSalesUsersStatus,
+    isLoadingSalesStatuses,
+  } = useSalesAvailability();
 
   const [debouncedSearchFilter] = useDebounce(searchFilter, 300);
 
@@ -173,6 +181,14 @@ export const SettingsWorkspaceMembers = () => {
   const handleSearchChange = (text: string) => {
     setSearchFilter(text);
   };
+
+  useEffect(() => {
+    if (!isAdmin) {
+      return;
+    }
+
+    void fetchSalesUsersStatus();
+  }, [fetchSalesUsersStatus, isAdmin]);
 
   useGetWorkspaceInvitationsQuery({
     onError: (error: ApolloError) => {
@@ -380,8 +396,8 @@ export const SettingsWorkspaceMembers = () => {
           </StyledSearchContainer>
           <StyledTable hasMoreRows={hasNextPage}>
             <TableRow
-              gridAutoColumns="150px 1fr 40px"
-              mobileGridAutoColumns="100px 1fr 32px"
+              gridAutoColumns={isAdmin ? '150px 1fr 130px 40px' : '150px 1fr 40px'}
+              mobileGridAutoColumns={isAdmin ? '100px 1fr 90px 32px' : '100px 1fr 32px'}
             >
               <TableHeader>
                 <Trans>Name</Trans>
@@ -389,14 +405,23 @@ export const SettingsWorkspaceMembers = () => {
               <TableHeader>
                 <Trans>Email</Trans>
               </TableHeader>
+              {isAdmin && (
+                <TableHeader>
+                  <Trans>Status</Trans>
+                </TableHeader>
+              )}
               <TableHeader align="right"></TableHeader>
             </TableRow>
             <StyledTableRows>
               {optimizedWorkspaceMembers.length > 0 ? (
                 optimizedWorkspaceMembers.map((workspaceMember) => (
                   <StyledClickableTableRow
-                    gridAutoColumns="150px 1fr 40px"
-                    mobileGridAutoColumns="100px 1fr 32px"
+                    gridAutoColumns={
+                      isAdmin ? '150px 1fr 130px 40px' : '150px 1fr 40px'
+                    }
+                    mobileGridAutoColumns={
+                      isAdmin ? '100px 1fr 90px 32px' : '100px 1fr 32px'
+                    }
                     key={workspaceMember.id}
                     onClick={() => {
                       if (currentWorkspaceMember?.id === workspaceMember.id) {
@@ -438,6 +463,31 @@ export const SettingsWorkspaceMembers = () => {
                         {workspaceMember.userEmail}
                       </StyledTextContainerWithEllipsis>
                     </TableCell>
+                    {isAdmin && (
+                      <TableCell>
+                        {salesStatusesByMemberId[workspaceMember.id]?.status ? (
+                          <Status
+                            color={
+                              salesStatusesByMemberId[workspaceMember.id].status
+                                .status === 'ACTIVE'
+                                ? 'green'
+                                : 'orange'
+                            }
+                            text={
+                              salesStatusesByMemberId[workspaceMember.id].status
+                                .status === 'ACTIVE'
+                                ? t`Active`
+                                : t`Inactive`
+                            }
+                          />
+                        ) : (
+                          <Status
+                            color="gray"
+                            text={isLoadingSalesStatuses ? t`...` : t`-`}
+                          />
+                        )}
+                      </TableCell>
+                    )}
                     <TableCell align="right">
                       <StyledChevronWrapper>
                         {currentWorkspaceMember?.id !== workspaceMember.id && (

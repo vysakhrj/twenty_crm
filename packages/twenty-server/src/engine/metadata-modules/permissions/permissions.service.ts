@@ -67,13 +67,16 @@ export class PermissionsService {
           ? roleOfUserWorkspace.canAccessAllTools
           : roleOfUserWorkspace.canUpdateAllSettings;
 
+        const hasExplicitFlag =
+          roleOfUserWorkspace.permissionFlags.some(
+            (permissionFlag) => permissionFlag.flag === feature,
+          ) ||
+          (feature === PermissionFlagType.UPLOAD_FILE &&
+            this.isSalesRole(roleOfUserWorkspace));
+
         return {
           ...acc,
-          [feature]:
-            hasBasePermission ||
-            roleOfUserWorkspace.permissionFlags.some(
-              (permissionFlag) => permissionFlag.flag === feature,
-            ),
+          [feature]: hasBasePermission || hasExplicitFlag,
         };
       },
       defaultSettingsPermissions,
@@ -219,6 +222,10 @@ export class PermissionsService {
     role: RoleEntity,
     setting: PermissionFlagType,
   ): boolean {
+    if (setting === PermissionFlagType.UPLOAD_FILE && this.isSalesRole(role)) {
+      return true;
+    }
+
     const hasBasePermission = this.isToolPermission(setting)
       ? role.canAccessAllTools
       : role.canUpdateAllSettings;
@@ -232,6 +239,10 @@ export class PermissionsService {
     return permissionFlags.some(
       (permissionFlag) => permissionFlag.flag === setting,
     );
+  }
+
+  private isSalesRole(role: RoleEntity): boolean {
+    return (role.label ?? '').toLowerCase().includes('sales');
   }
 
   private async getRolesFromPermissionConfig(
@@ -315,6 +326,10 @@ export class PermissionsService {
       const { roles, useIntersection } = result;
 
       const checkRoleHasPermission = (role: RoleEntity) => {
+        if (flag === PermissionFlagType.UPLOAD_FILE && this.isSalesRole(role)) {
+          return true;
+        }
+
         if (role.canAccessAllTools === true) {
           return true;
         }

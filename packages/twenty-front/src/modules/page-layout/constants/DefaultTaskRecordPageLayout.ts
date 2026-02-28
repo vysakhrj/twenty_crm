@@ -113,13 +113,6 @@ export const DEFAULT_TASK_RECORD_PAGE_LAYOUT: PageLayout = {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           deletedAt: null,
-          conditionalDisplay: {
-            and: [
-              {
-                '===': [{ var: 'device' }, 'DESKTOP'],
-              },
-            ],
-          },
         },
       ],
     },

@@ -20,12 +20,10 @@ export const RoleBasedRecordFilterEffect = () => {
   const [currentRecordFilters, setCurrentRecordFilters] =
     useRecoilComponentState(currentRecordFiltersComponentState);
 
-  // Get current view ID to track view changes
   const currentViewId = useRecoilComponentValue(
     contextStoreCurrentViewIdComponentState,
   );
 
-  // Check if view filters have been initialized
   const [hasInitializedCurrentRecordFilters] = useRecoilComponentFamilyState(
     hasInitializedCurrentRecordFiltersComponentFamilyState,
     {
@@ -33,17 +31,15 @@ export const RoleBasedRecordFilterEffect = () => {
     },
   );
 
-  // Track if we've applied the filter for the current view
-  const appliedForViewId = useRef<string | null>(null);
+  const filterIdRef = useRef<string | null>(null);
 
-  // Get permissions for the current object
   const objectPermissions = getObjectPermissions(objectMetadataItem.id);
   const canReadOwnObjectRecordsOnly =
     objectPermissions?.canReadOwnObjectRecordsOnly ?? false;
 
   useEffect(() => {
-    // Apply for Task and Lead objects for members who should see their own records only
     const supportedObjects = ['task', 'lead'];
+
     if (!supportedObjects.includes(objectMetadataItem.nameSingular)) {
       return;
     }
@@ -60,29 +56,10 @@ export const RoleBasedRecordFilterEffect = () => {
       return;
     }
 
-    // Wait for view filters to be initialized first
     if (!hasInitializedCurrentRecordFilters) {
       return;
     }
 
-    // Don't re-apply if already applied for this view
-    if (appliedForViewId.current === currentViewId) {
-      // But check if the filter still exists (might have been removed by view change)
-      const assigneeField = objectMetadataItem.fields.find(
-        (field) => field.name === 'assignee',
-      );
-      if (isDefined(assigneeField)) {
-        const existingAssigneeFilter = currentRecordFilters.find(
-          (filter) => filter.fieldMetadataId === assigneeField.id,
-        );
-        // If filter exists, we're good
-        if (isDefined(existingAssigneeFilter)) {
-          return;
-        }
-      }
-    }
-
-    // Find the assignee field
     const assigneeField = objectMetadataItem.fields.find(
       (field) => field.name === 'assignee',
     );
@@ -91,20 +68,22 @@ export const RoleBasedRecordFilterEffect = () => {
       return;
     }
 
-    // Check if assignee filter already exists
     const existingAssigneeFilter = currentRecordFilters.find(
       (filter) => filter.fieldMetadataId === assigneeField.id,
     );
 
     if (isDefined(existingAssigneeFilter)) {
-      // Mark as applied for this view
-      appliedForViewId.current = currentViewId;
+      filterIdRef.current = existingAssigneeFilter.id;
+
       return;
     }
 
-    // Create the "assignee is me" filter
+    const newFilterId = filterIdRef.current ?? v4();
+
+    filterIdRef.current = newFilterId;
+
     const assigneeFilter: RecordFilter = {
-      id: v4(),
+      id: newFilterId,
       fieldMetadataId: assigneeField.id,
       value: JSON.stringify({
         isCurrentWorkspaceMemberSelected: true,
@@ -117,7 +96,6 @@ export const RoleBasedRecordFilterEffect = () => {
     };
 
     setCurrentRecordFilters([...currentRecordFilters, assigneeFilter]);
-    appliedForViewId.current = currentViewId;
   }, [
     objectMetadataItem,
     canReadOwnObjectRecordsOnly,
@@ -128,10 +106,9 @@ export const RoleBasedRecordFilterEffect = () => {
     hasInitializedCurrentRecordFilters,
   ]);
 
-  // Reset when changing objects
   useEffect(() => {
     return () => {
-      appliedForViewId.current = null;
+      filterIdRef.current = null;
     };
   }, [objectMetadataItem.id]);
 
