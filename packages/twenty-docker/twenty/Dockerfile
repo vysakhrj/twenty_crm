@@ -39,6 +39,8 @@ ARG REACT_APP_SERVER_BASE_URL
 COPY ./packages/twenty-front /app/packages/twenty-front
 COPY ./packages/twenty-ui /app/packages/twenty-ui
 COPY ./packages/twenty-shared /app/packages/twenty-shared
+# Front build needs more heap to avoid OOM (matches twenty-front package.json)
+ENV NODE_OPTIONS="--max-old-space-size=8192"
 RUN npx nx build twenty-front
 
 

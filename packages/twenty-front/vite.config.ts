@@ -41,7 +41,6 @@ export default defineConfig(({ command, mode }) => {
     ? path.resolve(__dirname, './tsconfig.build.json')
     : path.resolve(__dirname, './tsconfig.json');
 
-  const CHUNK_SIZE_WARNING_LIMIT = 1024 * 1024; // 1MB
   // Please don't increase this limit for main index chunk
   // If it gets too big then find modules in the code base
   // that can be loaded lazily, there are more!
@@ -211,8 +210,6 @@ export default defineConfig(({ command, mode }) => {
         // including this one we wasted a lot of time on:
         // https://github.com/rollup/rollup/issues/2793
         output: {
-          // Set chunk size warning limit (in bytes) - warns at 1MB
-          chunkSizeWarningLimit: CHUNK_SIZE_WARNING_LIMIT,
           // Custom plugin to fail build if chunks exceed max size
           plugins: [
             {
