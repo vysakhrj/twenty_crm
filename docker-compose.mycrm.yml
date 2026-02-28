@@ -14,6 +14,7 @@ services:
       dockerfile: packages/twenty-docker/twenty/Dockerfile
       args:
         REACT_APP_SERVER_BASE_URL: ${SERVER_URL:-http://localhost:3000}
+        VITE_MAIN_CHUNK_SIZE_LIMIT_MB: ${VITE_MAIN_CHUNK_SIZE_LIMIT_MB:-7.2}
     volumes:
       - server-local-data:/app/packages/twenty-server/.local-storage
     ports:
@@ -78,6 +79,7 @@ services:
       dockerfile: packages/twenty-docker/twenty/Dockerfile
       args:
         REACT_APP_SERVER_BASE_URL: ${SERVER_URL:-http://localhost:3000}
+        VITE_MAIN_CHUNK_SIZE_LIMIT_MB: ${VITE_MAIN_CHUNK_SIZE_LIMIT_MB:-7}
     volumes:
       - server-local-data:/app/packages/twenty-server/.local-storage
     command: ["yarn", "worker:prod"]

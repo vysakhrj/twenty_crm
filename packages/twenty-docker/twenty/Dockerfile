@@ -35,12 +35,14 @@ RUN yarn workspaces focus --production twenty-emails twenty-shared twenty-server
 FROM common-deps AS twenty-front-build
 
 ARG REACT_APP_SERVER_BASE_URL
+ARG VITE_MAIN_CHUNK_SIZE_LIMIT_MB=7.2
 
 COPY ./packages/twenty-front /app/packages/twenty-front
 COPY ./packages/twenty-ui /app/packages/twenty-ui
 COPY ./packages/twenty-shared /app/packages/twenty-shared
 # Front build needs more heap to avoid OOM (matches twenty-front package.json)
 ENV NODE_OPTIONS="--max-old-space-size=8192"
+ENV VITE_MAIN_CHUNK_SIZE_LIMIT_MB=$VITE_MAIN_CHUNK_SIZE_LIMIT_MB
 RUN npx nx build twenty-front
 
 
