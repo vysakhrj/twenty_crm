@@ -37,6 +37,11 @@ type SalesLeaveUpdateInput = {
   clearLeave?: boolean;
 };
 
+type SalesAvailabilityPermission = {
+  canManageSalesAvailability: boolean;
+  isAdminLike: boolean;
+};
+
 const WEEKDAY_KEYS = [
   'MONDAY',
   'TUESDAY',
@@ -76,6 +81,7 @@ export class LeadWebhookService {
     person: any | null;
     taskTarget: any | null;
     origin: any | null;
+    property: any | null;
     debug: any;
   }> {
     const { workspaceId } = request;
@@ -101,10 +107,21 @@ export class LeadWebhookService {
       customer = await this.findOrCreateCustomer(body.person, authContext);
     }
 
-    // Step 3: Find or create Origin record (needed for originId on lead)
+    // Step 3: Find or create Origin record by name (needed for originId on lead)
     let origin: any | null = null;
     if (body.origin) {
       origin = await this.findOrCreateOrigin(body.origin, authContext);
+    }
+
+    // Step 3b: Resolve property by propertyName or use propertyId
+    let property: any | null = null;
+    let resolvedPropertyId: string | null = null;
+    if (body.propertyId) {
+      resolvedPropertyId = body.propertyId;
+      property = await this.findPropertyById(body.propertyId, authContext);
+    } else if (body.propertyName) {
+      property = await this.findPropertyByName(body.propertyName, authContext);
+      resolvedPropertyId = property?.id ?? null;
     }
 
     // Step 4: Compute lead title (auto-increment SFS-N)
@@ -115,16 +132,24 @@ export class LeadWebhookService {
       body.dueDate ??
       new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString();
 
-    // Step 5: Create Lead with assignee, customer, origin, property
+    const buildingType = Array.isArray(body.buildingType)
+      ? body.buildingType
+      : isDefined(body.buildingType)
+        ? [body.buildingType]
+        : undefined;
+
+    // Step 5: Create Lead with assignee, customer, origin, property, and custom fields
     const lead = await this.createLead(
       {
         title,
         body: body.body,
         dueDate,
+        convenientTime: body.convenientTime ?? undefined,
+        buildingType,
         assigneeId,
         customerId: customer?.id || null,
         originId: origin?.id || null,
-        propertyId: body.propertyId || null,
+        propertyId: resolvedPropertyId,
       },
       authContext,
     );
@@ -134,6 +159,7 @@ export class LeadWebhookService {
       person: customer,
       taskTarget: null,
       origin,
+      property,
       debug: {
         roundRobin: {
           totalMembers: memberCount,
@@ -151,7 +177,23 @@ export class LeadWebhookService {
     input: SalesAvailabilityUpdateInput,
     authContext: WorkspaceAuthContext,
   ) {
-    await this.assertManagerOrSuperAdmin(workspaceId, authContext);
+    const salesAvailabilityPermission = await this.assertManagerOrSuperAdmin(
+      workspaceId,
+      authContext,
+    );
+
+    if (!salesAvailabilityPermission.isAdminLike) {
+      const adminWorkspaceMemberIds = await this.getAdminWorkspaceMemberIds(
+        workspaceId,
+        authContext,
+      );
+
+      if (adminWorkspaceMemberIds.includes(workspaceMemberId)) {
+        throw new ForbiddenException(
+          'Managers cannot update sales availability for admin members',
+        );
+      }
+    }
 
     const salesMemberIds = await this.getSalesWorkspaceMemberIds(
       workspaceId,
@@ -342,7 +384,23 @@ export class LeadWebhookService {
     input: SalesLeaveUpdateInput,
     authContext: WorkspaceAuthContext,
   ) {
-    await this.assertManagerOrSuperAdmin(workspaceId, authContext);
+    const salesAvailabilityPermission = await this.assertManagerOrSuperAdmin(
+      workspaceId,
+      authContext,
+    );
+
+    if (!salesAvailabilityPermission.isAdminLike) {
+      const adminWorkspaceMemberIds = await this.getAdminWorkspaceMemberIds(
+        workspaceId,
+        authContext,
+      );
+
+      if (adminWorkspaceMemberIds.includes(workspaceMemberId)) {
+        throw new ForbiddenException(
+          'Managers cannot update sales leave for admin members',
+        );
+      }
+    }
 
     const salesMemberIds = await this.getSalesWorkspaceMemberIds(
       workspaceId,
@@ -486,7 +544,7 @@ export class LeadWebhookService {
   private async assertManagerOrSuperAdmin(
     workspaceId: string,
     authContext: WorkspaceAuthContext,
-  ): Promise<void> {
+  ): Promise<SalesAvailabilityPermission> {
     const userWorkspaceId = authContext.userWorkspaceId;
 
     if (!userWorkspaceId) {
@@ -499,29 +557,40 @@ export class LeadWebhookService {
         workspaceId,
       });
 
-    const currentRole = rolesByUserWorkspace.get(userWorkspaceId)?.[0];
+    const currentRoles = rolesByUserWorkspace.get(userWorkspaceId) ?? [];
 
-    if (!currentRole) {
+    if (currentRoles.length === 0) {
       throw new ForbiddenException('Current role could not be resolved');
     }
 
-    const normalizedLabel = currentRole.label.toLowerCase();
-    const hasManagerOrAdminLabel =
-      normalizedLabel.includes('manager') ||
-      normalizedLabel.includes('admin') ||
-      normalizedLabel.includes('superadmin') ||
-      normalizedLabel.includes('super admin');
-
-    const isPrivileged =
-      currentRole.standardId === ADMIN_ROLE.standardId ||
-      currentRole.canUpdateAllSettings ||
-      hasManagerOrAdminLabel;
+    const isAdminLike = currentRoles.some((role) => this.isAdminLikeRole(role));
+    const hasManagerRole = currentRoles.some((role) =>
+      role.label.toLowerCase().includes('manager'),
+    );
+    const isPrivileged = isAdminLike || hasManagerRole;
 
     if (!isPrivileged) {
       throw new ForbiddenException(
-        'Only manager or super admin roles can update sales availability',
+        'Only manager or super admin roles can manage sales availability',
       );
     }
+
+    return {
+      canManageSalesAvailability: true,
+      isAdminLike,
+    };
+  }
+
+  private isAdminLikeRole(role: Pick<RoleEntity, 'label' | 'standardId' | 'canUpdateAllSettings'>) {
+    const normalizedLabel = role.label.toLowerCase();
+
+    return (
+      role.standardId === ADMIN_ROLE.standardId ||
+      role.canUpdateAllSettings ||
+      normalizedLabel.includes('admin') ||
+      normalizedLabel.includes('superadmin') ||
+      normalizedLabel.includes('super admin')
+    );
   }
 
   private async getSalesWorkspaceMemberIds(
@@ -616,6 +685,65 @@ export class LeadWebhookService {
 
     const userWorkspaceIdsByRole = await Promise.all(
       managerRoleIds.map((roleId) =>
+        this.userRoleService.getUserWorkspaceIdsAssignedToRole(roleId, workspaceId),
+      ),
+    );
+
+    const userWorkspaceIds = Array.from(new Set(userWorkspaceIdsByRole.flat()));
+
+    if (userWorkspaceIds.length === 0) {
+      return [];
+    }
+
+    const userWorkspaces = await this.userWorkspaceRepository.find({
+      where: { id: In(userWorkspaceIds) },
+    });
+
+    const userIds = userWorkspaces.map((userWorkspace) => userWorkspace.userId);
+
+    if (userIds.length === 0) {
+      return [];
+    }
+
+    return this.globalWorkspaceOrmManager.executeInWorkspaceContext(
+      authContext,
+      async () => {
+        const workspaceMemberRepository =
+          await this.globalWorkspaceOrmManager.getRepository<WorkspaceMemberWorkspaceEntity>(
+            workspaceId,
+            'workspaceMember',
+            { shouldBypassPermissionChecks: true },
+          );
+
+        const members = await workspaceMemberRepository.find({
+          where: {
+            userId: In(userIds),
+          },
+        });
+
+        return members.map((member) => member.id);
+      },
+    );
+  }
+
+  private async getAdminWorkspaceMemberIds(
+    workspaceId: string,
+    authContext: WorkspaceAuthContext,
+  ): Promise<string[]> {
+    const roles = await this.roleRepository.find({
+      where: { workspaceId },
+    });
+
+    const adminRoleIds = roles
+      .filter((role) => this.isAdminLikeRole(role))
+      .map((role) => role.id);
+
+    if (adminRoleIds.length === 0) {
+      return [];
+    }
+
+    const userWorkspaceIdsByRole = await Promise.all(
+      adminRoleIds.map((roleId) =>
         this.userRoleService.getUserWorkspaceIdsAssignedToRole(roleId, workspaceId),
       ),
     );
@@ -1072,6 +1200,24 @@ export class LeadWebhookService {
       };
     }
 
+    if (personData?.jobTitle) {
+      customerPayload.jobTitle = personData.jobTitle;
+    }
+
+    if (personData?.companyName) {
+      customerPayload.companyName = personData.companyName;
+    }
+
+    if (personData?.whatsapp && personData.whatsapp.length > 0) {
+      customerPayload.whatsapp = {
+        primaryPhoneNumber: personData.whatsapp[0].number,
+        primaryPhoneCountryCode: '',
+        additionalPhones: personData.whatsapp
+          .slice(1)
+          .map((p) => ({ number: p.number, countryCode: '' })),
+      };
+    }
+
     const createdCustomer = await this.commonCreateOneQueryRunnerService.execute(
       {
         data: customerPayload,
@@ -1348,11 +1494,93 @@ export class LeadWebhookService {
     }
   }
 
+  private async findPropertyByName(
+    propertyName: string,
+    authContext: WorkspaceAuthContext,
+  ): Promise<any | null> {
+    try {
+      const workspaceId = authContext.workspace.id;
+
+      const property =
+        await this.globalWorkspaceOrmManager.executeInWorkspaceContext(
+          authContext,
+          async () => {
+            const propertyRepository =
+              await this.globalWorkspaceOrmManager.getRepository(
+                workspaceId,
+                'property',
+                { shouldBypassPermissionChecks: true },
+              );
+
+            const found = await propertyRepository.findOne({
+              where: { name: propertyName },
+            });
+
+            return found ?? null;
+          },
+        );
+
+      if (property) {
+        this.logger.log(
+          `[FindPropertyByName] Found property: ${propertyName} -> ${property.id}`,
+        );
+      } else {
+        this.logger.warn(
+          `[FindPropertyByName] No property found with name: ${propertyName}`,
+        );
+      }
+
+      return property;
+    } catch (error: any) {
+      this.logger.error(
+        `[FindPropertyByName] Failed: ${error?.message || error}`,
+      );
+      return null;
+    }
+  }
+
+  private async findPropertyById(
+    propertyId: string,
+    authContext: WorkspaceAuthContext,
+  ): Promise<any | null> {
+    try {
+      const workspaceId = authContext.workspace.id;
+
+      const property =
+        await this.globalWorkspaceOrmManager.executeInWorkspaceContext(
+          authContext,
+          async () => {
+            const propertyRepository =
+              await this.globalWorkspaceOrmManager.getRepository(
+                workspaceId,
+                'property',
+                { shouldBypassPermissionChecks: true },
+              );
+
+            const found = await propertyRepository.findOne({
+              where: { id: propertyId },
+            });
+
+            return found ?? null;
+          },
+        );
+
+      return property;
+    } catch (error: any) {
+      this.logger.error(
+        `[FindPropertyById] Failed: ${error?.message || error}`,
+      );
+      return null;
+    }
+  }
+
   private async createLead(
     leadData: {
       title: string;
       body?: string;
       dueDate?: string;
+      convenientTime?: string;
+      buildingType?: string[];
       assigneeId?: string | null;
       customerId?: string | null;
       originId?: string | null;
@@ -1399,9 +1627,19 @@ export class LeadWebhookService {
       statusValue = (preferredOption ?? options[0]).value;
     }
 
+    const hasReadAtField = Object.values(flatFieldMetadataMaps.byId).some(
+      (field: any) =>
+        field.objectMetadataId === flatObjectMetadata.id &&
+        field.name === 'readAt',
+    );
+
     const leadPayload: Record<string, unknown> = {
       name: leadData.title,
     };
+
+    if (hasReadAtField) {
+      leadPayload.readAt = null;
+    }
 
     if (isDefined(statusValue)) {
       leadPayload.status = statusValue;
@@ -1411,13 +1649,21 @@ export class LeadWebhookService {
       // Plain text body (existing field)
       leadPayload.body = leadData.body;
       // Rich-text notes field (RICH_TEXT_V2) mirroring Task body
-      leadPayload.notes = {
-        markdown: leadData.body,
-      };
+      // leadPayload.notes = {
+      //   markdown: leadData.body,
+      // };
     }
 
     if (leadData.dueDate) {
       leadPayload.dueDate = leadData.dueDate;
+    }
+
+    if (leadData.convenientTime) {
+      leadPayload.convenientTime = leadData.convenientTime;
+    }
+
+    if (Array.isArray(leadData.buildingType) && leadData.buildingType.length) {
+      leadPayload.buildingType = leadData.buildingType;
     }
 
     if (leadData.assigneeId) {

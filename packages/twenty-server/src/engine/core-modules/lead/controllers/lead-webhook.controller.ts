@@ -24,11 +24,16 @@ export type CreateLeadWithPersonDto = {
   // Lead fields
   body?: string;
   dueDate?: string;
-  // Origin tracking (e.g., "website", "zapier", "meta_instagram", "meta_facebook", "google_ads")
+  // Lead: Convenient time notes (plain text)
+  convenientTime?: string;
+  // Lead: Building Type multi-select values
+  buildingType?: string[] | string;
+  // Origin tracking by name (e.g., "website", "zapier", "meta_instagram")
   origin?: string;
-  // Property linking (optional - pass existing property ID)
+  // Property: pass propertyName to resolve to propertyId, or propertyId directly
+  propertyName?: string;
   propertyId?: string;
-  // Person fields (all optional)
+  // Person/Customer fields (all optional)
   person?: {
     name?: {
       firstName?: string;
@@ -43,6 +48,7 @@ export type CreateLeadWithPersonDto = {
       type?: string;
     }>;
     jobTitle?: string;
+    companyName?: string;
     city?: string;
     linkedin?: string;
     intro?: string;
@@ -53,6 +59,15 @@ export type CreateLeadWithPersonDto = {
     }>;
     workPreference?: string[];
   };
+};
+
+export type CreateLeadWithPersonResponse = {
+  lead: any;
+  person: any | null;
+  taskTarget: any | null;
+  origin: any | null;
+  property: any | null;
+  debug: any;
 };
 
 export type UpdateSalesAvailabilityDto = {
@@ -148,10 +163,8 @@ export class LeadWebhookController {
     );
 
     try {
-      const result = await this.leadWebhookService.createLeadWithPerson(
-        body,
-        request,
-      );
+      const result: CreateLeadWithPersonResponse =
+        await this.leadWebhookService.createLeadWithPerson(body, request);
 
       res.status(201).send({
         data: {
@@ -159,6 +172,7 @@ export class LeadWebhookController {
           person: result.person,
           taskTarget: result.taskTarget,
           origin: result.origin,
+          property: result.property,
         },
         debug: result.debug,
       });

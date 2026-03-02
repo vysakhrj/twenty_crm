@@ -1,6 +1,7 @@
 import { ActionLink } from '@/action-menu/actions/components/ActionLink';
 import { DeleteMultipleRecordsAction } from '@/action-menu/actions/record-actions/multiple-records/components/DeleteMultipleRecordsAction';
 import { DestroyMultipleRecordsAction } from '@/action-menu/actions/record-actions/multiple-records/components/DestroyMultipleRecordsAction';
+import { ExportMultipleRecordsExcelAction } from '@/action-menu/actions/record-actions/multiple-records/components/ExportMultipleRecordsExcelAction';
 import { ExportMultipleRecordsAction } from '@/action-menu/actions/record-actions/multiple-records/components/ExportMultipleRecordsAction';
 import { MergeMultipleRecordsAction } from '@/action-menu/actions/record-actions/multiple-records/components/MergeMultipleRecordsAction';
 import { RestoreMultipleRecordsAction } from '@/action-menu/actions/record-actions/multiple-records/components/RestoreMultipleRecordsAction';
@@ -434,15 +435,30 @@ export const DEFAULT_RECORD_ACTIONS_CONFIG: Record<
     type: ActionType.Standard,
     scope: ActionScope.Object,
     key: NoSelectionRecordActionKeys.EXPORT_VIEW,
-    label: msg`Export view`,
-    shortLabel: msg`Export`,
+    label: msg`Export CSV`,
+    shortLabel: msg`CSV`,
     position: 18,
     Icon: IconFileExport,
     accent: 'default',
-    isPinned: false,
+    isPinned: true,
     shouldBeRegistered: () => true,
     availableOn: [ActionViewType.INDEX_PAGE_NO_SELECTION],
     component: <ExportMultipleRecordsAction />,
+    requiredPermissionFlag: PermissionFlagType.EXPORT_CSV,
+  },
+  [NoSelectionRecordActionKeys.EXPORT_VIEW_EXCEL]: {
+    type: ActionType.Standard,
+    scope: ActionScope.Object,
+    key: NoSelectionRecordActionKeys.EXPORT_VIEW_EXCEL,
+    label: msg`Export Excel`,
+    shortLabel: msg`Excel`,
+    position: 19,
+    Icon: IconFileExport,
+    accent: 'default',
+    isPinned: true,
+    shouldBeRegistered: () => true,
+    availableOn: [ActionViewType.INDEX_PAGE_NO_SELECTION],
+    component: <ExportMultipleRecordsExcelAction />,
     requiredPermissionFlag: PermissionFlagType.EXPORT_CSV,
   },
   [NoSelectionRecordActionKeys.SEE_DELETED_RECORDS]: {
@@ -451,7 +467,7 @@ export const DEFAULT_RECORD_ACTIONS_CONFIG: Record<
     key: NoSelectionRecordActionKeys.SEE_DELETED_RECORDS,
     label: msg`See deleted records`,
     shortLabel: msg`Deleted records`,
-    position: 19,
+    position: 20,
     Icon: IconRotate2,
     accent: 'default',
     isPinned: false,
@@ -466,7 +482,7 @@ export const DEFAULT_RECORD_ACTIONS_CONFIG: Record<
     key: NoSelectionRecordActionKeys.CREATE_NEW_VIEW,
     label: msg`Create View`,
     shortLabel: msg`Create View`,
-    position: 20,
+    position: 21,
     Icon: IconLayout,
     accent: 'default',
     isPinned: false,
@@ -481,7 +497,7 @@ export const DEFAULT_RECORD_ACTIONS_CONFIG: Record<
     key: NoSelectionRecordActionKeys.HIDE_DELETED_RECORDS,
     label: msg`Hide deleted records`,
     shortLabel: msg`Hide deleted`,
-    position: 21,
+    position: 22,
     Icon: IconEyeOff,
     accent: 'default',
     isPinned: false,
@@ -496,7 +512,7 @@ export const DEFAULT_RECORD_ACTIONS_CONFIG: Record<
     key: NoSelectionRecordActionKeys.GO_TO_WORKFLOWS,
     label: msg`Go to Workflows`,
     shortLabel: msg`See Workflows`,
-    position: 22,
+    position: 23,
     Icon: IconSettingsAutomation,
     accent: 'default',
     isPinned: false,
@@ -529,7 +545,7 @@ export const DEFAULT_RECORD_ACTIONS_CONFIG: Record<
     key: NoSelectionRecordActionKeys.GO_TO_PEOPLE,
     label: msg`Go to People`,
     shortLabel: msg`People`,
-    position: 23,
+    position: 24,
     Icon: IconUser,
     isPinned: false,
     availableOn: [
@@ -561,7 +577,7 @@ export const DEFAULT_RECORD_ACTIONS_CONFIG: Record<
     key: NoSelectionRecordActionKeys.GO_TO_COMPANIES,
     label: msg`Go to Companies`,
     shortLabel: msg`Companies`,
-    position: 24,
+    position: 25,
     Icon: IconBuildingSkyscraper,
     isPinned: false,
     availableOn: [
@@ -593,7 +609,7 @@ export const DEFAULT_RECORD_ACTIONS_CONFIG: Record<
     key: NoSelectionRecordActionKeys.GO_TO_DASHBOARDS,
     label: msg`Go to Dashboards`,
     shortLabel: msg`Dashboards`,
-    position: 25,
+    position: 26,
     Icon: IconLayoutDashboard,
     isPinned: false,
     availableOn: [
@@ -624,7 +640,7 @@ export const DEFAULT_RECORD_ACTIONS_CONFIG: Record<
     key: NoSelectionRecordActionKeys.GO_TO_OPPORTUNITIES,
     label: msg`Go to Opportunities`,
     shortLabel: msg`Opportunities`,
-    position: 26,
+    position: 27,
     Icon: IconTargetArrow,
     isPinned: false,
     availableOn: [
@@ -657,7 +673,7 @@ export const DEFAULT_RECORD_ACTIONS_CONFIG: Record<
     key: NoSelectionRecordActionKeys.GO_TO_SETTINGS,
     label: msg`Go to Settings`,
     shortLabel: msg`Settings`,
-    position: 27,
+    position: 28,
     Icon: IconSettings,
     isPinned: false,
     availableOn: [
@@ -683,7 +699,7 @@ export const DEFAULT_RECORD_ACTIONS_CONFIG: Record<
     key: NoSelectionRecordActionKeys.GO_TO_TASKS,
     label: msg`Go to Tasks`,
     shortLabel: msg`Tasks`,
-    position: 28,
+    position: 29,
     Icon: IconCheckbox,
     isPinned: false,
     availableOn: [
@@ -715,7 +731,7 @@ export const DEFAULT_RECORD_ACTIONS_CONFIG: Record<
     key: NoSelectionRecordActionKeys.GO_TO_NOTES,
     label: msg`Go to Notes`,
     shortLabel: msg`Notes`,
-    position: 29,
+    position: 30,
     Icon: IconCheckbox,
     isPinned: false,
     availableOn: [

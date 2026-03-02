@@ -1,5 +1,6 @@
 import { json2csv } from 'json-2-csv';
 import { useMemo } from 'react';
+import { utils, write } from 'xlsx-ugnis';
 
 import { isCompositeFieldType } from '@/object-record/object-filter-dropdown/utils/isCompositeFieldType';
 import { EXPORT_TABLE_DATA_DEFAULT_PAGE_SIZE } from '@/object-record/object-options-dropdown/constants/ExportTableDataDefaultPageSize';
@@ -70,7 +71,16 @@ export const generateCsv: GenerateExport = ({
     const columnType = col.type;
     if (!isCompositeFieldType(columnType)) return [column];
 
-    const nestedFieldsWithoutTypename = Object.keys(rows[0][column.field])
+    const firstRowCompositeFieldValue = rows[0]?.[column.field];
+
+    if (
+      !isDefined(firstRowCompositeFieldValue) ||
+      typeof firstRowCompositeFieldValue !== 'object'
+    ) {
+      return [column];
+    }
+
+    const nestedFieldsWithoutTypename = Object.keys(firstRowCompositeFieldValue)
       .filter((key) => key !== '__typename')
       .map((key) => {
         const subFieldLabel = COMPOSITE_FIELD_SUB_FIELD_LABELS[columnType][key];
@@ -119,6 +129,79 @@ export const generateCsv: GenerateExport = ({
   });
 };
 
+const getValueByPath = (record: Record<string, any>, path: string) => {
+  return path
+    .split('.')
+    .reduce<any>((acc, key) => (isDefined(acc) ? acc[key] : undefined), record);
+};
+
+export const generateXlsx = ({
+  columns,
+  rows,
+}: GenerateExportOptions): ArrayBuffer => {
+  const columnsToExport = columns.filter(
+    (col) =>
+      !('relationType' in col.metadata && col.metadata.relationType) ||
+      col.metadata.relationType === RelationType.MANY_TO_ONE,
+  );
+
+  const objectIdColumn: ColumnDefinition<FieldMetadata> = {
+    fieldMetadataId: '',
+    type: FieldMetadataType.UUID,
+    iconName: '',
+    label: `Id`,
+    metadata: {
+      fieldName: 'id',
+    },
+    position: 0,
+    size: 0,
+  };
+
+  const columnsToExportWithIdColumn = [objectIdColumn, ...columnsToExport];
+
+  const flattenedColumns = columnsToExportWithIdColumn.flatMap((col) => {
+    const headerLabel = `${col.label}${col.type === 'RELATION' ? ' Id' : ''}`;
+    const fieldName = `${col.metadata.fieldName}${
+      col.type === 'RELATION' ? 'Id' : ''
+    }`;
+
+    const columnType = col.type;
+    if (!isCompositeFieldType(columnType)) {
+      return [{ field: fieldName, header: headerLabel }];
+    }
+
+    return Object.entries(COMPOSITE_FIELD_SUB_FIELD_LABELS[columnType]).map(
+      ([subFieldKey, subFieldLabel]) => ({
+        field: `${fieldName}.${subFieldKey}`,
+        header: `${headerLabel} / ${subFieldLabel}`,
+      }),
+    );
+  });
+
+  const headers = flattenedColumns.map((column) => column.header);
+
+  const dataRows = rows.map((row) =>
+    flattenedColumns.map((column) => {
+      const value = getValueByPath(row, column.field);
+
+      if (typeof value === 'string') {
+        return sanitizeValueForCSVExport(value);
+      }
+
+      return value ?? '';
+    }),
+  );
+
+  const worksheet = utils.aoa_to_sheet([headers, ...dataRows]);
+  const workbook = utils.book_new();
+  utils.book_append_sheet(workbook, worksheet, 'Export');
+
+  return write(workbook, {
+    bookType: 'xlsx',
+    type: 'array',
+  }) as ArrayBuffer;
+};
+
 const percentage = (part: number, whole: number): number => {
   return Math.round((part / whole) * 100);
 };
@@ -151,6 +234,14 @@ const downloader = (mimeType: string, generator: GenerateExport) => {
 };
 
 export const csvDownloader = downloader('text/csv', generateCsv);
+
+export const xlsxDownloader = (filename: string, data: GenerateExportOptions) => {
+  const xlsxArrayBuffer = generateXlsx(data);
+  const blob = new Blob([xlsxArrayBuffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+  saveAs(blob, filename);
+};
 
 type UseExportTableDataOptions = Omit<UseRecordDataOptions, 'callback'> & {
   filename: string;
@@ -192,6 +283,48 @@ export const useRecordIndexExportRecords = ({
     pageSize,
     recordIndexId,
     callback: downloadCsv,
+    viewType,
+  });
+
+  return { progress, download };
+};
+
+export const useRecordIndexExportExcelRecords = ({
+  delayMs,
+  filename,
+  maximumRequests = 1000,
+  objectMetadataItem,
+  pageSize = EXPORT_TABLE_DATA_DEFAULT_PAGE_SIZE,
+  recordIndexId,
+  viewType,
+}: UseExportTableDataOptions) => {
+  const { processRecordsForCSVExport } = useExportProcessRecordsForCSV(
+    objectMetadataItem.nameSingular,
+  );
+
+  const downloadXlsx = useMemo(
+    () =>
+      (
+        records: ObjectRecord[],
+        columns: Pick<
+          ColumnDefinition<FieldMetadata>,
+          'label' | 'type' | 'metadata'
+        >[],
+      ) => {
+        const recordsProcessedForExport = processRecordsForCSVExport(records);
+
+        xlsxDownloader(filename, { rows: recordsProcessedForExport, columns });
+      },
+    [filename, processRecordsForCSVExport],
+  );
+
+  const { getTableData: download, progress } = useRecordIndexLazyFetchRecords({
+    delayMs,
+    maximumRequests,
+    objectMetadataItem,
+    pageSize,
+    recordIndexId,
+    callback: downloadXlsx,
     viewType,
   });
 

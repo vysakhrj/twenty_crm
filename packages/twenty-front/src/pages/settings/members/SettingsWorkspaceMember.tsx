@@ -45,6 +45,28 @@ const SETTINGS_WORKSPACE_MEMBER_TABS = {
 
 const DELETE_MEMBER_MODAL_ID = 'workspace-member-delete-modal';
 
+const hasManagerOrAdminRoleLabel = (roleLabel: string) => {
+  const normalizedRoleLabel = roleLabel.toLowerCase();
+
+  return (
+    normalizedRoleLabel.includes('manager') ||
+    normalizedRoleLabel.includes('admin') ||
+    normalizedRoleLabel.includes('superadmin') ||
+    normalizedRoleLabel.includes('super admin')
+  );
+};
+
+const hasAdminRole = (role: { label: string; canUpdateAllSettings: boolean }) => {
+  const normalizedRoleLabel = role.label.toLowerCase();
+
+  return (
+    role.canUpdateAllSettings ||
+    normalizedRoleLabel.includes('admin') ||
+    normalizedRoleLabel.includes('superadmin') ||
+    normalizedRoleLabel.includes('super admin')
+  );
+};
+
 export const SettingsWorkspaceMember = () => {
   const { workspaceMemberId = '' } = useParams();
   const navigateSettings = useNavigateSettings();
@@ -56,16 +78,26 @@ export const SettingsWorkspaceMember = () => {
   const isImpersonating = useRecoilValue(isImpersonatingState);
   const canImpersonate =
     useHasPermissionFlag(PermissionFlagType.IMPERSONATE) && !isImpersonating;
-  const { isAdmin } = useCurrentUserRole();
+  const { isAdmin, currentWorkspaceMemberId } = useCurrentUserRole();
 
   const {
     roles,
     allRoles,
     loading: rolesLoading,
   } = useWorkspaceMemberRoles(workspaceMemberId);
+  const { roles: currentMemberRoles } = useWorkspaceMemberRoles(
+    currentWorkspaceMemberId ?? '',
+  );
   const isSalesMember = roles.some((role) =>
     role.label.toLowerCase().includes('sales'),
   );
+  const canManageSalesSettings =
+    isAdmin ||
+    currentMemberRoles.some((role) => hasManagerOrAdminRoleLabel(role.label));
+  const isTargetAdminMember = roles.some((role) => hasAdminRole(role));
+  const isEditingSelf = currentWorkspaceMemberId === workspaceMemberId;
+  const canEditMemberDetails =
+    isAdmin || !isTargetAdminMember || isEditingSelf;
 
   const { record: member, loading } = useFindOneRecord<WorkspaceMember>({
     objectNameSingular: CoreObjectNameSingular.WorkspaceMember,
@@ -213,9 +245,14 @@ export const SettingsWorkspaceMember = () => {
                 member={member}
                 onImpersonate={canImpersonate ? handleImpersonate : undefined}
                 onNameChange={debouncedUpdateName}
-                onDelete={() => openModal(DELETE_MEMBER_MODAL_ID)}
+                onDelete={
+                  canEditMemberDetails
+                    ? () => openModal(DELETE_MEMBER_MODAL_ID)
+                    : undefined
+                }
                 isSalesMember={isSalesMember}
-                canManageSalesSettings={isAdmin}
+                canManageSalesSettings={canManageSalesSettings}
+                canEditDetails={canEditMemberDetails}
               />
             )}
 
@@ -225,6 +262,7 @@ export const SettingsWorkspaceMember = () => {
                 member={member}
                 roles={roles}
                 allRoles={allRoles}
+                canEditRoleAssignment={canEditMemberDetails}
               />
             )}
           </SettingsPageContainer>

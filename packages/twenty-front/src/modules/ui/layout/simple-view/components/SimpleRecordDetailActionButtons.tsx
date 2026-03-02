@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 
-import { IconMail, IconPhone } from 'twenty-ui/display';
+import { IconMail, IconMessage, IconPhone } from 'twenty-ui/display';
 
 const StyledActionRow = styled.div`
   display: flex;
@@ -53,10 +53,16 @@ const StyledDisabledButton = styled.div`
 export const SimpleRecordDetailActionButtons = ({
   phoneNumber,
   email,
+  whatsappNumber,
 }: {
   phoneNumber?: string;
   email?: string;
+  whatsappNumber?: string;
 }) => {
+  const whatsappLink = whatsappNumber
+    ? `https://wa.me/${whatsappNumber.replace(/\D/g, '')}`
+    : undefined;
+
   return (
     <StyledActionRow>
       {phoneNumber ? (
@@ -80,6 +86,18 @@ export const SimpleRecordDetailActionButtons = ({
         <StyledDisabledButton>
           <IconMail size={22} />
           Email
+        </StyledDisabledButton>
+      )}
+
+      {whatsappLink ? (
+        <StyledActionButton href={whatsappLink} target="_blank" rel="noreferrer">
+          <IconMessage size={22} />
+          WhatsApp
+        </StyledActionButton>
+      ) : (
+        <StyledDisabledButton>
+          <IconMessage size={22} />
+          WhatsApp
         </StyledDisabledButton>
       )}
     </StyledActionRow>

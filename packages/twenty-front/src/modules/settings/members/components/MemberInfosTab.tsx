@@ -15,9 +15,10 @@ type MemberInfosTabProps = {
   member: WorkspaceMember;
   onNameChange: (firstName: string, lastName: string) => void;
   onImpersonate?: () => void;
-  onDelete: () => void;
+  onDelete?: () => void;
   isSalesMember: boolean;
   canManageSalesSettings: boolean;
+  canEditDetails: boolean;
 };
 
 const StyledNameRow = styled.div`
@@ -38,6 +39,7 @@ export const MemberInfosTab = ({
   onDelete,
   isSalesMember,
   canManageSalesSettings,
+  canEditDetails,
 }: MemberInfosTabProps) => {
   const [firstName, setFirstName] = useState(member.name.firstName);
   const [lastName, setLastName] = useState(member.name.lastName);
@@ -53,6 +55,7 @@ export const MemberInfosTab = ({
           workspaceMemberId={member.id}
           avatarUrl={avatarUrl}
           onAvatarUpdated={setAvatarUrl}
+          disabled={!canEditDetails}
         />
       </Section>
 
@@ -67,6 +70,10 @@ export const MemberInfosTab = ({
             firstName={firstName}
             lastName={lastName}
             onChange={(field, value) => {
+              if (!canEditDetails) {
+                return;
+              }
+
               if (field === 'firstName') {
                 setFirstName(value);
                 onNameChange(value, lastName);
@@ -75,6 +82,7 @@ export const MemberInfosTab = ({
                 onNameChange(firstName, value);
               }
             }}
+            disabled={!canEditDetails}
           />
         </StyledNameRow>
       </Section>
@@ -90,7 +98,7 @@ export const MemberInfosTab = ({
       <MemberSalesAvailabilitySection
         member={member}
         isSalesMember={isSalesMember}
-        canEdit={canManageSalesSettings}
+        canEdit={canManageSalesSettings && canEditDetails}
       />
 
       <Section>
@@ -107,13 +115,15 @@ export const MemberInfosTab = ({
               onClick={onImpersonate}
             />
           )}
-          <Button
-            accent="danger"
-            title={t`Delete account`}
-            variant="secondary"
-            size="small"
-            onClick={onDelete}
-          />
+          {onDelete && (
+            <Button
+              accent="danger"
+              title={t`Delete account`}
+              variant="secondary"
+              size="small"
+              onClick={onDelete}
+            />
+          )}
         </StyledActionRow>
       </Section>
     </>

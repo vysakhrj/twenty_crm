@@ -1,5 +1,6 @@
 export enum NoSelectionRecordActionKeys {
   EXPORT_VIEW = 'export-view',
+  EXPORT_VIEW_EXCEL = 'export-view-excel',
   CREATE_NEW_RECORD = 'create-new-record',
   SEE_DELETED_RECORDS = 'see-deleted-records',
   HIDE_DELETED_RECORDS = 'hide-deleted-records',

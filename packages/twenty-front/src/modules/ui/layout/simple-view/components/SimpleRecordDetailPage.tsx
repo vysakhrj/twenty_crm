@@ -1,12 +1,13 @@
 import styled from '@emotion/styled';
-import { useCallback, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
+import { useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';
 
+import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
 import { useGenerateDepthRecordGqlFieldsFromObject } from '@/object-record/graphql/record-gql-fields/hooks/useGenerateDepthRecordGqlFieldsFromObject';
 import { useFindOneRecord } from '@/object-record/hooks/useFindOneRecord';
 import { useUpdateOneRecord } from '@/object-record/hooks/useUpdateOneRecord';
-import { SimpleRecordDetailActionButtons } from '@/ui/layout/simple-view/components/SimpleRecordDetailActionButtons';
 import { SimpleRecordDetailNotes } from '@/ui/layout/simple-view/components/SimpleRecordDetailNotes';
 import {
     SimpleRecordDetailSection,
@@ -14,7 +15,7 @@ import {
 } from '@/ui/layout/simple-view/components/SimpleRecordDetailSection';
 import { SimpleRecordDetailStageSelect } from '@/ui/layout/simple-view/components/SimpleRecordDetailStageSelect';
 import { FieldMetadataType } from 'twenty-shared/types';
-import { IconArrowLeft, IconCheck, IconPencil } from 'twenty-ui/display';
+import { IconArrowLeft, IconCalendar } from 'twenty-ui/display';
 
 const StyledContainer = styled.div`
   display: flex;
@@ -66,58 +67,165 @@ const StyledBody = styled.div`
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing(4)};
+  gap: ${({ theme }) => theme.spacing(3)};
   max-width: 100%;
-  padding: ${({ theme }) => theme.spacing(4)};
+  padding: ${({ theme }) => theme.spacing(3)};
   padding-bottom: ${({ theme }) => theme.spacing(10)};
+`;
+
+const StyledTopCard = styled.div`
+  background: ${({ theme }) => theme.background.secondary};
+  border: 1px solid ${({ theme }) => theme.border.color.medium};
+  border-radius: ${({ theme }) => theme.border.radius.md};
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing(2)};
+  padding: ${({ theme }) => theme.spacing(3)};
 `;
 
 const StyledNameRow = styled.div`
   align-items: center;
   display: flex;
-  gap: ${({ theme }) => theme.spacing(2)};
+  gap: ${({ theme }) => theme.spacing(2.5)};
 `;
 
 const StyledRecordName = styled.div`
   color: ${({ theme }) => theme.font.color.primary};
   flex: 1;
-  font-size: ${({ theme }) => theme.font.size.xl};
+  font-size: ${({ theme }) => theme.font.size.lg};
   font-weight: ${({ theme }) => theme.font.weight.semiBold};
-`;
-
-const StyledNameInput = styled.input`
-  background: ${({ theme }) => theme.background.secondary};
-  border: 1px solid ${({ theme }) => theme.color.blue};
-  border-radius: ${({ theme }) => theme.border.radius.md};
-  color: ${({ theme }) => theme.font.color.primary};
-  flex: 1;
-  font-family: ${({ theme }) => theme.font.family};
-  font-size: ${({ theme }) => theme.font.size.xl};
-  font-weight: ${({ theme }) => theme.font.weight.semiBold};
-  outline: none;
-  padding: ${({ theme }) => theme.spacing(1)} ${({ theme }) => theme.spacing(2)};
-`;
-
-const StyledEditButton = styled.button`
-  align-items: center;
-  background: none;
-  border: 1px solid ${({ theme }) => theme.border.color.medium};
-  border-radius: ${({ theme }) => theme.border.radius.sm};
-  color: ${({ theme }) => theme.font.color.secondary};
-  cursor: pointer;
-  display: flex;
-  flex-shrink: 0;
-  padding: ${({ theme }) => theme.spacing(1)};
-
-  &:hover {
-    background: ${({ theme }) => theme.background.transparent.light};
-  }
 `;
 
 const StyledCreatedDate = styled.div`
   color: ${({ theme }) => theme.font.color.tertiary};
   font-size: ${({ theme }) => theme.font.size.sm};
-  margin-top: ${({ theme }) => theme.spacing(0.5)};
+`;
+
+const StyledAvatar = styled.div`
+  align-items: center;
+  background: ${({ theme }) => theme.background.transparent.medium};
+  border-radius: 50%;
+  color: ${({ theme }) => theme.font.color.secondary};
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: ${({ theme }) => theme.font.size.md};
+  font-weight: ${({ theme }) => theme.font.weight.medium};
+  height: ${({ theme }) => theme.spacing(8)};
+  justify-content: center;
+  width: ${({ theme }) => theme.spacing(8)};
+`;
+
+const StyledPrimaryInfo = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing(0.25)};
+  min-width: 0;
+`;
+
+const StyledChip = styled.div`
+  background: ${({ theme }) => theme.background.transparent.light};
+  border: 1px solid ${({ theme }) => theme.border.color.medium};
+  border-radius: ${({ theme }) => theme.border.radius.xl};
+  color: ${({ theme }) => theme.font.color.secondary};
+  font-size: ${({ theme }) => theme.font.size.sm};
+  font-weight: ${({ theme }) => theme.font.weight.medium};
+  padding: ${({ theme }) => theme.spacing(0.75)} ${({ theme }) => theme.spacing(1.5)};
+`;
+
+const StyledTopActionRow = styled.div`
+  align-items: stretch;
+  display: flex;
+  flex-wrap: wrap;
+  gap: ${({ theme }) => theme.spacing(2)};
+`;
+
+const StyledStageSlot = styled.div`
+  display: flex;
+  flex: 0 1 44%;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing(0.75)};
+  min-width: 0;
+`;
+
+const StyledStatusLabel = styled.div`
+  color: ${({ theme }) => theme.font.color.tertiary};
+  font-size: ${({ theme }) => theme.font.size.xs};
+  font-weight: ${({ theme }) => theme.font.weight.medium};
+`;
+
+const StyledFollowUpDue = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing(0.75)};
+  min-width: 0;
+`;
+
+const StyledTopMetaRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: ${({ theme }) => theme.spacing(2)};
+`;
+
+const StyledTopMetaItem = styled.div`
+  display: flex;
+  flex: 1 1 100%;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing(0.75)};
+  min-width: 0;
+`;
+
+const StyledFollowUpLabel = styled.div`
+  color: ${({ theme }) => theme.font.color.tertiary};
+  font-size: ${({ theme }) => theme.font.size.xs};
+  font-weight: ${({ theme }) => theme.font.weight.medium};
+`;
+
+const StyledFollowUpValueRow = styled.div`
+  align-items: center;
+  background: ${({ theme }) => theme.background.primary};
+  border: 1px solid ${({ theme }) => theme.border.color.medium};
+  border-radius: ${({ theme }) => theme.border.radius.md};
+  color: ${({ theme }) => theme.font.color.primary};
+  cursor: pointer;
+  display: flex;
+  gap: ${({ theme }) => theme.spacing(1)};
+  min-width: 0;
+  padding: ${({ theme }) => theme.spacing(2)} ${({ theme }) => theme.spacing(2.5)};
+`;
+
+const StyledFollowUpValue = styled.div`
+  flex: 1;
+  font-size: ${({ theme }) => theme.font.size.sm};
+  font-weight: ${({ theme }) => theme.font.weight.medium};
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const StyledFollowUpCalendarButton = styled.button`
+  align-items: center;
+  background: transparent;
+  border: none;
+  color: ${({ theme }) => theme.font.color.tertiary};
+  cursor: pointer;
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 0;
+
+  &:hover {
+    color: ${({ theme }) => theme.font.color.primary};
+  }
+`;
+
+const StyledHiddenFollowUpInput = styled.input`
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  width: 0;
 `;
 
 const StyledLoading = styled.div`
@@ -162,6 +270,36 @@ const StyledDateInput = styled.input`
   }
 `;
 
+const StyledReadOnlyDateValue = styled.div`
+  align-items: center;
+  background: ${({ theme }) => theme.background.secondary};
+  border: 1px solid ${({ theme }) => theme.border.color.medium};
+  border-radius: ${({ theme }) => theme.border.radius.md};
+  box-sizing: border-box;
+  color: ${({ theme }) => theme.font.color.primary};
+  display: flex;
+  font-family: ${({ theme }) => theme.font.family};
+  font-size: ${({ theme }) => theme.font.size.md};
+  justify-content: space-between;
+  padding: ${({ theme }) => theme.spacing(3)} ${({ theme }) => theme.spacing(4)};
+  width: 100%;
+`;
+
+const StyledTopMetaValue = styled.div`
+  align-items: center;
+  background: ${({ theme }) => theme.background.primary};
+  border: 1px solid ${({ theme }) => theme.border.color.medium};
+  border-radius: ${({ theme }) => theme.border.radius.md};
+  color: ${({ theme }) => theme.font.color.primary};
+  display: flex;
+  font-size: ${({ theme }) => theme.font.size.sm};
+  font-weight: ${({ theme }) => theme.font.weight.medium};
+  min-height: ${({ theme }) => theme.spacing(9)};
+  min-width: 0;
+  padding: ${({ theme }) => theme.spacing(2)} ${({ theme }) => theme.spacing(2.5)};
+  word-break: break-word;
+`;
+
 const CONTACT_FIELD_TYPES = new Set([
   FieldMetadataType.EMAILS,
   FieldMetadataType.PHONES,
@@ -189,27 +327,54 @@ const SYSTEM_FIELD_NAMES = new Set([
   '__typename',
 ]);
 
+const PRIORITY_FIELD_NAMES = new Set(['body']);
+const AUTO_MANAGED_FIELD_NAMES = new Set(['readAt']);
+
+const getInitials = (value: string): string => {
+  const cleaned = value.trim();
+  if (!cleaned) return '--';
+
+  const parts = cleaned.split(/\s+/).filter((part) => part.length > 0);
+  if (parts.length === 1) {
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+
+  return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+};
+
 const formatDate = (dateString: string): string => {
   try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: '2-digit',
-      day: '2-digit',
-      year: '2-digit',
-      hour: 'numeric',
-      minute: '2-digit',
+    const date = new Date(dateString);
+    const month = date.toLocaleString('en-US', {
+      month: 'short',
     });
+    const day = date.toLocaleString('en-US', {
+      day: 'numeric',
+    });
+    const time = date
+      .toLocaleString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      })
+      .replace(' ', '')
+      .toLowerCase();
+
+    return `${month} ${day} ${time}`;
   } catch {
     return dateString;
   }
 };
 
-const toDateInputValue = (dateString: string | null | undefined): string => {
-  if (!dateString) return '';
+const formatDateOnly = (dateString: string): string => {
   try {
-    const date = new Date(dateString);
-    return date.toISOString().split('T')[0];
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
   } catch {
-    return '';
+    return dateString;
   }
 };
 
@@ -221,6 +386,7 @@ const formatFieldValue = (
 
   switch (fieldType) {
     case FieldMetadataType.DATE:
+      return formatDateOnly(String(value));
     case FieldMetadataType.DATE_TIME:
       return formatDate(String(value));
     case FieldMetadataType.BOOLEAN:
@@ -246,6 +412,27 @@ const formatFieldValue = (
     default:
       if (typeof value === 'object') return '-';
       return String(value);
+  }
+};
+
+const toDateInputValue = (dateString: string | null | undefined): string => {
+  if (!dateString) return '';
+  try {
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
+  } catch {
+    return '';
+  }
+};
+
+const toDateTimeInputValue = (dateString: string | null | undefined): string => {
+  if (!dateString) return '';
+  try {
+    const date = new Date(dateString);
+    const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+    return localDate.toISOString().slice(0, 16);
+  } catch {
+    return '';
   }
 };
 
@@ -324,18 +511,30 @@ const extractEmailFromRecord = (
 const extractPhoneFromRecord = (
   record: Record<string, unknown>,
 ): string | undefined => {
+  const getFormattedPhone = (phoneObj: Record<string, unknown>) => {
+    const primaryPhoneNumber = phoneObj.primaryPhoneNumber;
+    if (
+      typeof primaryPhoneNumber !== 'string' ||
+      primaryPhoneNumber.trim().length === 0
+    ) {
+      return undefined;
+    }
+
+    const callingCode =
+      typeof phoneObj.primaryPhoneCallingCode === 'string'
+        ? phoneObj.primaryPhoneCallingCode
+        : '';
+
+    const prefix = callingCode;
+
+    return `${prefix}${primaryPhoneNumber}`.trim();
+  };
+
   for (const value of Object.values(record)) {
     if (value && typeof value === 'object' && !Array.isArray(value)) {
-      const obj = value as Record<string, unknown>;
-      if (
-        typeof obj.primaryPhoneNumber === 'string' &&
-        obj.primaryPhoneNumber.length > 0
-      ) {
-        const cc =
-          typeof obj.primaryPhoneCountryCode === 'string'
-            ? obj.primaryPhoneCountryCode
-            : '';
-        return `${cc}${obj.primaryPhoneNumber}`;
+      const phone = getFormattedPhone(value as Record<string, unknown>);
+      if (phone) {
+        return phone;
       }
     }
   }
@@ -350,20 +549,105 @@ const extractPhoneFromRecord = (
             typeof relValue === 'object' &&
             !Array.isArray(relValue)
           ) {
-            const obj = relValue as Record<string, unknown>;
-            if (
-              typeof obj.primaryPhoneNumber === 'string' &&
-              obj.primaryPhoneNumber.length > 0
-            ) {
-              const cc =
-                typeof obj.primaryPhoneCountryCode === 'string'
-                  ? obj.primaryPhoneCountryCode
-                  : '';
-              return `${cc}${obj.primaryPhoneNumber}`;
+            const phone = getFormattedPhone(relValue as Record<string, unknown>);
+            if (phone) {
+              return phone;
             }
           }
         }
       }
+    }
+  }
+
+  return undefined;
+};
+
+const extractWhatsappFromRecord = (
+  record: Record<string, unknown>,
+): string | undefined => {
+  const whatsapp = record.whatsapp;
+  if (whatsapp && typeof whatsapp === 'object' && !Array.isArray(whatsapp)) {
+    const whatsappObj = whatsapp as Record<string, unknown>;
+    const primaryPhoneNumber = whatsappObj.primaryPhoneNumber;
+    if (
+      typeof primaryPhoneNumber === 'string' &&
+      primaryPhoneNumber.trim().length > 0
+    ) {
+      const callingCode =
+        typeof whatsappObj.primaryPhoneCallingCode === 'string'
+          ? whatsappObj.primaryPhoneCallingCode
+          : '';
+      const prefix = callingCode;
+      return `${prefix}${primaryPhoneNumber}`.trim();
+    }
+  }
+
+  for (const value of Object.values(record)) {
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      const related = value as Record<string, unknown>;
+      if (related.__typename && related.whatsapp) {
+        const relatedWhatsapp = extractWhatsappFromRecord(related);
+        if (relatedWhatsapp) {
+          return relatedWhatsapp;
+        }
+      }
+    }
+  }
+
+  return undefined;
+};
+
+const getWhatsappHref = (phoneNumber: string): string => {
+  const digits = phoneNumber.replace(/\D/g, '');
+  return `https://wa.me/${digits}`;
+};
+
+const formatPreferenceValue = (value: unknown): string | undefined => {
+  if (!value) return undefined;
+
+  if (Array.isArray(value)) {
+    const labels = value
+      .map((item) => {
+        if (typeof item === 'string') return item;
+        if (item && typeof item === 'object') {
+          const label = (item as Record<string, unknown>).label;
+          const rawValue = (item as Record<string, unknown>).value;
+          if (typeof label === 'string') return label;
+          if (typeof rawValue === 'string') return rawValue;
+        }
+        return null;
+      })
+      .filter((item): item is string => !!item && item.trim().length > 0);
+
+    return labels.length > 0 ? labels.join(', ') : undefined;
+  }
+
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object') {
+    const obj = value as Record<string, unknown>;
+    if (typeof obj.label === 'string') return obj.label;
+    if (typeof obj.value === 'string') return obj.value;
+  }
+
+  return undefined;
+};
+
+const findCustomerRecord = (
+  record: Record<string, unknown>,
+): Record<string, unknown> | undefined => {
+  const customer = record.customer;
+  if (customer && typeof customer === 'object' && !Array.isArray(customer)) {
+    return customer as Record<string, unknown>;
+  }
+
+  for (const value of Object.values(record)) {
+    if (
+      value &&
+      typeof value === 'object' &&
+      !Array.isArray(value) &&
+      (value as Record<string, unknown>).__typename === 'Person'
+    ) {
+      return value as Record<string, unknown>;
     }
   }
 
@@ -379,8 +663,9 @@ export const SimpleRecordDetailPage = ({
 }) => {
   const navigate = useNavigate();
   const { updateOneRecord } = useUpdateOneRecord();
-  const [isEditingTitle, setIsEditingTitle] = useState(false);
-  const [editedTitle, setEditedTitle] = useState('');
+  const followUpPickerInputRef = useRef<HTMLInputElement>(null);
+  const hasMarkedReadAtRef = useRef(false);
+  const currentWorkspaceMember = useRecoilValue(currentWorkspaceMemberState);
 
   const { objectMetadataItem } = useObjectMetadataItem({
     objectNameSingular,
@@ -424,14 +709,207 @@ export const SimpleRecordDetailPage = ({
     return extractPhoneFromRecord(record as Record<string, unknown>);
   }, [record]);
 
+  const primaryWhatsapp = useMemo(() => {
+    if (!record) return undefined;
+    return extractWhatsappFromRecord(record as Record<string, unknown>);
+  }, [record]);
+
+  const followUpField = useMemo(
+    () =>
+      objectMetadataItem.fields.find(
+        (field) =>
+          field.isActive &&
+          (field.name === 'dueDate' || field.label.toLowerCase() === 'due date'),
+      ),
+    [objectMetadataItem.fields],
+  );
+
+  const followUpValue = useMemo(() => {
+    if (!record) return undefined;
+    const typedRecord = record as Record<string, unknown>;
+    const followUpRawValue = followUpField
+      ? typedRecord[followUpField.name]
+      : undefined;
+    return typeof followUpRawValue === 'string' && followUpRawValue
+      ? followUpRawValue
+      : undefined;
+  }, [record, followUpField]);
+
+  const followUpDue = useMemo(
+    () => (followUpValue ? formatDate(followUpValue) : undefined),
+    [followUpValue],
+  );
+
+  const convenientTimeField = useMemo(
+    () =>
+      objectMetadataItem.fields.find(
+        (field) =>
+          field.isActive &&
+          (field.name === 'convenientTime' ||
+            field.label.toLowerCase() === 'convenient time'),
+      ),
+    [objectMetadataItem.fields],
+  );
+
+  const convenientTimeText = useMemo(() => {
+    if (!record) return undefined;
+
+    if (convenientTimeField) {
+      const value = record[convenientTimeField.name];
+      if (typeof value === 'string' && value.trim().length > 0) {
+        return value.trim();
+      }
+    }
+
+    // Fallback for migrated/renamed convenient time fields.
+    for (const [key, value] of Object.entries(record)) {
+      if (typeof value !== 'string' || value.trim().length === 0) continue;
+      const normalizedKey = key.toLowerCase();
+      if (normalizedKey.includes('convenient') && normalizedKey.includes('time')) {
+        return value.trim();
+      }
+    }
+
+    return undefined;
+  }, [record, convenientTimeField]);
+
+  const customerPriorityFields = useMemo((): SectionField[] => {
+    if (!record) return [];
+
+    const typedRecord = record as Record<string, unknown>;
+    const customerRecord = findCustomerRecord(typedRecord);
+
+    const customerName = customerRecord
+      ? getRelatedRecordDisplayName(customerRecord)
+      : null;
+
+    const jobTitleCandidates = [
+      customerRecord?.jobTitle,
+      typedRecord.jobTitle,
+    ];
+    const jobTitle = jobTitleCandidates.find(
+      (value): value is string =>
+        typeof value === 'string' && value.trim().length > 0,
+    );
+
+    const customerCompanyRecord =
+      customerRecord &&
+      customerRecord.company &&
+      typeof customerRecord.company === 'object' &&
+      !Array.isArray(customerRecord.company)
+        ? (customerRecord.company as Record<string, unknown>)
+        : undefined;
+
+    const companyFromRelation = customerCompanyRecord
+      ? getRelatedRecordDisplayName(customerCompanyRecord)
+      : null;
+    const companyFromRoot =
+      typedRecord.company &&
+      typeof typedRecord.company === 'object' &&
+      !Array.isArray(typedRecord.company)
+        ? getRelatedRecordDisplayName(typedRecord.company as Record<string, unknown>)
+        : null;
+
+    const companyName = companyFromRelation || companyFromRoot;
+
+    const preference = formatPreferenceValue(
+      customerRecord?.workPreference ?? typedRecord.workPreference,
+    );
+
+    const propertyRecord =
+      typedRecord.property &&
+      typeof typedRecord.property === 'object' &&
+      !Array.isArray(typedRecord.property)
+        ? (typedRecord.property as Record<string, unknown>)
+        : undefined;
+    const propertyName = propertyRecord
+      ? getRelatedRecordDisplayName(propertyRecord)
+      : null;
+
+    const bodyField = objectMetadataItem.fields.find(
+      (field) => field.isActive && field.name === 'body',
+    );
+    const bodyValue = bodyField ? typedRecord[bodyField.name] : undefined;
+    const customerQuery =
+      typeof bodyValue === 'string' && bodyValue.trim().length > 0
+        ? bodyValue.trim()
+        : undefined;
+
+    const fields: SectionField[] = [];
+
+    if (customerName) {
+      fields.push({ label: 'Customer', value: customerName });
+    }
+    if (jobTitle) {
+      fields.push({ label: 'Job title', value: jobTitle });
+    }
+    if (companyName) {
+      fields.push({ label: 'Company', value: companyName });
+    }
+    if (propertyName) {
+      fields.push({ label: 'Property', value: propertyName });
+    }
+    if (preference) {
+      fields.push({ label: 'Preference', value: preference });
+    }
+    if (customerQuery) {
+      fields.push({ label: 'Customer query', value: customerQuery });
+    }
+
+    return fields;
+  }, [record, objectMetadataItem.fields]);
+
+  const originChip = useMemo(() => {
+    if (!record) return undefined;
+
+    const typedRecord = record as Record<string, unknown>;
+    const originValue = typedRecord.origin;
+
+    if (typeof originValue === 'string' && originValue.trim().length > 0) {
+      return originValue.trim();
+    }
+
+    if (originValue && typeof originValue === 'object' && !Array.isArray(originValue)) {
+      const displayName = getRelatedRecordDisplayName(
+        originValue as Record<string, unknown>,
+      );
+      if (displayName) return displayName;
+    }
+
+    const originField = objectMetadataItem.fields.find(
+      (field) => field.isActive && field.label.toLowerCase() === 'origin',
+    );
+    if (!originField) return undefined;
+
+    const fallbackValue = typedRecord[originField.name];
+    if (
+      fallbackValue &&
+      typeof fallbackValue === 'object' &&
+      !Array.isArray(fallbackValue)
+    ) {
+      return getRelatedRecordDisplayName(fallbackValue as Record<string, unknown>) ?? undefined;
+    }
+    if (typeof fallbackValue === 'string' && fallbackValue.trim().length > 0) {
+      return fallbackValue.trim();
+    }
+
+    return undefined;
+  }, [record, objectMetadataItem.fields]);
+
   // Extract relation fields (Customer, Property, etc.)
   const relationFields = useMemo((): SectionField[] => {
     if (!record) return [];
     const fields: SectionField[] = [];
+    const existingLabels = new Set(
+      customerPriorityFields.map((field) => field.label.toLowerCase()),
+    );
+    existingLabels.add('origin');
 
     for (const fieldMeta of objectMetadataItem.fields) {
       if (!fieldMeta.isActive) continue;
       if (fieldMeta.type !== FieldMetadataType.RELATION) continue;
+      if (existingLabels.has(fieldMeta.label.toLowerCase())) continue;
+      if (fieldMeta.name.toLowerCase() === 'origin') continue;
 
       const relatedRecord = record[fieldMeta.name];
       if (!relatedRecord || typeof relatedRecord !== 'object') continue;
@@ -448,7 +926,7 @@ export const SimpleRecordDetailPage = ({
     }
 
     return fields;
-  }, [record, objectMetadataItem.fields]);
+  }, [record, objectMetadataItem.fields, customerPriorityFields]);
 
   const contactFields = useMemo((): SectionField[] => {
     if (!record) return [];
@@ -459,6 +937,7 @@ export const SimpleRecordDetailPage = ({
         label: 'Email address',
         value: primaryEmail,
         href: `mailto:${primaryEmail}`,
+        actions: [{ type: 'email', href: `mailto:${primaryEmail}` }],
       });
     }
 
@@ -467,6 +946,17 @@ export const SimpleRecordDetailPage = ({
         label: 'Phone number',
         value: primaryPhone,
         href: `tel:${primaryPhone}`,
+        actions: [{ type: 'call', href: `tel:${primaryPhone}` }],
+      });
+    }
+
+    if (primaryWhatsapp) {
+      const whatsappHref = getWhatsappHref(primaryWhatsapp);
+      fields.push({
+        label: 'WhatsApp',
+        value: primaryWhatsapp,
+        href: whatsappHref,
+        actions: [{ type: 'whatsapp', href: whatsappHref }],
       });
     }
 
@@ -491,7 +981,13 @@ export const SimpleRecordDetailPage = ({
     }
 
     return fields;
-  }, [record, objectMetadataItem.fields, primaryEmail, primaryPhone]);
+  }, [
+    record,
+    objectMetadataItem.fields,
+    primaryEmail,
+    primaryPhone,
+    primaryWhatsapp,
+  ]);
 
   const dateFields = useMemo(() => {
     return objectMetadataItem.fields.filter(
@@ -499,9 +995,11 @@ export const SimpleRecordDetailPage = ({
         field.isActive &&
         (field.type === FieldMetadataType.DATE ||
           field.type === FieldMetadataType.DATE_TIME) &&
+        field.name !== followUpField?.name &&
+        !AUTO_MANAGED_FIELD_NAMES.has(field.name) &&
         !SYSTEM_FIELD_NAMES.has(field.name),
     );
-  }, [objectMetadataItem.fields]);
+  }, [objectMetadataItem.fields, followUpField?.name]);
 
   const detailFields = useMemo((): SectionField[] => {
     if (!record) return [];
@@ -516,6 +1014,7 @@ export const SimpleRecordDetailPage = ({
       if (fieldMeta.type === FieldMetadataType.DATE) continue;
       if (fieldMeta.type === FieldMetadataType.DATE_TIME) continue;
       if (fieldMeta.type === FieldMetadataType.RELATION) continue;
+      if (PRIORITY_FIELD_NAMES.has(fieldMeta.name)) continue;
       if (fieldMeta.id === objectMetadataItem.labelIdentifierFieldMetadataId)
         continue;
 
@@ -549,41 +1048,105 @@ export const SimpleRecordDetailPage = ({
     });
   };
 
-  const handleStartEditTitle = useCallback(() => {
-    setEditedTitle(displayName);
-    setIsEditingTitle(true);
-  }, [displayName]);
+  const handleFollowUpChange = (newValue: string) => {
+    if (!followUpField) return;
+    handleDateChange(followUpField.name, newValue);
+  };
 
-  const handleSaveTitle = useCallback(() => {
-    if (!labelField || !editedTitle.trim()) {
-      setIsEditingTitle(false);
+  useEffect(() => {
+    hasMarkedReadAtRef.current = false;
+  }, [objectNameSingular, objectRecordId]);
+
+  useEffect(() => {
+    if (
+      objectNameSingular !== 'lead' ||
+      !record ||
+      hasMarkedReadAtRef.current
+    ) {
       return;
     }
 
-    let updateInput: Record<string, unknown>;
-    if (labelField.type === FieldMetadataType.FULL_NAME) {
-      const parts = editedTitle.trim().split(/\s+/);
-      const firstName = parts[0] ?? '';
-      const lastName = parts.slice(1).join(' ');
-      updateInput = { [labelField.name]: { firstName, lastName } };
-    } else {
-      updateInput = { [labelField.name]: editedTitle.trim() };
+    const hasReadAtField = objectMetadataItem.fields.some(
+      (field) => field.name === 'readAt',
+    );
+
+    if (!hasReadAtField) {
+      hasMarkedReadAtRef.current = true;
+      return;
     }
 
-    updateOneRecord({
+    const typedRecord = record as Record<string, unknown>;
+    const readAt = typedRecord.readAt;
+    const normalizedReadAt =
+      typeof readAt === 'string' ? readAt.trim().toLowerCase() : readAt;
+    const isAlreadyRead =
+      normalizedReadAt !== null &&
+      normalizedReadAt !== undefined &&
+      normalizedReadAt !== '' &&
+      normalizedReadAt !== 'null' &&
+      normalizedReadAt !== 'undefined';
+
+    if (isAlreadyRead) {
+      hasMarkedReadAtRef.current = true;
+      return;
+    }
+
+    const assigneeId =
+      typeof typedRecord.assigneeId === 'string' && typedRecord.assigneeId
+        ? typedRecord.assigneeId
+        : null;
+    const assigneeRelation =
+      typedRecord.assignee &&
+      typeof typedRecord.assignee === 'object' &&
+      !Array.isArray(typedRecord.assignee)
+        ? (typedRecord.assignee as Record<string, unknown>)
+        : null;
+    const assigneeRelationId =
+      assigneeRelation && typeof assigneeRelation.id === 'string'
+        ? assigneeRelation.id
+        : null;
+    const leadAssigneeId = assigneeId ?? assigneeRelationId;
+    const currentMemberId = currentWorkspaceMember?.id ?? null;
+
+    if (
+      leadAssigneeId &&
+      currentMemberId &&
+      currentMemberId !== leadAssigneeId
+    ) {
+      hasMarkedReadAtRef.current = true;
+      return;
+    }
+
+    hasMarkedReadAtRef.current = true;
+
+    void updateOneRecord({
       idToUpdate: objectRecordId,
       objectNameSingular,
-      updateOneRecordInput: updateInput,
+      updateOneRecordInput: {
+        readAt: new Date().toISOString(),
+      },
     });
-
-    setIsEditingTitle(false);
   }, [
-    labelField,
-    editedTitle,
-    updateOneRecord,
-    objectRecordId,
+    currentWorkspaceMember,
+    objectMetadataItem.fields,
     objectNameSingular,
+    objectRecordId,
+    record,
+    updateOneRecord,
   ]);
+
+  const openFollowUpPicker = () => {
+    const input = followUpPickerInputRef.current;
+    if (!input) return;
+
+    if ('showPicker' in input && typeof input.showPicker === 'function') {
+      input.showPicker();
+      return;
+    }
+
+    input.focus();
+    input.click();
+  };
 
   if (loading && !record) {
     return <StyledLoading>Loading...</StyledLoading>;
@@ -607,80 +1170,89 @@ export const SimpleRecordDetailPage = ({
       </StyledHeader>
 
       <StyledBody>
-        <div>
+        <StyledTopCard>
           <StyledNameRow>
-            {isEditingTitle ? (
-              <>
-                <StyledNameInput
-                  value={editedTitle}
-                  onChange={(event) => setEditedTitle(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter') handleSaveTitle();
-                    if (event.key === 'Escape') setIsEditingTitle(false);
-                  }}
-                  autoFocus
-                />
-                <StyledEditButton onClick={handleSaveTitle}>
-                  <IconCheck size={16} />
-                </StyledEditButton>
-              </>
-            ) : (
-              <>
-                <StyledRecordName>
-                  {displayName || 'Untitled'}
-                </StyledRecordName>
-                <StyledEditButton onClick={handleStartEditTitle}>
-                  <IconPencil size={16} />
-                </StyledEditButton>
-              </>
-            )}
+            <StyledAvatar>{getInitials(displayName || 'Untitled')}</StyledAvatar>
+            <StyledPrimaryInfo>
+              <StyledRecordName>{displayName || 'Untitled'}</StyledRecordName>
+              {record.createdAt && (
+                <StyledCreatedDate>
+                  Created: {formatDate(record.createdAt)}
+                </StyledCreatedDate>
+              )}
+            </StyledPrimaryInfo>
+            {originChip && <StyledChip>{originChip}</StyledChip>}
           </StyledNameRow>
-          {record.createdAt && (
-            <StyledCreatedDate>{formatDate(record.createdAt)}</StyledCreatedDate>
+
+          <StyledTopActionRow>
+            <StyledStageSlot>
+              <StyledStatusLabel>Status</StyledStatusLabel>
+              <SimpleRecordDetailStageSelect
+                compact
+                record={record}
+                objectMetadataItem={objectMetadataItem}
+              />
+            </StyledStageSlot>
+            {followUpField && (
+              <StyledFollowUpDue>
+                <StyledFollowUpLabel>Follow up due</StyledFollowUpLabel>
+                <StyledFollowUpValueRow
+                  role="button"
+                  onClick={openFollowUpPicker}
+                >
+                  <StyledFollowUpValue>{followUpDue ?? '-'}</StyledFollowUpValue>
+                  <StyledFollowUpCalendarButton
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      openFollowUpPicker();
+                    }}
+                    aria-label="Set follow up due"
+                  >
+                    <IconCalendar size={16} />
+                  </StyledFollowUpCalendarButton>
+                  <StyledHiddenFollowUpInput
+                    ref={followUpPickerInputRef}
+                    type={
+                      followUpField.type === FieldMetadataType.DATE_TIME
+                        ? 'datetime-local'
+                        : 'date'
+                    }
+                    value={
+                      followUpField.type === FieldMetadataType.DATE_TIME
+                        ? toDateTimeInputValue(followUpValue)
+                        : toDateInputValue(followUpValue)
+                    }
+                    onChange={(event) => handleFollowUpChange(event.target.value)}
+                  />
+                </StyledFollowUpValueRow>
+              </StyledFollowUpDue>
+            )}
+          </StyledTopActionRow>
+
+          {(convenientTimeField || convenientTimeText !== undefined) && (
+            <StyledTopMetaRow>
+              <StyledTopMetaItem>
+                <StyledFollowUpLabel>
+                  {convenientTimeField?.label ?? 'Convenient Time'}
+                </StyledFollowUpLabel>
+                <StyledTopMetaValue>{convenientTimeText ?? '-'}</StyledTopMetaValue>
+              </StyledTopMetaItem>
+            </StyledTopMetaRow>
           )}
-        </div>
+        </StyledTopCard>
 
-        <SimpleRecordDetailActionButtons
-          phoneNumber={primaryPhone}
-          email={primaryEmail}
-        />
-
-        <SimpleRecordDetailStageSelect
-          record={record}
-          objectMetadataItem={objectMetadataItem}
-        />
-
-        {relationFields.length > 0 && (
+        {customerPriorityFields.length > 0 && (
           <SimpleRecordDetailSection
-            title="Related"
-            fields={relationFields}
+            title="Details"
+            fields={customerPriorityFields}
           />
         )}
-
-        {dateFields.map((field) => (
-          <StyledDateSection key={field.id}>
-            <StyledDateLabel>{field.label}</StyledDateLabel>
-            <StyledDateInput
-              type="date"
-              value={toDateInputValue(record[field.name] as string)}
-              onChange={(event) =>
-                handleDateChange(field.name, event.target.value)
-              }
-            />
-          </StyledDateSection>
-        ))}
 
         {contactFields.length > 0 && (
           <SimpleRecordDetailSection
             title="Contact info"
             fields={contactFields}
-          />
-        )}
-
-        {detailFields.length > 0 && (
-          <SimpleRecordDetailSection
-            title="Details"
-            fields={detailFields}
           />
         )}
 
@@ -690,6 +1262,37 @@ export const SimpleRecordDetailPage = ({
           objectRecordId={objectRecordId}
           record={record}
         />
+
+        {relationFields.length > 0 && (
+          <SimpleRecordDetailSection title="Related" fields={relationFields} />
+        )}
+
+        {dateFields.map((field) => (
+          <StyledDateSection key={field.id}>
+            <StyledDateLabel>{field.label}</StyledDateLabel>
+            {field.name === 'dueDate' ||
+            field.label.toLowerCase() === 'due date' ? (
+              <StyledReadOnlyDateValue>
+                <span>
+                  {field.type === FieldMetadataType.DATE_TIME
+                    ? formatDate(String(record[field.name] ?? ''))
+                    : formatDateOnly(String(record[field.name] ?? ''))}
+                </span>
+                <IconCalendar size={20} />
+              </StyledReadOnlyDateValue>
+            ) : (
+              <StyledDateInput
+                type="date"
+                value={toDateInputValue(record[field.name] as string)}
+                onChange={(event) => handleDateChange(field.name, event.target.value)}
+              />
+            )}
+          </StyledDateSection>
+        ))}
+
+        {detailFields.length > 0 && (
+          <SimpleRecordDetailSection title="Details" fields={detailFields} />
+        )}
       </StyledBody>
     </StyledContainer>
   );

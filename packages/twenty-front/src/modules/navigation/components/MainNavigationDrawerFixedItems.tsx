@@ -5,6 +5,7 @@ import { NavigationDrawerItem } from '@/ui/navigation/navigation-drawer/componen
 import { isNavigationDrawerExpandedState } from '@/ui/navigation/states/isNavigationDrawerExpanded';
 import { navigationDrawerExpandedMemorizedState } from '@/ui/navigation/states/navigationDrawerExpandedMemorizedState';
 import { navigationMemorizedUrlState } from '@/ui/navigation/states/navigationMemorizedUrlState';
+import { useColorScheme } from '@/ui/theme/hooks/useColorScheme';
 import { useIsFeatureEnabled } from '@/workspace/hooks/useIsFeatureEnabled';
 import { useLingui } from '@lingui/react/macro';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -13,9 +14,11 @@ import { SettingsPath } from 'twenty-shared/types';
 import { getSettingsPath } from 'twenty-shared/utils';
 import {
   IconEye,
+  IconMoon,
   IconSearch,
   IconSettings,
   IconSparkles,
+  IconSun,
 } from 'twenty-ui/display';
 import { useIsMobile } from 'twenty-ui/utilities';
 import { FeatureFlagKey } from '~/generated/graphql';
@@ -41,6 +44,7 @@ export const MainNavigationDrawerFixedItems = () => {
   const { openRecordsSearchPage } = useOpenRecordsSearchPageInCommandMenu();
   const { openAskAIPage } = useOpenAskAIPageInCommandMenu();
   const isAiEnabled = useIsFeatureEnabled(FeatureFlagKey.IS_AI_ENABLED);
+  const { colorScheme, setColorScheme } = useColorScheme();
 
   return (
     !isMobile && (
@@ -61,6 +65,11 @@ export const MainNavigationDrawerFixedItems = () => {
             mouseUpNavigation={true}
           />
         )}
+        <NavigationDrawerItem
+          label={t`Dark mode`}
+          Icon={colorScheme === 'Dark' ? IconSun : IconMoon}
+          onClick={() => setColorScheme(colorScheme === 'Dark' ? 'Light' : 'Dark')}
+        />
         <NavigationDrawerItem
           label={t`Simple View`}
           Icon={IconEye}

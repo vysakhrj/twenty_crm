@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import { t } from '@lingui/core/macro';
 import { useEffect, useMemo, useState } from 'react';
+import { isDefined } from 'twenty-shared/utils';
 
 import { useSalesAvailability } from '@/settings/members/hooks/useSalesAvailability';
 import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
@@ -58,9 +59,13 @@ const StyledDayCard = styled.button<{ checked: boolean; disabled?: boolean }>`
     ${({ checked, theme }) =>
       checked ? theme.border.color.strong : theme.border.color.medium};
   border-radius: ${({ theme }) => theme.border.radius.md};
+  color: ${({ disabled, theme }) =>
+    disabled ? theme.font.color.tertiary : theme.font.color.primary};
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   display: flex;
   flex-direction: column;
+  font-family: ${({ theme }) => theme.font.family};
+  font-size: ${({ theme }) => theme.font.size.md};
   gap: ${({ theme }) => theme.spacing(1)};
   justify-content: center;
   opacity: ${({ disabled }) => (disabled ? 0.6 : 1)};
@@ -178,6 +183,10 @@ export const MemberSalesAvailabilitySection = ({
     updateSalesAvailability,
     updateSalesLeave,
   } = useSalesAvailability();
+  const [hasSalesAvailabilityAccess, setHasSalesAvailabilityAccess] =
+    useState(false);
+  const [resolvedIsSalesMember, setResolvedIsSalesMember] =
+    useState(isSalesMember);
 
   const [availabilityStartTime, setAvailabilityStartTime] = useState<string>(
     member.availabilityStartTime ?? '00:00',
@@ -226,12 +235,39 @@ export const MemberSalesAvailabilitySection = ({
   ]);
 
   useEffect(() => {
-    if (!isSalesMember) {
-      return;
-    }
+    let isMounted = true;
 
-    void fetchSalesUsersStatus();
-  }, [fetchSalesUsersStatus, isSalesMember]);
+    const loadSalesStatuses = async () => {
+      try {
+        const statusMap = await fetchSalesUsersStatus();
+
+        if (!isMounted) {
+          return;
+        }
+
+        setHasSalesAvailabilityAccess(true);
+        setResolvedIsSalesMember(
+          isDefined(statusMap) && isDefined(statusMap[member.id]),
+        );
+      } catch {
+        if (!isMounted) {
+          return;
+        }
+
+        setHasSalesAvailabilityAccess(false);
+      }
+    };
+
+    void loadSalesStatuses();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [fetchSalesUsersStatus, member.id]);
+
+  const canEditSalesAvailability = canEdit || hasSalesAvailabilityAccess;
+  const isResolvedSalesMember =
+    resolvedIsSalesMember || isDefined(salesStatusesByMemberId[member.id]);
 
   const currentSalesStatus = useMemo(
     () => salesStatusesByMemberId[member.id]?.status,
@@ -239,7 +275,7 @@ export const MemberSalesAvailabilitySection = ({
   );
 
   const handleToggleDay = (day: string, nextChecked?: boolean) => {
-    if (!canEdit) {
+    if (!canEditSalesAvailability) {
       return;
     }
 
@@ -361,7 +397,19 @@ export const MemberSalesAvailabilitySection = ({
     }
   };
 
-  if (!isSalesMember) {
+  if (!isResolvedSalesMember && isLoadingSalesStatuses) {
+    return (
+      <Section>
+        <H2Title
+          title={t`Sales Availability`}
+          description={t`Loading scheduling settings`}
+        />
+        <StyledMutedText>{t`Refreshing sales availability...`}</StyledMutedText>
+      </Section>
+    );
+  }
+
+  if (!isResolvedSalesMember) {
     return (
       <Section>
         <H2Title
@@ -378,7 +426,7 @@ export const MemberSalesAvailabilitySection = ({
       <H2Title
         title={t`Sales Availability`}
         description={
-          canEdit
+          canEditSalesAvailability
             ? t`Set availability time range, active days, and leave period`
             : t`Read-only view. Only manager/super admin can edit sales scheduling.`
         }
@@ -414,7 +462,7 @@ export const MemberSalesAvailabilitySection = ({
               inputMode="numeric"
               value={availabilityStartTime}
               onChange={(event) => setAvailabilityStartTime(event.target.value)}
-              disabled={!canEdit}
+              disabled={!canEditSalesAvailability}
               placeholder='00:00'
             />
           </div>
@@ -425,7 +473,7 @@ export const MemberSalesAvailabilitySection = ({
               inputMode="numeric"
               value={availabilityEndTime}
               onChange={(event) => setAvailabilityEndTime(event.target.value)}
-              disabled={!canEdit}
+              disabled={!canEditSalesAvailability}
               placeholder='24:00'
             />
           </div>
@@ -438,14 +486,14 @@ export const MemberSalesAvailabilitySection = ({
               <StyledDayCard
                 key={day.key}
                 checked={checked}
-                disabled={!canEdit}
+                disabled={!canEditSalesAvailability}
                 type="button"
                 onClick={() => handleToggleDay(day.key)}
               >
                 <div>{day.label}</div>
                 <Checkbox
                   checked={checked}
-                  disabled={!canEdit}
+                  disabled={!canEditSalesAvailability}
                   onChange={(event) => {
                     event.stopPropagation();
                     handleToggleDay(day.key, event.target.checked);
@@ -462,7 +510,7 @@ export const MemberSalesAvailabilitySection = ({
           title={t`Save availability`}
           variant="secondary"
           onClick={handleSaveAvailability}
-          disabled={!canEdit}
+          disabled={!canEditSalesAvailability}
           isLoading={isSavingSalesAvailability}
         />
       </StyledActionsRow>
@@ -474,7 +522,7 @@ export const MemberSalesAvailabilitySection = ({
             type="date"
             value={leaveStartDate}
             onChange={(event) => setLeaveStartDate(event.target.value)}
-            disabled={!canEdit}
+            disabled={!canEditSalesAvailability}
           />
         </div>
         <div>
@@ -483,7 +531,7 @@ export const MemberSalesAvailabilitySection = ({
             type="date"
             value={leaveEndDate}
             onChange={(event) => setLeaveEndDate(event.target.value)}
-            disabled={!canEdit}
+            disabled={!canEditSalesAvailability}
           />
         </div>
       </StyledLeaveGrid>
@@ -493,14 +541,14 @@ export const MemberSalesAvailabilitySection = ({
           title={t`Apply leave`}
           variant="secondary"
           onClick={handleApplyLeave}
-          disabled={!canEdit}
+          disabled={!canEditSalesAvailability}
           isLoading={isSavingSalesLeave}
         />
         <Button
           title={t`Clear leave`}
           variant="tertiary"
           onClick={handleClearLeave}
-          disabled={!canEdit}
+          disabled={!canEditSalesAvailability}
           isLoading={isSavingSalesLeave}
         />
       </StyledActionsRow>

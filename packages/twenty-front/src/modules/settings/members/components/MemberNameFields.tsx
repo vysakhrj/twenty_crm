@@ -6,6 +6,7 @@ type MemberNameFieldsProps = {
   firstName: string;
   lastName: string;
   onChange: (field: 'firstName' | 'lastName', value: string) => void;
+  disabled?: boolean;
 };
 
 export const MemberNameFields = ({
@@ -13,6 +14,7 @@ export const MemberNameFields = ({
   firstName,
   lastName,
   onChange,
+  disabled = false,
 }: MemberNameFieldsProps) => {
   const firstNameInstanceId = `${memberId}-first-name`;
   const lastNameInstanceId = `${memberId}-last-name`;
@@ -27,6 +29,7 @@ export const MemberNameFields = ({
         onChange={(value) => {
           onChange('firstName', value);
         }}
+        disabled={disabled}
         fullWidth
       />
       <SettingsTextInput
@@ -37,6 +40,7 @@ export const MemberNameFields = ({
         onChange={(value) => {
           onChange('lastName', value);
         }}
+        disabled={disabled}
         fullWidth
       />
     </>

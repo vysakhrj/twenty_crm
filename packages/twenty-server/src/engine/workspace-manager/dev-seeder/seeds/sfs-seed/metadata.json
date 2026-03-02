@@ -19063,7 +19063,20 @@
         "applicationId": "bbb719d5-4626-40d6-aec6-7d53f24e5459"
       }
     ],
-    "objectPermission": [],
+    "objectPermission": [
+      {
+        "id": "0f6bbf79-52f0-4f0e-8d9a-5a2f0e819f43",
+        "roleId": "9b10f843-22ed-4429-ba95-c218fea6be03",
+        "objectMetadataId": "41a553bd-c463-40f2-88bc-07967f17a128",
+        "canReadObjectRecords": true,
+        "canUpdateObjectRecords": false,
+        "canSoftDeleteObjectRecords": false,
+        "canDestroyObjectRecords": false,
+        "workspaceId": "a8cf39ab-a363-48fd-8960-096055b51144",
+        "createdAt": "2026-02-28T05:17:39.674Z",
+        "updatedAt": "2026-02-28T05:17:39.674Z"
+      }
+    ],
     "fieldPermission": [],
     "view": [
       {

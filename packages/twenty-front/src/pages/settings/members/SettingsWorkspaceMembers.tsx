@@ -12,8 +12,10 @@ import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
 import { useCurrentUserRole } from '@/auth/hooks/useCurrentUserRole';
 import { CoreObjectNameSingular } from '@/object-metadata/types/CoreObjectNameSingular';
 import { useFindManyRecords } from '@/object-record/hooks/useFindManyRecords';
-import { useSalesAvailability } from '@/settings/members/hooks/useSalesAvailability';
 import { SettingsPageContainer } from '@/settings/components/SettingsPageContainer';
+import { useSalesAvailability } from '@/settings/members/hooks/useSalesAvailability';
+import { settingsAllRolesSelector } from '@/settings/roles/states/settingsAllRolesSelector';
+import { useWorkspaceMemberRoles } from '@/settings/members/hooks/useWorkspaceMemberRoles';
 import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
 import { SettingsTextInput } from '@/ui/input/components/SettingsTextInput';
@@ -112,6 +114,17 @@ const StyledNoMembers = styled(TableCell)`
   color: ${({ theme }) => theme.font.color.tertiary};
 `;
 
+const hasManagerOrAdminRoleLabel = (roleLabel: string) => {
+  const normalizedRoleLabel = roleLabel.toLowerCase();
+
+  return (
+    normalizedRoleLabel.includes('manager') ||
+    normalizedRoleLabel.includes('admin') ||
+    normalizedRoleLabel.includes('superadmin') ||
+    normalizedRoleLabel.includes('super admin')
+  );
+};
+
 export const SettingsWorkspaceMembers = () => {
   const { t } = useLingui();
   const { enqueueErrorSnackBar } = useSnackBar();
@@ -120,7 +133,14 @@ export const SettingsWorkspaceMembers = () => {
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [searchFilter, setSearchFilter] = useState('');
   const currentWorkspaceMember = useRecoilValue(currentWorkspaceMemberState);
-  const { isAdmin } = useCurrentUserRole();
+  const { isAdmin, currentWorkspaceMemberId } = useCurrentUserRole();
+  const allRoles = useRecoilValue(settingsAllRolesSelector);
+  const { roles: currentMemberRoles } = useWorkspaceMemberRoles(
+    currentWorkspaceMemberId ?? '',
+  );
+  const canManageSalesSettings =
+    isAdmin ||
+    currentMemberRoles.some((role) => hasManagerOrAdminRoleLabel(role.label));
   const {
     salesStatusesByMemberId,
     fetchSalesUsersStatus,
@@ -183,12 +203,12 @@ export const SettingsWorkspaceMembers = () => {
   };
 
   useEffect(() => {
-    if (!isAdmin) {
+    if (!canManageSalesSettings) {
       return;
     }
 
     void fetchSalesUsersStatus();
-  }, [fetchSalesUsersStatus, isAdmin]);
+  }, [canManageSalesSettings, fetchSalesUsersStatus]);
 
   useGetWorkspaceInvitationsQuery({
     onError: (error: ApolloError) => {
@@ -246,28 +266,62 @@ export const SettingsWorkspaceMembers = () => {
   };
 
   const optimizedWorkspaceMembers = useMemo(() => {
-    if (!searchFilter.trim()) {
-      return workspaceMembers;
+    const normalizedSearchTerm = normalizeSearchText(searchFilter);
+    const searchTerms = normalizedSearchTerm
+      .split(/\s+/)
+      .filter((term) => term.length > 0);
+
+    const filteredBySearch =
+      searchTerms.length === 0
+        ? workspaceMembers
+        : workspaceMembers.filter((member) => {
+            const firstName = normalizeSearchText(member.name.firstName);
+            const lastName = normalizeSearchText(member.name.lastName);
+            const email = normalizeSearchText(member.userEmail);
+            const fullName = `${firstName} ${lastName}`.trim();
+
+            return searchTerms.every(
+              (term) =>
+                firstName.includes(term) ||
+                lastName.includes(term) ||
+                fullName.includes(term) ||
+                email.includes(term),
+            );
+          });
+
+    const adminWorkspaceMemberIds = new Set(
+      allRoles
+        .filter(
+          (role) =>
+            role.canUpdateAllSettings ||
+            role.label.toLowerCase().includes('admin') ||
+            role.label.toLowerCase().includes('superadmin') ||
+            role.label.toLowerCase().includes('super admin'),
+        )
+        .flatMap((role) => role.workspaceMembers.map((member) => member.id)),
+    );
+
+    const isCurrentManagerWithoutAdmin =
+      !isAdmin &&
+      currentMemberRoles.some((role) =>
+        role.label.toLowerCase().includes('manager'),
+      ) &&
+      !currentMemberRoles.some(
+        (role) =>
+          role.canUpdateAllSettings ||
+          role.label.toLowerCase().includes('admin') ||
+          role.label.toLowerCase().includes('superadmin') ||
+          role.label.toLowerCase().includes('super admin'),
+      );
+
+    if (!isCurrentManagerWithoutAdmin) {
+      return filteredBySearch;
     }
 
-    const normalizedSearchTerm = normalizeSearchText(searchFilter);
-    const searchTerms = normalizedSearchTerm.split(/\s+/);
-
-    return workspaceMembers.filter((member) => {
-      const firstName = normalizeSearchText(member.name.firstName);
-      const lastName = normalizeSearchText(member.name.lastName);
-      const email = normalizeSearchText(member.userEmail);
-      const fullName = `${firstName} ${lastName}`.trim();
-
-      return searchTerms.every(
-        (term) =>
-          firstName.includes(term) ||
-          lastName.includes(term) ||
-          fullName.includes(term) ||
-          email.includes(term),
-      );
-    });
-  }, [workspaceMembers, searchFilter]);
+    return filteredBySearch.filter(
+      (member) => !adminWorkspaceMemberIds.has(member.id),
+    );
+  }, [allRoles, currentMemberRoles, isAdmin, searchFilter, workspaceMembers]);
 
   return (
     <SubMenuTopBarContainer
@@ -396,8 +450,14 @@ export const SettingsWorkspaceMembers = () => {
           </StyledSearchContainer>
           <StyledTable hasMoreRows={hasNextPage}>
             <TableRow
-              gridAutoColumns={isAdmin ? '150px 1fr 130px 40px' : '150px 1fr 40px'}
-              mobileGridAutoColumns={isAdmin ? '100px 1fr 90px 32px' : '100px 1fr 32px'}
+              gridAutoColumns={
+                canManageSalesSettings ? '150px 1fr 130px 40px' : '150px 1fr 40px'
+              }
+              mobileGridAutoColumns={
+                canManageSalesSettings
+                  ? '100px 1fr 90px 32px'
+                  : '100px 1fr 32px'
+              }
             >
               <TableHeader>
                 <Trans>Name</Trans>
@@ -405,7 +465,7 @@ export const SettingsWorkspaceMembers = () => {
               <TableHeader>
                 <Trans>Email</Trans>
               </TableHeader>
-              {isAdmin && (
+              {canManageSalesSettings && (
                 <TableHeader>
                   <Trans>Status</Trans>
                 </TableHeader>
@@ -417,10 +477,14 @@ export const SettingsWorkspaceMembers = () => {
                 optimizedWorkspaceMembers.map((workspaceMember) => (
                   <StyledClickableTableRow
                     gridAutoColumns={
-                      isAdmin ? '150px 1fr 130px 40px' : '150px 1fr 40px'
+                      canManageSalesSettings
+                        ? '150px 1fr 130px 40px'
+                        : '150px 1fr 40px'
                     }
                     mobileGridAutoColumns={
-                      isAdmin ? '100px 1fr 90px 32px' : '100px 1fr 32px'
+                      canManageSalesSettings
+                        ? '100px 1fr 90px 32px'
+                        : '100px 1fr 32px'
                     }
                     key={workspaceMember.id}
                     onClick={() => {
@@ -463,7 +527,7 @@ export const SettingsWorkspaceMembers = () => {
                         {workspaceMember.userEmail}
                       </StyledTextContainerWithEllipsis>
                     </TableCell>
-                    {isAdmin && (
+                    {canManageSalesSettings && (
                       <TableCell>
                         {salesStatusesByMemberId[workspaceMember.id]?.status ? (
                           <Status

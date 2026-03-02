@@ -10,11 +10,14 @@ import { SimpleViewObjectConfig } from '@/ui/layout/simple-view/components/Simpl
 import { isSimpleViewDrawerOpenState } from '@/ui/layout/simple-view/states/isSimpleViewDrawerOpenState';
 import { isSimpleViewEnabledState } from '@/ui/layout/simple-view/states/isSimpleViewEnabledState';
 import { simpleViewObjectsState } from '@/ui/layout/simple-view/states/simpleViewObjectsState';
+import { useColorScheme } from '@/ui/theme/hooks/useColorScheme';
 import {
   IconArrowLeft,
   IconLayoutSidebarRightCollapse,
+  IconMoon,
   IconSettings,
   IconSettings2,
+  IconSun,
 } from 'twenty-ui/display';
 
 const StyledOverlay = styled(motion.div)`
@@ -186,6 +189,7 @@ export const SimpleViewSideDrawer = () => {
   const { alphaSortedActiveNonSystemObjectMetadataItems } =
     useFilteredObjectMetadataItems();
   const [showObjectConfig, setShowObjectConfig] = useState(false);
+  const { colorScheme, setColorScheme } = useColorScheme();
 
   const currentPath = window.location.pathname;
 
@@ -285,6 +289,26 @@ export const SimpleViewSideDrawer = () => {
               {showObjectConfig && <SimpleViewObjectConfig />}
 
               <StyledDivider />
+
+              <StyledToggleRow>
+                <StyledToggleLabel>
+                  {colorScheme === 'Dark' ? (
+                    <>
+                      <IconSun size={14} /> Dark mode
+                    </>
+                  ) : (
+                    <>
+                      <IconMoon size={14} /> Dark mode
+                    </>
+                  )}
+                </StyledToggleLabel>
+                <StyledToggle
+                  isOn={colorScheme === 'Dark'}
+                  onClick={() =>
+                    setColorScheme(colorScheme === 'Dark' ? 'Light' : 'Dark')
+                  }
+                />
+              </StyledToggleRow>
 
               <StyledToggleRow>
                 <StyledToggleLabel>

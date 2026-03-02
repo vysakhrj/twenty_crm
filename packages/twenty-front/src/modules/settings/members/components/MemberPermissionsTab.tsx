@@ -46,12 +46,14 @@ type MemberPermissionsTabProps = {
   member: WorkspaceMember;
   roles: RoleWithPartialMembers[];
   allRoles: RoleWithPartialMembers[];
+  canEditRoleAssignment?: boolean;
 };
 
 export const MemberPermissionsTab = ({
   member,
   roles,
   allRoles,
+  canEditRoleAssignment = true,
 }: MemberPermissionsTabProps) => {
   const primaryRole = roles?.[0];
   const { getIcon } = useIcons();
@@ -75,6 +77,10 @@ export const MemberPermissionsTab = ({
       })) || [];
 
   const handleRoleChangeRequest = (newRoleId: string) => {
+    if (!canEditRoleAssignment) {
+      return;
+    }
+
     const newRole = allRoles.find((role) => role.id === newRoleId);
     if (!newRole || newRoleId === primaryRole?.id) return;
 
@@ -133,6 +139,7 @@ export const MemberPermissionsTab = ({
               options={rolesOptions}
               value={primaryRole.id}
               onChange={handleRoleChangeRequest}
+              disabled={!canEditRoleAssignment}
               withSearchInput
               fullWidth
             />

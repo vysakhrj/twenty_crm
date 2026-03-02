@@ -1,9 +1,15 @@
 import styled from '@emotion/styled';
+import { useRecoilValue } from 'recoil';
 
+import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
+import { currentWorkspaceMembersState } from '@/auth/states/currentWorkspaceMembersState';
+import { CoreObjectNameSingular } from '@/object-metadata/types/CoreObjectNameSingular';
 import { type ObjectMetadataItem } from '@/object-metadata/types/ObjectMetadataItem';
 import { type ObjectRecord } from '@/object-record/types/ObjectRecord';
-import { IconChevronRight } from 'twenty-ui/display';
 import { FieldMetadataType } from 'twenty-shared/types';
+import { isDefined } from 'twenty-shared/utils';
+import { Chip, ChipAccent, ChipSize, ChipVariant } from 'twenty-ui/components';
+import { IconChevronRight } from 'twenty-ui/display';
 
 const StyledRow = styled.div`
   align-items: center;
@@ -43,12 +49,19 @@ const StyledSubText = styled.div`
   white-space: nowrap;
 `;
 
-const StyledDot = styled.div<{ dotColor?: string }>`
-  background: ${({ dotColor }) => dotColor ?? '#e57373'};
+const StyledRightSection = styled.div`
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  gap: ${({ theme }) => theme.spacing(2)};
+`;
+
+const StyledUnreadDot = styled.div`
+  background: ${({ theme }) => theme.color.blue};
   border-radius: 50%;
   flex-shrink: 0;
-  height: 10px;
-  width: 10px;
+  height: 8px;
+  width: 8px;
 `;
 
 const StyledChevron = styled.div`
@@ -105,6 +118,49 @@ const getSelectFieldValue = (
     : { label: String(value) };
 };
 
+const ASSIGNEE_FIELD_CANDIDATE_NAMES = [
+  'assignedTo',
+  'assignee',
+  'owner',
+  'manager',
+] as const;
+
+const getAssigneeJoinColumnId = (
+  record: ObjectRecord,
+  objectMetadataItem: ObjectMetadataItem,
+): string | null => {
+  const workspaceMemberRelationFields = objectMetadataItem.fields.filter(
+    (field) =>
+      field.type === FieldMetadataType.RELATION &&
+      field.isActive &&
+      isDefined(field.relation?.targetObjectMetadata?.nameSingular) &&
+      field.relation?.targetObjectMetadata?.nameSingular ===
+        CoreObjectNameSingular.WorkspaceMember &&
+      isDefined(field.settings?.joinColumnName),
+  );
+
+  if (workspaceMemberRelationFields.length === 0) {
+    return null;
+  }
+
+  const preferredRelationField =
+    workspaceMemberRelationFields.find((field) =>
+      ASSIGNEE_FIELD_CANDIDATE_NAMES.includes(
+        field.name as (typeof ASSIGNEE_FIELD_CANDIDATE_NAMES)[number],
+      ),
+    ) ?? workspaceMemberRelationFields[0];
+
+  const joinColumnName = preferredRelationField.settings?.joinColumnName;
+
+  if (!isDefined(joinColumnName)) {
+    return null;
+  }
+
+  const idValue = record[joinColumnName];
+
+  return typeof idValue === 'string' && idValue.length > 0 ? idValue : null;
+};
+
 // Extract display names from relation fields (Customer, Property, etc.)
 const getRelationSummaries = (
   record: ObjectRecord,
@@ -146,19 +202,6 @@ const getRelationSummaries = (
   return summaries;
 };
 
-const SELECT_DOT_COLOR_MAP: Record<string, string> = {
-  green: '#34a853',
-  turquoise: '#40bad5',
-  sky: '#64b4e6',
-  blue: '#4285f4',
-  purple: '#9b51e0',
-  pink: '#e96ba8',
-  red: '#ea4335',
-  orange: '#ff9800',
-  yellow: '#fbbc04',
-  gray: '#9e9e9e',
-};
-
 const formatRelativeTime = (dateString: string): string => {
   try {
     const date = new Date(dateString);
@@ -194,6 +237,9 @@ export const SimpleRecordListCard = ({
   objectMetadataItem: ObjectMetadataItem;
   onClick: () => void;
 }) => {
+  const currentWorkspaceMember = useRecoilValue(currentWorkspaceMemberState);
+  const workspaceMembers = useRecoilValue(currentWorkspaceMembersState);
+
   const displayName = getRecordDisplayName(record, objectMetadataItem);
   const selectValue = getSelectFieldValue(record, objectMetadataItem);
   const relativeTime = record.createdAt
@@ -201,14 +247,39 @@ export const SimpleRecordListCard = ({
     : null;
   const relationSummaries = getRelationSummaries(record, objectMetadataItem);
 
+  const assigneeId = getAssigneeJoinColumnId(record, objectMetadataItem);
+
+  // Don't show the assignee avatar when it's the current user (e.g. sales role seeing own tickets)
+  const isAssigneeSelf =
+    isDefined(assigneeId) && assigneeId === currentWorkspaceMember?.id;
+
+  const assigneeMember =
+    isDefined(assigneeId) && !isAssigneeSelf
+      ? workspaceMembers.find((member) => member.id === assigneeId)
+      : null;
+
+  const assigneePlaceholder = isDefined(assigneeMember)
+    ? `${assigneeMember.name.firstName} ${assigneeMember.name.lastName}`.trim()
+    : undefined;
+
   const subParts: string[] = [];
   if (relationSummaries.length > 0) subParts.push(...relationSummaries);
   if (selectValue) subParts.push(selectValue.label);
   if (relativeTime) subParts.push(relativeTime);
 
-  const dotColor = selectValue?.color
-    ? SELECT_DOT_COLOR_MAP[selectValue.color]
-    : undefined;
+  const readAtValue = record.readAt;
+  const hasReadAtValue = Object.prototype.hasOwnProperty.call(record, 'readAt');
+  const normalizedReadAtValue =
+    typeof readAtValue === 'string'
+      ? readAtValue.trim().toLowerCase()
+      : readAtValue;
+  const isUnread =
+    hasReadAtValue &&
+    (normalizedReadAtValue === null ||
+      normalizedReadAtValue === undefined ||
+      normalizedReadAtValue === '' ||
+      normalizedReadAtValue === 'null' ||
+      normalizedReadAtValue === 'undefined');
 
   return (
     <StyledRow onClick={onClick}>
@@ -218,10 +289,22 @@ export const SimpleRecordListCard = ({
           <StyledSubText>{subParts.join(' \u00B7 ')}</StyledSubText>
         )}
       </StyledTextContainer>
-      {selectValue && <StyledDot dotColor={dotColor} />}
-      <StyledChevron>
-        <IconChevronRight size={16} />
-      </StyledChevron>
+      <StyledRightSection>
+        {isDefined(assigneeMember) && isDefined(assigneePlaceholder) && (
+          <Chip
+            label={assigneePlaceholder}
+            variant={ChipVariant.Highlighted}
+            accent={ChipAccent.TextSecondary}
+            size={ChipSize.Small}
+            clickable={false}
+            maxWidth={120}
+          />
+        )}
+        {isUnread ? <StyledUnreadDot /> : <span>&nbsp;</span>}
+        <StyledChevron>
+          <IconChevronRight size={16} />
+        </StyledChevron>
+      </StyledRightSection>
     </StyledRow>
   );
 };
