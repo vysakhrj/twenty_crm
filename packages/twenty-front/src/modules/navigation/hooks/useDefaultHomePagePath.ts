@@ -62,9 +62,27 @@ export const useDefaultHomePagePath = () => {
       return null;
     }
 
-    const view = getFirstView(firstObjectMetadataItem?.id);
+    const view = getFirstView(firstObjectMetadataItem.id);
 
     return { objectMetadataItem: firstObjectMetadataItem, view };
+  }, [getFirstView, readableAlphaSortedActiveNonSystemObjectMetadataItems]);
+
+  const leadsObjectPathInfo = useMemo<ObjectPathInfo | null>(() => {
+    const leadsObjectMetadataItem =
+      readableAlphaSortedActiveNonSystemObjectMetadataItems.find((item) => {
+        const nameSingularLower = item.nameSingular.toLowerCase();
+        const namePluralLower = item.namePlural.toLowerCase();
+
+        return nameSingularLower === 'lead' || namePluralLower === 'leads';
+      });
+
+    if (!isDefined(leadsObjectMetadataItem)) {
+      return null;
+    }
+
+    const view = getFirstView(leadsObjectMetadataItem.id);
+
+    return { objectMetadataItem: leadsObjectMetadataItem, view };
   }, [getFirstView, readableAlphaSortedActiveNonSystemObjectMetadataItems]);
 
   const getDefaultObjectPathInfo = useRecoilCallback(
@@ -89,10 +107,19 @@ export const useDefaultHomePagePath = () => {
           };
         }
 
+        if (isDefined(leadsObjectPathInfo)) {
+          return leadsObjectPathInfo;
+        }
+
         return firstObjectPathInfo;
       };
     },
-    [firstObjectPathInfo, getActiveObjectMetadataItemMatchingId, getFirstView],
+    [
+      firstObjectPathInfo,
+      getActiveObjectMetadataItemMatchingId,
+      getFirstView,
+      leadsObjectPathInfo,
+    ],
   );
 
   const defaultHomePagePath = useMemo(() => {

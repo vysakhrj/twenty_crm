@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
+import { useAuth } from '@/auth/hooks/useAuth';
 import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
 import { useFilteredObjectMetadataItems } from '@/object-metadata/hooks/useFilteredObjectMetadataItems';
 import { SimpleViewObjectConfig } from '@/ui/layout/simple-view/components/SimpleViewObjectConfig';
@@ -11,6 +12,7 @@ import { isSimpleViewDrawerOpenState } from '@/ui/layout/simple-view/states/isSi
 import { isSimpleViewEnabledState } from '@/ui/layout/simple-view/states/isSimpleViewEnabledState';
 import { simpleViewObjectsState } from '@/ui/layout/simple-view/states/simpleViewObjectsState';
 import { useColorScheme } from '@/ui/theme/hooks/useColorScheme';
+import { useLingui } from '@lingui/react/macro';
 import {
   IconArrowLeft,
   IconLayoutSidebarRightCollapse,
@@ -18,6 +20,7 @@ import {
   IconSettings,
   IconSettings2,
   IconSun,
+  IconLogout,
 } from 'twenty-ui/display';
 
 const StyledOverlay = styled(motion.div)`
@@ -128,8 +131,11 @@ const StyledToggleRow = styled.div`
 `;
 
 const StyledToggleLabel = styled.span`
+  align-items: center;
   color: ${({ theme }) => theme.font.color.secondary};
+  display: flex;
   font-size: ${({ theme }) => theme.font.size.sm};
+  gap: ${({ theme }) => theme.spacing(1)};
 `;
 
 const StyledToggle = styled.button<{ isOn: boolean }>`
@@ -190,6 +196,8 @@ export const SimpleViewSideDrawer = () => {
     useFilteredObjectMetadataItems();
   const [showObjectConfig, setShowObjectConfig] = useState(false);
   const { colorScheme, setColorScheme } = useColorScheme();
+  const { signOut } = useAuth();
+  const { t } = useLingui();
 
   const currentPath = window.location.pathname;
 
@@ -277,6 +285,11 @@ export const SimpleViewSideDrawer = () => {
                 Settings
               </StyledNavItem>
 
+              <StyledNavItem onClick={signOut}>
+                <IconLogout size={16} />
+                {t`Log out`}
+              </StyledNavItem>
+
               <StyledDivider />
 
               <StyledConfigButton
@@ -294,7 +307,7 @@ export const SimpleViewSideDrawer = () => {
                 <StyledToggleLabel>
                   {colorScheme === 'Dark' ? (
                     <>
-                      <IconSun size={14} /> Dark mode
+                      <IconSun size={14} /> Light mode
                     </>
                   ) : (
                     <>
