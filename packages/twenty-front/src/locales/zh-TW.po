@@ -29,6 +29,11 @@ msgstr "每年結算"
 msgid " must be one of {ratingValues} values"
 msgstr " 必須是 {ratingValues} 值中的一個"
 
+#. js-lingui-id: eKC+EC
+#: src/pages/settings/members/SettingsWorkspaceMembers.tsx
+msgid "-"
+msgstr ""
+
 #. js-lingui-id: ypz2+E
 #: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
 msgid ": Empty"
@@ -73,6 +78,11 @@ msgstr ": 今天{timeZoneAbbreviationSuffix}"
 #: src/modules/billing/hooks/useBillingWording.ts
 msgid ". The change will be applied the {beautifiedRenewDate}."
 msgstr "將會在 {beautifiedRenewDate} 生效。"
+
+#. js-lingui-id: 1bpx9A
+#: src/pages/settings/members/SettingsWorkspaceMembers.tsx
+msgid "..."
+msgstr ""
 
 #. js-lingui-id: 4tCM3o
 #: src/modules/views/components/ViewBarFilterDropdownAnyFieldSearchButtonMenuItem.tsx
@@ -715,6 +725,8 @@ msgstr "啟用工作流程"
 
 #. js-lingui-id: F6pfE9
 #: src/pages/settings/SettingsProfile.tsx
+#: src/pages/settings/members/SettingsWorkspaceMembers.tsx
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 #: src/modules/settings/domains/components/SettingsWorkspaceDomainCard.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminQueueJobsTable.tsx
 msgid "Active"
@@ -1625,6 +1637,11 @@ msgstr "應用程序"
 msgid "Apply"
 msgstr ""
 
+#. js-lingui-id: /q0HFa
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Apply leave"
+msgstr ""
+
 #. js-lingui-id: 9re43z
 #: src/modules/object-record/record-update-multiple/components/UpdateMultipleRecordsFooter.tsx
 msgid "Apply{progressText}"
@@ -2457,6 +2474,11 @@ msgstr "城市"
 #: src/modules/ui/input/components/internal/date/components/DatePicker.tsx
 msgid "Clear"
 msgstr "清除"
+
+#. js-lingui-id: kT0eae
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Clear leave"
+msgstr ""
 
 #. js-lingui-id: wu0RfR
 #: src/modules/settings/admin-panel/config-variables/components/ConfigVariableHelpText.tsx
@@ -3302,6 +3324,11 @@ msgstr ""
 msgid "CRUD"
 msgstr ""
 
+#. js-lingui-id: 6N5Lt+
+#: src/modules/action-menu/actions/record-actions/constants/DefaultRecordActionsConfig.tsx
+msgid "CSV"
+msgstr ""
+
 #. js-lingui-id: J1QT+3
 #: src/modules/command-menu/pages/page-layout/constants/settings/ChartConfigurationSettingLabels.ts
 msgid "Cumulative"
@@ -3449,6 +3476,11 @@ msgstr "丹麥語"
 #: src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownThemesComponents.tsx
 msgid "Dark"
 msgstr "深色模式"
+
+#. js-lingui-id: yB1YpA
+#: src/modules/navigation/components/MainNavigationDrawerFixedItems.tsx
+msgid "Dark mode"
+msgstr ""
 
 #. js-lingui-id: ogQzcZ
 #: src/modules/action-menu/actions/record-actions/single-record/dashboard-actions/components/DuplicateDashboardSingleRecordAction.tsx
@@ -4593,6 +4625,21 @@ msgstr "啟用繞過選項"
 msgid "Enable model-specific features"
 msgstr "啟用特定模型功能"
 
+#. js-lingui-id: AolXyL
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "End time (HH:mm)"
+msgstr ""
+
+#. js-lingui-id: Qm1hrz
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "End time must be in HH:mm format between 00:00 and 24:00"
+msgstr ""
+
+#. js-lingui-id: UNWW2X
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "End time must be later than start time"
+msgstr ""
+
 #. js-lingui-id: k1i50B
 #: src/modules/information-banner/components/billing/InformationBannerEndTrialPeriod.tsx
 msgid "End Trial Period"
@@ -5070,6 +5117,11 @@ msgstr "所有人"
 msgid "Everything"
 msgstr "所有內容"
 
+#. js-lingui-id: UR8vqQ
+#: src/modules/action-menu/actions/record-actions/constants/DefaultRecordActionsConfig.tsx
+msgid "Excel"
+msgstr ""
+
 #. js-lingui-id: QQlMid
 #: src/modules/settings/accounts/components/SettingsAccountsMessageChannelDetails.tsx
 msgid "Exclude group emails"
@@ -5199,7 +5251,6 @@ msgstr "在 {dateDiff} 過期"
 #: src/modules/action-menu/actions/record-actions/constants/DefaultRecordActionsConfig.tsx
 #: src/modules/action-menu/actions/record-actions/constants/DefaultRecordActionsConfig.tsx
 #: src/modules/action-menu/actions/record-actions/constants/DefaultRecordActionsConfig.tsx
-#: src/modules/action-menu/actions/record-actions/constants/DefaultRecordActionsConfig.tsx
 msgid "Export"
 msgstr "導出"
 
@@ -5215,6 +5266,7 @@ msgstr "匯出（{percentageValue}%）"
 
 #. js-lingui-id: 2KAI4N
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useActionRolePermissionFlagConfig.ts
+#: src/modules/action-menu/actions/record-actions/constants/DefaultRecordActionsConfig.tsx
 msgid "Export CSV"
 msgstr "導出 CSV"
 
@@ -5222,6 +5274,11 @@ msgstr "導出 CSV"
 #: src/modules/action-menu/actions/record-actions/constants/DashboardActionsConfig.tsx
 msgid "Export dashboard"
 msgstr "導出儀表板"
+
+#. js-lingui-id: hH/DVF
+#: src/modules/action-menu/actions/record-actions/constants/DefaultRecordActionsConfig.tsx
+msgid "Export Excel"
+msgstr ""
 
 #. js-lingui-id: wVUjld
 #: src/modules/action-menu/actions/record-actions/constants/WorkspaceMembersActionsConfig.tsx
@@ -5270,7 +5327,6 @@ msgstr "導出版本"
 #: src/modules/action-menu/actions/record-actions/constants/WorkspaceMembersActionsConfig.tsx
 #: src/modules/action-menu/actions/record-actions/constants/WorkflowRunsActionsConfig.tsx
 #: src/modules/action-menu/actions/record-actions/constants/WorkflowActionsConfig.tsx
-#: src/modules/action-menu/actions/record-actions/constants/DefaultRecordActionsConfig.tsx
 msgid "Export view"
 msgstr "導出視圖"
 
@@ -5610,6 +5666,11 @@ msgstr "篩選"
 msgid "Filter group rule options"
 msgstr "篩選群組規則選項"
 
+#. js-lingui-id: 03Qqf9
+#: src/modules/views/components/TeamMemberFilterDropdown.tsx
+msgid "Filtered"
+msgstr ""
+
 #. js-lingui-id: cSev+j
 #: src/modules/settings/developers/components/SettingsDevelopersWebhookForm.tsx
 msgid "Filters"
@@ -5736,6 +5797,11 @@ msgstr "免費試用點數已用盡。立即訂閱以繼續使用 AI 功能。"
 #: src/pages/settings/profile/appearance/components/LocalePicker.tsx
 msgid "French"
 msgstr "法語"
+
+#. js-lingui-id: xVhQZV
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Fri"
+msgstr ""
 
 #. js-lingui-id: qR8gT9
 #: src/modules/workflow/workflow-trigger/utils/cron-to-human/descriptors/getDayOfWeekDescription.ts
@@ -6353,7 +6419,9 @@ msgid "In {dateDiff}"
 msgstr "在 {dateDiff}"
 
 #. js-lingui-id: NoNwIX
+#: src/pages/settings/members/SettingsWorkspaceMembers.tsx
 #: src/pages/settings/data-model/SettingsObjectFieldTable.tsx
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 #: src/modules/settings/domains/components/SettingsWorkspaceDomainCard.tsx
 #: src/modules/settings/data-model/object-details/components/SettingsObjectRelationsTable.tsx
 msgid "Inactive"
@@ -6622,6 +6690,16 @@ msgstr "通過鏈接邀請"
 #: src/modules/settings/security/components/SettingsSecurityAuthProvidersOptionsList.tsx
 msgid "Invite by Link"
 msgstr "通過鏈接邀請"
+
+#. js-lingui-id: mZGPxt
+#: src/pages/settings/members/SettingsWorkspaceMembers.tsx
+msgid "Invite link copied to clipboard"
+msgstr ""
+
+#. js-lingui-id: we2E6F
+#: src/pages/settings/members/SettingsWorkspaceMembers.tsx
+msgid "Invite link not available"
+msgstr ""
 
 #. js-lingui-id: 5IfmKA
 #: src/pages/onboarding/InviteTeam.tsx
@@ -6997,6 +7075,31 @@ msgstr "如果不需要匯入電子郵件，請留空。"
 msgid "Leave blank if you don't need to send emails."
 msgstr "如果不需要發送電子郵件，請留空。"
 
+#. js-lingui-id: 1qQfQy
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Leave cleared"
+msgstr ""
+
+#. js-lingui-id: RoDmEO
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Leave dates updated"
+msgstr ""
+
+#. js-lingui-id: UjKqj6
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Leave end date"
+msgstr ""
+
+#. js-lingui-id: 79+i3R
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Leave end date must be after leave start date"
+msgstr ""
+
+#. js-lingui-id: ekfMee
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Leave start date"
+msgstr ""
+
 #. js-lingui-id: qvRaz1
 #: src/modules/settings/profile/components/DeleteAccount.tsx
 #: src/modules/settings/profile/components/DeleteAccount.tsx
@@ -7144,6 +7247,11 @@ msgstr "載入更多..."
 #: src/pages/settings/admin-panel/SettingsAdminQueueDetail.tsx
 msgid "Loading retention configuration..."
 msgstr "正在加載保留配置..."
+
+#. js-lingui-id: 2wyTOc
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Loading scheduling settings"
+msgstr ""
 
 #. js-lingui-id: 7YK6ap
 #: src/modules/command-menu/pages/message-thread/components/CommandMenuMessageThreadPage.tsx
@@ -7516,6 +7624,11 @@ msgstr "觸發器之間的分鐘數"
 #: src/modules/activities/tasks/components/TaskGroups.tsx
 msgid "Mission accomplished!"
 msgstr "任務完成！"
+
+#. js-lingui-id: fpMgHS
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Mon"
+msgstr ""
 
 #. js-lingui-id: hty0d5
 #: src/pages/settings/profile/appearance/components/DateTimeSettingsCalendarStartDaySelect.tsx
@@ -8365,6 +8478,11 @@ msgstr "默認視圖中不可用"
 msgid "Not available on Default View"
 msgstr "默認視圖中不可用"
 
+#. js-lingui-id: lPQcNh
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Not available today"
+msgstr ""
+
 #. js-lingui-id: 4wUkDk
 #: src/modules/object-record/record-board/record-board-column/utils/getAggregateOperationShortLabel.ts
 msgid "Not empty"
@@ -8528,6 +8646,11 @@ msgstr ""
 msgid "Omit zero values"
 msgstr "省略零值"
 
+#. js-lingui-id: d/+Qw7
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "On leave"
+msgstr ""
+
 #. js-lingui-id: jcwJgk
 #: src/modules/workflow/workflow-trigger/utils/cron-to-human/descriptors/getDayOfMonthDescription.ts
 msgid "on the {firstDay} and {secondDay} of the month"
@@ -8620,6 +8743,11 @@ msgstr "僅在 {firstDay} 和 {secondDay}"
 #: src/modules/workflow/workflow-trigger/utils/cron-to-human/descriptors/getDayOfWeekDescription.ts
 msgid "only on {remainingDays} and {lastDay}"
 msgstr "僅在 {remainingDays} 和 {lastDay}"
+
+#. js-lingui-id: UvBtO8
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Only sales members have scheduling settings"
+msgstr ""
 
 #. js-lingui-id: saaSLd
 #: src/modules/activities/emails/components/EmailThreadNotShared.tsx
@@ -8797,6 +8925,11 @@ msgstr "輸出"
 #: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowOutputSchemaBuilder.tsx
 msgid "Output Field {fieldNumber}"
 msgstr "輸出欄位 {fieldNumber}"
+
+#. js-lingui-id: 1z8qQS
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Outside available hours"
+msgstr ""
 
 #. js-lingui-id: in6CUw
 #: src/modules/workflow/components/OverrideWorkflowDraftConfirmationModal.tsx
@@ -9291,6 +9424,11 @@ msgstr "屬性名稱"
 msgid "Property value"
 msgstr "屬性值"
 
+#. js-lingui-id: ZnPB5O
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Provide both leave start and end dates"
+msgstr ""
+
 #. js-lingui-id: GVxbU6
 #: src/modules/settings/security/components/SSO/SettingsSSOOIDCForm.tsx
 msgid "Provide your OIDC provider details"
@@ -9407,6 +9545,11 @@ msgstr "查看更新記錄"
 msgid "Read documentation"
 msgstr "閱讀說明文件"
 
+#. js-lingui-id: BYElEo
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Read-only view. Only manager/super admin can edit sales scheduling."
+msgstr ""
+
 #. js-lingui-id: BT7pY+
 #: src/modules/settings/profile/components/SetOrChangePassword.tsx
 msgid "Receive an email containing password set link"
@@ -9508,6 +9651,16 @@ msgstr "重定向網址已複製到剪貼板"
 #: src/modules/settings/security/components/SSO/SettingsSSOOIDCForm.tsx
 msgid "Redirection URI"
 msgstr "重定向 URI"
+
+#. js-lingui-id: wxQs+8
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Refreshing sales availability..."
+msgstr ""
+
+#. js-lingui-id: vUi1Qr
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Refreshing status..."
+msgstr ""
 
 #. js-lingui-id: vpZcGd
 #: src/pages/settings/developers/api-keys/SettingsDevelopersApiKeyDetail.tsx
@@ -9982,6 +10135,23 @@ msgstr "執行階段"
 msgid "Russian"
 msgstr "俄語"
 
+#. js-lingui-id: gBwNdF
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Sales Availability"
+msgstr ""
+
+#. js-lingui-id: JMdgmi
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Sales availability updated"
+msgstr ""
+
+#. js-lingui-id: PiK6Ld
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Sat"
+msgstr ""
+
 #. js-lingui-id: +5kO8P
 #: src/pages/settings/profile/appearance/components/DateTimeSettingsCalendarStartDaySelect.tsx
 msgid "Saturday"
@@ -9998,6 +10168,11 @@ msgstr "保存"
 #: src/modules/views/components/UpdateViewButtonGroup.tsx
 msgid "Save as new view"
 msgstr "另存為新視圖"
+
+#. js-lingui-id: XLWu+L
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Save availability"
+msgstr ""
 
 #. js-lingui-id: 7GK4Vt
 #: src/modules/action-menu/actions/record-actions/constants/DashboardActionsConfig.tsx
@@ -10418,6 +10593,11 @@ msgstr "選擇操作"
 msgid "Select an option"
 msgstr "選擇一個選項"
 
+#. js-lingui-id: YQvWIa
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Select at least one available day"
+msgstr ""
+
 #. js-lingui-id: 21YIUv
 #: src/modules/spreadsheet-import/steps/components/MatchColumnsStep/components/TemplateColumn.tsx
 msgid "Select column..."
@@ -10602,6 +10782,11 @@ msgstr "設為默認"
 msgid "Set as Primary"
 msgstr "設為主要"
 
+#. js-lingui-id: q5LIpl
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Set availability time range, active days, and leave period"
+msgstr ""
+
 #. js-lingui-id: V7fgiB
 #: src/modules/settings/accounts/components/SettingsAccountsSettingsSection.tsx
 msgid "Set email visibility, manage your blocklist and more."
@@ -10771,6 +10956,11 @@ msgstr "登入或建立賬戶"
 #: src/modules/auth/sign-in-up/components/internal/SignInUpWithCredentials.tsx
 msgid "Sign up"
 msgstr "註冊"
+
+#. js-lingui-id: ffWWmG
+#: src/modules/navigation/components/MainNavigationDrawerFixedItems.tsx
+msgid "Simple View"
+msgstr ""
 
 #. js-lingui-id: 5v3IHX
 #: src/modules/auth/sign-in-up/components/internal/SignInUpWithSSO.tsx
@@ -11026,6 +11216,16 @@ msgstr "開始"
 msgid "Start a conversation with your AI agent to get workflow insights, task assistance, and process guidance"
 msgstr "開始與您的 AI 代理進行對話，以獲取工作流程見解、任務輔助和流程指導"
 
+#. js-lingui-id: h03PgD
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Start time (HH:mm)"
+msgstr ""
+
+#. js-lingui-id: 4XjwmC
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Start time must be in HH:mm format between 00:00 and 23:59"
+msgstr ""
+
 #. js-lingui-id: s+K73L
 #: src/modules/billing/components/SettingsBillingSubscriptionInfo.tsx
 msgid "Start Your Subscription"
@@ -11046,6 +11246,7 @@ msgid "State"
 msgstr "狀態"
 
 #. js-lingui-id: uAQUqI
+#: src/pages/settings/members/SettingsWorkspaceMembers.tsx
 #: src/pages/settings/admin-panel/SettingsAdminIndicatorHealthStatus.tsx
 #: src/modules/settings/components/SettingsDnsRecordsTable.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceContent.tsx
@@ -11235,6 +11436,11 @@ msgstr "建議"
 #: src/modules/object-record/record-board/record-board-column/utils/getAggregateOperationLabel.ts
 msgid "Sum"
 msgstr "總和"
+
+#. js-lingui-id: D89zck
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Sun"
+msgstr ""
 
 #. js-lingui-id: DBC3t5
 #: src/pages/settings/profile/appearance/components/DateTimeSettingsCalendarStartDaySelect.tsx
@@ -11705,6 +11911,11 @@ msgstr "這是啟用手動排序的必要條件。"
 msgid "This key should be set through body input"
 msgstr "此鍵應透過主體輸入設定"
 
+#. js-lingui-id: xc4JwB
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "This member is not in a sales role."
+msgstr ""
+
 #. js-lingui-id: dWJTyU
 #: src/modules/information-banner/components/deleted-record/InformationBannerDeletedRecord.tsx
 msgid "This record has been deleted"
@@ -11774,6 +11985,11 @@ msgstr "這將永久刪除您的雙重驗證方法。<0/>由於您的工作區�
 #: src/pages/settings/admin-panel/SettingsAdminConfigVariableDetails.tsx
 msgid "This will revert the database value to environment/default value. The database override will be removed and the system will use the environment settings."
 msgstr "這將把數據庫值恢復為環境/默認值。數據庫覆蓋將被移除，系統將使用環境設置。"
+
+#. js-lingui-id: +FjWgX
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Thu"
+msgstr ""
 
 #. js-lingui-id: 5g/sE8
 #: src/modules/action-menu/actions/record-actions/constants/WorkflowActionsConfig.tsx
@@ -12023,6 +12239,11 @@ msgstr "嘗試其他電子郵件"
 msgid "TTL"
 msgstr "TTL"
 
+#. js-lingui-id: vq2WxD
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Tue"
+msgstr ""
+
 #. js-lingui-id: Kz91g/
 #: src/pages/settings/profile/appearance/components/LocalePicker.tsx
 msgid "Turkish"
@@ -12123,6 +12344,11 @@ msgstr "烏克蘭語"
 msgid "ul"
 msgstr ""
 
+#. js-lingui-id: CZT+vy
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Unable to clear leave"
+msgstr ""
+
 #. js-lingui-id: N/XI5S
 #: src/pages/settings/members/SettingsWorkspaceMember.tsx
 msgid "Unable to delete member right now"
@@ -12132,6 +12358,16 @@ msgstr ""
 #: src/modules/client-config/components/ClientConfigProvider.tsx
 msgid "Unable to Reach Back-end"
 msgstr "無法連接後端"
+
+#. js-lingui-id: 0e4GSb
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Unable to update leave"
+msgstr ""
+
+#. js-lingui-id: UEN0Kn
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Unable to update sales availability"
+msgstr ""
 
 #. js-lingui-id: EUHN7i
 #: src/modules/settings/admin-panel/config-variables/components/ConfigVariableValueInput.tsx
@@ -12621,6 +12857,11 @@ msgstr "視圖組"
 msgid "View Jobs"
 msgstr "查看工作"
 
+#. js-lingui-id: jiLf7Z
+#: src/modules/settings/roles/role-permissions/objects-permissions/components/SettingsRolePermissionsObjectsSection.tsx
+msgid "View Own Records Only"
+msgstr ""
+
 #. js-lingui-id: ecVcAx
 #: src/modules/ai/components/AIChatTab.tsx
 #: src/modules/action-menu/actions/record-agnostic-actions/constants/RecordAgnosticActionsConfig.tsx
@@ -12794,6 +13035,11 @@ msgstr "更新所需的 Webhook ID"
 msgid "Webhooks"
 msgstr "Webhooks"
 
+#. js-lingui-id: 0f7U0k
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Wed"
+msgstr ""
+
 #. js-lingui-id: zx4BuL
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownLayoutContent.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCustomView.tsx
@@ -12827,6 +13073,11 @@ msgstr ""
 #: src/pages/settings/developers/api-keys/SettingsDevelopersApiKeyDetail.tsx
 msgid "What this API can do: Select a user role to define its permissions."
 msgstr "此 API 能做什麼：選擇用戶角色以定義其權限。"
+
+#. js-lingui-id: XD8J+H
+#: src/modules/settings/roles/role-permissions/objects-permissions/components/SettingsRolePermissionsObjectsSection.tsx
+msgid "When enabled, users can only see records they created"
+msgstr ""
 
 #. js-lingui-id: C51ilI
 #: src/pages/settings/developers/api-keys/SettingsDevelopersApiKeysNew.tsx

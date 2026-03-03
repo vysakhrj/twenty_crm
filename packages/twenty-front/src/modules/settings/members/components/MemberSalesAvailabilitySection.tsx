@@ -10,15 +10,36 @@ import { H2Title, Status } from 'twenty-ui/display';
 import { Button, Checkbox } from 'twenty-ui/input';
 import { Section } from 'twenty-ui/layout';
 
-const WEEKDAY_OPTIONS = [
-  { key: 'MONDAY', label: t`Mon` },
-  { key: 'TUESDAY', label: t`Tue` },
-  { key: 'WEDNESDAY', label: t`Wed` },
-  { key: 'THURSDAY', label: t`Thu` },
-  { key: 'FRIDAY', label: t`Fri` },
-  { key: 'SATURDAY', label: t`Sat` },
-  { key: 'SUNDAY', label: t`Sun` },
+const WEEKDAY_KEYS = [
+  'MONDAY',
+  'TUESDAY',
+  'WEDNESDAY',
+  'THURSDAY',
+  'FRIDAY',
+  'SATURDAY',
+  'SUNDAY',
 ] as const;
+
+const getWeekdayLabel = (key: string): string => {
+  switch (key) {
+    case 'MONDAY':
+      return t`Mon`;
+    case 'TUESDAY':
+      return t`Tue`;
+    case 'WEDNESDAY':
+      return t`Wed`;
+    case 'THURSDAY':
+      return t`Thu`;
+    case 'FRIDAY':
+      return t`Fri`;
+    case 'SATURDAY':
+      return t`Sat`;
+    case 'SUNDAY':
+      return t`Sun`;
+    default:
+      return key;
+  }
+};
 
 const StyledStatusRow = styled.div`
   align-items: center;
@@ -198,7 +219,7 @@ export const MemberSalesAvailabilitySection = ({
   const [selectedDays, setSelectedDays] = useState<string[]>(
     member.availableDays?.length
       ? member.availableDays
-      : WEEKDAY_OPTIONS.map((day) => day.key),
+      : [...WEEKDAY_KEYS],
   );
   const [leaveStartDate, setLeaveStartDate] = useState(
     toDateInputValue(member.leaveStartDate),
@@ -220,7 +241,7 @@ export const MemberSalesAvailabilitySection = ({
     setSelectedDays(
       member.availableDays?.length
         ? member.availableDays
-        : WEEKDAY_OPTIONS.map((day) => day.key),
+        : [...WEEKDAY_KEYS],
     );
     setLeaveStartDate(toDateInputValue(member.leaveStartDate));
     setLeaveEndDate(toDateInputValue(member.leaveEndDate));
@@ -479,24 +500,24 @@ export const MemberSalesAvailabilitySection = ({
           </div>
         </StyledTimeGrid>
         <StyledDaysGrid>
-          {WEEKDAY_OPTIONS.map((day) => {
-            const checked = selectedDays.includes(day.key);
+          {WEEKDAY_KEYS.map((dayKey) => {
+            const checked = selectedDays.includes(dayKey);
 
             return (
               <StyledDayCard
-                key={day.key}
+                key={dayKey}
                 checked={checked}
                 disabled={!canEditSalesAvailability}
                 type="button"
-                onClick={() => handleToggleDay(day.key)}
+                onClick={() => handleToggleDay(dayKey)}
               >
-                <div>{day.label}</div>
+                <div>{getWeekdayLabel(dayKey)}</div>
                 <Checkbox
                   checked={checked}
                   disabled={!canEditSalesAvailability}
                   onChange={(event) => {
                     event.stopPropagation();
-                    handleToggleDay(day.key, event.target.checked);
+                    handleToggleDay(dayKey, event.target.checked);
                   }}
                 />
               </StyledDayCard>

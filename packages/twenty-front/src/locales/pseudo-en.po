@@ -24,6 +24,11 @@ msgstr ""
 msgid " must be one of {ratingValues} values"
 msgstr ""
 
+#. js-lingui-id: eKC+EC
+#: src/pages/settings/members/SettingsWorkspaceMembers.tsx
+msgid "-"
+msgstr ""
+
 #. js-lingui-id: ypz2+E
 #: src/modules/object-record/object-filter-dropdown/utils/getOperandLabel.ts
 msgid ": Empty"
@@ -67,6 +72,11 @@ msgstr ""
 #. js-lingui-id: N/lIUf
 #: src/modules/billing/hooks/useBillingWording.ts
 msgid ". The change will be applied the {beautifiedRenewDate}."
+msgstr ""
+
+#. js-lingui-id: 1bpx9A
+#: src/pages/settings/members/SettingsWorkspaceMembers.tsx
+msgid "..."
 msgstr ""
 
 #. js-lingui-id: 4tCM3o
@@ -710,6 +720,8 @@ msgstr ""
 
 #. js-lingui-id: F6pfE9
 #: src/pages/settings/SettingsProfile.tsx
+#: src/pages/settings/members/SettingsWorkspaceMembers.tsx
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 #: src/modules/settings/domains/components/SettingsWorkspaceDomainCard.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminQueueJobsTable.tsx
 msgid "Active"
@@ -1620,6 +1632,11 @@ msgstr ""
 msgid "Apply"
 msgstr ""
 
+#. js-lingui-id: /q0HFa
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Apply leave"
+msgstr ""
+
 #. js-lingui-id: 9re43z
 #: src/modules/object-record/record-update-multiple/components/UpdateMultipleRecordsFooter.tsx
 msgid "Apply{progressText}"
@@ -2451,6 +2468,11 @@ msgstr ""
 #: src/modules/ui/input/components/internal/date/components/DateTimePicker.tsx
 #: src/modules/ui/input/components/internal/date/components/DatePicker.tsx
 msgid "Clear"
+msgstr ""
+
+#. js-lingui-id: kT0eae
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Clear leave"
 msgstr ""
 
 #. js-lingui-id: wu0RfR
@@ -3297,6 +3319,11 @@ msgstr ""
 msgid "CRUD"
 msgstr ""
 
+#. js-lingui-id: 6N5Lt+
+#: src/modules/action-menu/actions/record-actions/constants/DefaultRecordActionsConfig.tsx
+msgid "CSV"
+msgstr ""
+
 #. js-lingui-id: J1QT+3
 #: src/modules/command-menu/pages/page-layout/constants/settings/ChartConfigurationSettingLabels.ts
 msgid "Cumulative"
@@ -3443,6 +3470,11 @@ msgstr ""
 #: src/pages/settings/profile/appearance/components/SettingsExperience.tsx
 #: src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownThemesComponents.tsx
 msgid "Dark"
+msgstr ""
+
+#. js-lingui-id: yB1YpA
+#: src/modules/navigation/components/MainNavigationDrawerFixedItems.tsx
+msgid "Dark mode"
 msgstr ""
 
 #. js-lingui-id: ogQzcZ
@@ -4588,6 +4620,21 @@ msgstr ""
 msgid "Enable model-specific features"
 msgstr ""
 
+#. js-lingui-id: AolXyL
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "End time (HH:mm)"
+msgstr ""
+
+#. js-lingui-id: Qm1hrz
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "End time must be in HH:mm format between 00:00 and 24:00"
+msgstr ""
+
+#. js-lingui-id: UNWW2X
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "End time must be later than start time"
+msgstr ""
+
 #. js-lingui-id: k1i50B
 #: src/modules/information-banner/components/billing/InformationBannerEndTrialPeriod.tsx
 msgid "End Trial Period"
@@ -5065,6 +5112,11 @@ msgstr ""
 msgid "Everything"
 msgstr ""
 
+#. js-lingui-id: UR8vqQ
+#: src/modules/action-menu/actions/record-actions/constants/DefaultRecordActionsConfig.tsx
+msgid "Excel"
+msgstr ""
+
 #. js-lingui-id: QQlMid
 #: src/modules/settings/accounts/components/SettingsAccountsMessageChannelDetails.tsx
 msgid "Exclude group emails"
@@ -5194,7 +5246,6 @@ msgstr ""
 #: src/modules/action-menu/actions/record-actions/constants/DefaultRecordActionsConfig.tsx
 #: src/modules/action-menu/actions/record-actions/constants/DefaultRecordActionsConfig.tsx
 #: src/modules/action-menu/actions/record-actions/constants/DefaultRecordActionsConfig.tsx
-#: src/modules/action-menu/actions/record-actions/constants/DefaultRecordActionsConfig.tsx
 msgid "Export"
 msgstr ""
 
@@ -5210,12 +5261,18 @@ msgstr ""
 
 #. js-lingui-id: 2KAI4N
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useActionRolePermissionFlagConfig.ts
+#: src/modules/action-menu/actions/record-actions/constants/DefaultRecordActionsConfig.tsx
 msgid "Export CSV"
 msgstr ""
 
 #. js-lingui-id: KVvnDa
 #: src/modules/action-menu/actions/record-actions/constants/DashboardActionsConfig.tsx
 msgid "Export dashboard"
+msgstr ""
+
+#. js-lingui-id: hH/DVF
+#: src/modules/action-menu/actions/record-actions/constants/DefaultRecordActionsConfig.tsx
+msgid "Export Excel"
 msgstr ""
 
 #. js-lingui-id: wVUjld
@@ -5265,7 +5322,6 @@ msgstr ""
 #: src/modules/action-menu/actions/record-actions/constants/WorkspaceMembersActionsConfig.tsx
 #: src/modules/action-menu/actions/record-actions/constants/WorkflowRunsActionsConfig.tsx
 #: src/modules/action-menu/actions/record-actions/constants/WorkflowActionsConfig.tsx
-#: src/modules/action-menu/actions/record-actions/constants/DefaultRecordActionsConfig.tsx
 msgid "Export view"
 msgstr ""
 
@@ -5605,6 +5661,11 @@ msgstr ""
 msgid "Filter group rule options"
 msgstr ""
 
+#. js-lingui-id: 03Qqf9
+#: src/modules/views/components/TeamMemberFilterDropdown.tsx
+msgid "Filtered"
+msgstr ""
+
 #. js-lingui-id: cSev+j
 #: src/modules/settings/developers/components/SettingsDevelopersWebhookForm.tsx
 msgid "Filters"
@@ -5730,6 +5791,11 @@ msgstr ""
 #. js-lingui-id: nLC6tu
 #: src/pages/settings/profile/appearance/components/LocalePicker.tsx
 msgid "French"
+msgstr ""
+
+#. js-lingui-id: xVhQZV
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Fri"
 msgstr ""
 
 #. js-lingui-id: qR8gT9
@@ -6348,7 +6414,9 @@ msgid "In {dateDiff}"
 msgstr ""
 
 #. js-lingui-id: NoNwIX
+#: src/pages/settings/members/SettingsWorkspaceMembers.tsx
 #: src/pages/settings/data-model/SettingsObjectFieldTable.tsx
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 #: src/modules/settings/domains/components/SettingsWorkspaceDomainCard.tsx
 #: src/modules/settings/data-model/object-details/components/SettingsObjectRelationsTable.tsx
 msgid "Inactive"
@@ -6616,6 +6684,16 @@ msgstr ""
 #. js-lingui-id: 3athPG
 #: src/modules/settings/security/components/SettingsSecurityAuthProvidersOptionsList.tsx
 msgid "Invite by Link"
+msgstr ""
+
+#. js-lingui-id: mZGPxt
+#: src/pages/settings/members/SettingsWorkspaceMembers.tsx
+msgid "Invite link copied to clipboard"
+msgstr ""
+
+#. js-lingui-id: we2E6F
+#: src/pages/settings/members/SettingsWorkspaceMembers.tsx
+msgid "Invite link not available"
 msgstr ""
 
 #. js-lingui-id: 5IfmKA
@@ -6992,6 +7070,31 @@ msgstr ""
 msgid "Leave blank if you don't need to send emails."
 msgstr ""
 
+#. js-lingui-id: 1qQfQy
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Leave cleared"
+msgstr ""
+
+#. js-lingui-id: RoDmEO
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Leave dates updated"
+msgstr ""
+
+#. js-lingui-id: UjKqj6
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Leave end date"
+msgstr ""
+
+#. js-lingui-id: 79+i3R
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Leave end date must be after leave start date"
+msgstr ""
+
+#. js-lingui-id: ekfMee
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Leave start date"
+msgstr ""
+
 #. js-lingui-id: qvRaz1
 #: src/modules/settings/profile/components/DeleteAccount.tsx
 #: src/modules/settings/profile/components/DeleteAccount.tsx
@@ -7138,6 +7241,11 @@ msgstr ""
 #. js-lingui-id: nDnbEe
 #: src/pages/settings/admin-panel/SettingsAdminQueueDetail.tsx
 msgid "Loading retention configuration..."
+msgstr ""
+
+#. js-lingui-id: 2wyTOc
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Loading scheduling settings"
 msgstr ""
 
 #. js-lingui-id: 7YK6ap
@@ -7510,6 +7618,11 @@ msgstr ""
 #. js-lingui-id: mibKsa
 #: src/modules/activities/tasks/components/TaskGroups.tsx
 msgid "Mission accomplished!"
+msgstr ""
+
+#. js-lingui-id: fpMgHS
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Mon"
 msgstr ""
 
 #. js-lingui-id: hty0d5
@@ -8360,6 +8473,11 @@ msgstr ""
 msgid "Not available on Default View"
 msgstr ""
 
+#. js-lingui-id: lPQcNh
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Not available today"
+msgstr ""
+
 #. js-lingui-id: 4wUkDk
 #: src/modules/object-record/record-board/record-board-column/utils/getAggregateOperationShortLabel.ts
 msgid "Not empty"
@@ -8523,6 +8641,11 @@ msgstr ""
 msgid "Omit zero values"
 msgstr ""
 
+#. js-lingui-id: d/+Qw7
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "On leave"
+msgstr ""
+
 #. js-lingui-id: jcwJgk
 #: src/modules/workflow/workflow-trigger/utils/cron-to-human/descriptors/getDayOfMonthDescription.ts
 msgid "on the {firstDay} and {secondDay} of the month"
@@ -8614,6 +8737,11 @@ msgstr ""
 #. js-lingui-id: pYaMbU
 #: src/modules/workflow/workflow-trigger/utils/cron-to-human/descriptors/getDayOfWeekDescription.ts
 msgid "only on {remainingDays} and {lastDay}"
+msgstr ""
+
+#. js-lingui-id: UvBtO8
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Only sales members have scheduling settings"
 msgstr ""
 
 #. js-lingui-id: saaSLd
@@ -8791,6 +8919,11 @@ msgstr ""
 #. js-lingui-id: xvfn7l
 #: src/modules/workflow/workflow-steps/workflow-actions/ai-agent-action/components/WorkflowOutputSchemaBuilder.tsx
 msgid "Output Field {fieldNumber}"
+msgstr ""
+
+#. js-lingui-id: 1z8qQS
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Outside available hours"
 msgstr ""
 
 #. js-lingui-id: in6CUw
@@ -9286,6 +9419,11 @@ msgstr ""
 msgid "Property value"
 msgstr ""
 
+#. js-lingui-id: ZnPB5O
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Provide both leave start and end dates"
+msgstr ""
+
 #. js-lingui-id: GVxbU6
 #: src/modules/settings/security/components/SSO/SettingsSSOOIDCForm.tsx
 msgid "Provide your OIDC provider details"
@@ -9402,6 +9540,11 @@ msgstr ""
 msgid "Read documentation"
 msgstr ""
 
+#. js-lingui-id: BYElEo
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Read-only view. Only manager/super admin can edit sales scheduling."
+msgstr ""
+
 #. js-lingui-id: BT7pY+
 #: src/modules/settings/profile/components/SetOrChangePassword.tsx
 msgid "Receive an email containing password set link"
@@ -9502,6 +9645,16 @@ msgstr ""
 #. js-lingui-id: RZjynQ
 #: src/modules/settings/security/components/SSO/SettingsSSOOIDCForm.tsx
 msgid "Redirection URI"
+msgstr ""
+
+#. js-lingui-id: wxQs+8
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Refreshing sales availability..."
+msgstr ""
+
+#. js-lingui-id: vUi1Qr
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Refreshing status..."
 msgstr ""
 
 #. js-lingui-id: vpZcGd
@@ -9977,6 +10130,23 @@ msgstr ""
 msgid "Russian"
 msgstr ""
 
+#. js-lingui-id: gBwNdF
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Sales Availability"
+msgstr ""
+
+#. js-lingui-id: JMdgmi
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Sales availability updated"
+msgstr ""
+
+#. js-lingui-id: PiK6Ld
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Sat"
+msgstr ""
+
 #. js-lingui-id: +5kO8P
 #: src/pages/settings/profile/appearance/components/DateTimeSettingsCalendarStartDaySelect.tsx
 msgid "Saturday"
@@ -9992,6 +10162,11 @@ msgstr ""
 #. js-lingui-id: apLRCm
 #: src/modules/views/components/UpdateViewButtonGroup.tsx
 msgid "Save as new view"
+msgstr ""
+
+#. js-lingui-id: XLWu+L
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Save availability"
 msgstr ""
 
 #. js-lingui-id: 7GK4Vt
@@ -10413,6 +10588,11 @@ msgstr ""
 msgid "Select an option"
 msgstr ""
 
+#. js-lingui-id: YQvWIa
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Select at least one available day"
+msgstr ""
+
 #. js-lingui-id: 21YIUv
 #: src/modules/spreadsheet-import/steps/components/MatchColumnsStep/components/TemplateColumn.tsx
 msgid "Select column..."
@@ -10597,6 +10777,11 @@ msgstr ""
 msgid "Set as Primary"
 msgstr ""
 
+#. js-lingui-id: q5LIpl
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Set availability time range, active days, and leave period"
+msgstr ""
+
 #. js-lingui-id: V7fgiB
 #: src/modules/settings/accounts/components/SettingsAccountsSettingsSection.tsx
 msgid "Set email visibility, manage your blocklist and more."
@@ -10765,6 +10950,11 @@ msgstr ""
 #. js-lingui-id: e+RpCP
 #: src/modules/auth/sign-in-up/components/internal/SignInUpWithCredentials.tsx
 msgid "Sign up"
+msgstr ""
+
+#. js-lingui-id: ffWWmG
+#: src/modules/navigation/components/MainNavigationDrawerFixedItems.tsx
+msgid "Simple View"
 msgstr ""
 
 #. js-lingui-id: 5v3IHX
@@ -11021,6 +11211,16 @@ msgstr ""
 msgid "Start a conversation with your AI agent to get workflow insights, task assistance, and process guidance"
 msgstr ""
 
+#. js-lingui-id: h03PgD
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Start time (HH:mm)"
+msgstr ""
+
+#. js-lingui-id: 4XjwmC
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Start time must be in HH:mm format between 00:00 and 23:59"
+msgstr ""
+
 #. js-lingui-id: s+K73L
 #: src/modules/billing/components/SettingsBillingSubscriptionInfo.tsx
 msgid "Start Your Subscription"
@@ -11041,6 +11241,7 @@ msgid "State"
 msgstr ""
 
 #. js-lingui-id: uAQUqI
+#: src/pages/settings/members/SettingsWorkspaceMembers.tsx
 #: src/pages/settings/admin-panel/SettingsAdminIndicatorHealthStatus.tsx
 #: src/modules/settings/components/SettingsDnsRecordsTable.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceContent.tsx
@@ -11229,6 +11430,11 @@ msgstr ""
 #: src/modules/object-record/record-board/record-board-column/utils/getAggregateOperationShortLabel.ts
 #: src/modules/object-record/record-board/record-board-column/utils/getAggregateOperationLabel.ts
 msgid "Sum"
+msgstr ""
+
+#. js-lingui-id: D89zck
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Sun"
 msgstr ""
 
 #. js-lingui-id: DBC3t5
@@ -11700,6 +11906,11 @@ msgstr ""
 msgid "This key should be set through body input"
 msgstr ""
 
+#. js-lingui-id: xc4JwB
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "This member is not in a sales role."
+msgstr ""
+
 #. js-lingui-id: dWJTyU
 #: src/modules/information-banner/components/deleted-record/InformationBannerDeletedRecord.tsx
 msgid "This record has been deleted"
@@ -11768,6 +11979,11 @@ msgstr ""
 #. js-lingui-id: 4YifBe
 #: src/pages/settings/admin-panel/SettingsAdminConfigVariableDetails.tsx
 msgid "This will revert the database value to environment/default value. The database override will be removed and the system will use the environment settings."
+msgstr ""
+
+#. js-lingui-id: +FjWgX
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Thu"
 msgstr ""
 
 #. js-lingui-id: 5g/sE8
@@ -12018,6 +12234,11 @@ msgstr ""
 msgid "TTL"
 msgstr ""
 
+#. js-lingui-id: vq2WxD
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Tue"
+msgstr ""
+
 #. js-lingui-id: Kz91g/
 #: src/pages/settings/profile/appearance/components/LocalePicker.tsx
 msgid "Turkish"
@@ -12118,6 +12339,11 @@ msgstr ""
 msgid "ul"
 msgstr ""
 
+#. js-lingui-id: CZT+vy
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Unable to clear leave"
+msgstr ""
+
 #. js-lingui-id: N/XI5S
 #: src/pages/settings/members/SettingsWorkspaceMember.tsx
 msgid "Unable to delete member right now"
@@ -12126,6 +12352,16 @@ msgstr ""
 #. js-lingui-id: l+ALBd
 #: src/modules/client-config/components/ClientConfigProvider.tsx
 msgid "Unable to Reach Back-end"
+msgstr ""
+
+#. js-lingui-id: 0e4GSb
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Unable to update leave"
+msgstr ""
+
+#. js-lingui-id: UEN0Kn
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Unable to update sales availability"
 msgstr ""
 
 #. js-lingui-id: EUHN7i
@@ -12616,6 +12852,11 @@ msgstr ""
 msgid "View Jobs"
 msgstr ""
 
+#. js-lingui-id: jiLf7Z
+#: src/modules/settings/roles/role-permissions/objects-permissions/components/SettingsRolePermissionsObjectsSection.tsx
+msgid "View Own Records Only"
+msgstr ""
+
 #. js-lingui-id: ecVcAx
 #: src/modules/ai/components/AIChatTab.tsx
 #: src/modules/action-menu/actions/record-agnostic-actions/constants/RecordAgnosticActionsConfig.tsx
@@ -12787,6 +13028,11 @@ msgstr ""
 msgid "Webhooks"
 msgstr ""
 
+#. js-lingui-id: 0f7U0k
+#: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
+msgid "Wed"
+msgstr ""
+
 #. js-lingui-id: zx4BuL
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownLayoutContent.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCustomView.tsx
@@ -12819,6 +13065,11 @@ msgstr ""
 #: src/pages/settings/developers/api-keys/SettingsDevelopersApiKeysNew.tsx
 #: src/pages/settings/developers/api-keys/SettingsDevelopersApiKeyDetail.tsx
 msgid "What this API can do: Select a user role to define its permissions."
+msgstr ""
+
+#. js-lingui-id: XD8J+H
+#: src/modules/settings/roles/role-permissions/objects-permissions/components/SettingsRolePermissionsObjectsSection.tsx
+msgid "When enabled, users can only see records they created"
 msgstr ""
 
 #. js-lingui-id: C51ilI
