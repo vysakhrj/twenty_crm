@@ -51,3 +51,6 @@ mcp.json
 TRANSLATION_QA_REPORT.md
 
 sfs-crm-5f038-firebase-adminsdk-fbsvc-12fda05ef9.json
+
+# Used only for git-filter-repo purge; do not commit (contains literal secrets)
+.git-filter-repo-replacements.txt

@@ -4,14 +4,13 @@
 importScripts('https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging-compat.js');
 
-// Firebase configuration for sfs-crm-5f038 project
-// These values are replaced during build by vite.config.ts
+// Firebase config is injected at build time from VITE_FIREBASE_* env vars (vite.config.ts)
 const firebaseConfig = {
-  apiKey: self.__FIREBASE_API_KEY__ || 'AIzaSyBG3M5VG_f65RZJuZM5KiYuRadBFNggheU',
-  authDomain: self.__FIREBASE_AUTH_DOMAIN__ || 'sfs-crm-5f038.firebaseapp.com',
-  projectId: self.__FIREBASE_PROJECT_ID__ || 'sfs-crm-5f038',
-  messagingSenderId: self.__FIREBASE_MESSAGING_SENDER_ID__ || '1048685449819',
-  appId: self.__FIREBASE_APP_ID__ || '1:1048685449819:web:cc7bd49fd814bfa0f4a57e',
+  apiKey: self.__FIREBASE_API_KEY__ || '',
+  authDomain: self.__FIREBASE_AUTH_DOMAIN__ || '',
+  projectId: self.__FIREBASE_PROJECT_ID__ || '',
+  messagingSenderId: self.__FIREBASE_MESSAGING_SENDER_ID__ || '',
+  appId: self.__FIREBASE_APP_ID__ || '',
 };
 const SW_VERSION = '2026-03-06-01';
 
