@@ -45,11 +45,16 @@ export const RecordBoardColumnNewRecordButton = () => {
 
   const hasObjectUpdatePermissions = objectPermissions.canUpdateObjectRecords;
 
+  const isLeadObject =
+    objectMetadataItem.nameSingular.toLowerCase() === 'lead';
+  // Lead creation is only allowed via webhooks, not from the UI
+  const isLeadNoCreateInUi = isLeadObject;
+
   const { createNewIndexRecord } = useCreateNewIndexRecord({
     objectMetadataItem: objectMetadataItem,
   });
 
-  if (!hasObjectUpdatePermissions) {
+  if (!hasObjectUpdatePermissions || isLeadNoCreateInUi) {
     return null;
   }
 

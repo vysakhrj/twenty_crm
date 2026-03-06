@@ -40,6 +40,11 @@ export const RecordCalendarAddNew = ({
 
   const hasObjectUpdatePermissions = objectPermissions.canUpdateObjectRecords;
 
+  const isLeadObject =
+    objectMetadataItem.nameSingular.toLowerCase() === 'lead';
+  // Lead creation is only allowed via webhooks, not from the UI
+  const isLeadNoCreateInUi = isLeadObject;
+
   const hasAnySoftDeleteFilterOnView = useRecoilComponentValue(
     hasAnySoftDeleteFilterOnViewComponentSelector,
   );
@@ -62,6 +67,7 @@ export const RecordCalendarAddNew = ({
   if (
     hasAnySoftDeleteFilterOnView ||
     !hasObjectUpdatePermissions ||
+    isLeadNoCreateInUi ||
     !calendarFieldMetadataItem ||
     isCalendarFieldReadOnly
   ) {

@@ -13443,6 +13443,33 @@ msgstr "Your workspace doesn't have an active subscription."
 msgid "Your workspace doesn't have an active subscription. Please contact your admin."
 msgstr "Your workspace doesn't have an active subscription. Please contact your admin."
 
+#[ Notification center ]
+#. js-lingui-id: TODO-Notifications
+#: src/modules/navigation/components/MainNavigationDrawerFixedItems.tsx
+#: src/modules/notifications/components/NotificationCenter.tsx
+msgid "Notifications"
+msgstr "Notifications"
+
+#. js-lingui-id: TODO-NoNotificationsYet
+#: src/modules/notifications/components/NotificationCenter.tsx
+msgid "No notifications yet"
+msgstr "No notifications yet"
+
+#. js-lingui-id: TODO-UnreadCountUnread
+#: src/modules/notifications/components/NotificationCenter.tsx
+msgid "{unreadCount} unread"
+msgstr "{unreadCount} unread"
+
+#. js-lingui-id: TODO-AllCaughtUp
+#: src/modules/notifications/components/NotificationCenter.tsx
+msgid "All caught up!"
+msgstr "All caught up!"
+
+#. js-lingui-id: TODO-MarkAllAsRead
+#: src/modules/notifications/components/NotificationCenter.tsx
+msgid "Mark all as read"
+msgstr "Mark all as read"
+
 #. js-lingui-id: RhNbPE
 #: src/modules/billing/components/SettingsBillingContent.tsx
 msgid "Your workspace will be disabled"

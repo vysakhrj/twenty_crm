@@ -56,10 +56,18 @@ export const RecordTableEmptyStateDisplay = (
   const objectPermissions = useObjectPermissionsForObject(
     objectMetadataItem.id,
   );
-  const isReadOnly = isObjectMetadataReadOnly({
-    objectPermissions,
-    objectMetadataItem,
-  });
+
+  const isLeadObject =
+    objectMetadataItem.nameSingular.toLowerCase() === 'lead';
+  // Lead creation is only allowed via webhooks, not from the UI
+  const isLeadNoCreateInUi = isLeadObject;
+
+  const isReadOnly =
+    isLeadNoCreateInUi ||
+    isObjectMetadataReadOnly({
+      objectPermissions,
+      objectMetadataItem,
+    });
 
   const hasAnySoftDeleteFilterOnView = useRecoilComponentValue(
     hasAnySoftDeleteFilterOnViewComponentSelector,

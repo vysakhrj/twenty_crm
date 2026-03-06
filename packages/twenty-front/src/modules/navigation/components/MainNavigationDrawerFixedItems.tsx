@@ -1,5 +1,6 @@
 import { useOpenAskAIPageInCommandMenu } from '@/command-menu/hooks/useOpenAskAIPageInCommandMenu';
 import { useOpenRecordsSearchPageInCommandMenu } from '@/command-menu/hooks/useOpenRecordsSearchPageInCommandMenu';
+import { useNotifications } from '@/notifications/hooks/useNotifications';
 import { showNotificationCenterState } from '@/notifications/states/notificationsState';
 import { isSimpleViewEnabledState } from '@/ui/layout/simple-view/states/isSimpleViewEnabledState';
 import { NavigationDrawerItem } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerItem';
@@ -23,7 +24,6 @@ import {
   IconSun,
 } from 'twenty-ui/display';
 import { useIsMobile } from 'twenty-ui/utilities';
-import { useNotifications } from '@/notifications/hooks/useNotifications';
 import { FeatureFlagKey } from '~/generated/graphql';
 
 export const MainNavigationDrawerFixedItems = () => {

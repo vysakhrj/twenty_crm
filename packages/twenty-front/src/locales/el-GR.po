@@ -3482,6 +3482,33 @@ msgstr "Σκοτεινό"
 msgid "Dark mode"
 msgstr ""
 
+#[ Notification center ]
+#. js-lingui-id: TODO-Notifications
+#: src/modules/navigation/components/MainNavigationDrawerFixedItems.tsx
+#: src/modules/notifications/components/NotificationCenter.tsx
+msgid "Notifications"
+msgstr "Ειδοποιήσεις"
+
+#. js-lingui-id: TODO-NoNotificationsYet
+#: src/modules/notifications/components/NotificationCenter.tsx
+msgid "No notifications yet"
+msgstr "Δεν υπάρχουν ακόμη ειδοποιήσεις"
+
+#. js-lingui-id: TODO-UnreadCountUnread
+#: src/modules/notifications/components/NotificationCenter.tsx
+msgid "{unreadCount} unread"
+msgstr "{unreadCount} μη αναγνωσμένα"
+
+#. js-lingui-id: TODO-AllCaughtUp
+#: src/modules/notifications/components/NotificationCenter.tsx
+msgid "All caught up!"
+msgstr "Είσαι ενημερωμένος!"
+
+#. js-lingui-id: TODO-MarkAllAsRead
+#: src/modules/notifications/components/NotificationCenter.tsx
+msgid "Mark all as read"
+msgstr "Σήμανση όλων ως αναγνωσμένων"
+
 #. js-lingui-id: ogQzcZ
 #: src/modules/action-menu/actions/record-actions/single-record/dashboard-actions/components/DuplicateDashboardSingleRecordAction.tsx
 msgid "Dashboard duplicated successfully"

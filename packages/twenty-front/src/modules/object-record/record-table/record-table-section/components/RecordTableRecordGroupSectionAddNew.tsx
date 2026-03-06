@@ -37,7 +37,12 @@ export const RecordTableRecordGroupSectionAddNew = () => {
 
   const hasObjectUpdatePermissions = objectPermissions.canUpdateObjectRecords;
 
-  if (!hasObjectUpdatePermissions) {
+  const isLeadObject =
+    objectMetadataItem.nameSingular.toLowerCase() === 'lead';
+  // Lead creation is only allowed via webhooks, not from the UI
+  const isLeadNoCreateInUi = isLeadObject;
+
+  if (!hasObjectUpdatePermissions || isLeadNoCreateInUi) {
     return null;
   }
 

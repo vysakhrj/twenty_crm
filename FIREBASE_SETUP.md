@@ -4,14 +4,14 @@ This guide will help you complete the Firebase Cloud Messaging setup for push no
 
 ## Your Firebase Configuration
 
-Your project is already configured with these values:
+Set these in `packages/twenty-front/.env` (from Firebase Console > Project Settings > General):
 
-- **Project ID**: `sfs-crm-5f038`
-- **API Key**: `AIzaSyBG3M5VG_f65RZJuZM5KiYuRadBFNggheU`
-- **Auth Domain**: `sfs-crm-5f038.firebaseapp.com`
-- **Messaging Sender ID**: `1048685449819`
-- **App ID**: `1:1048685449819:web:cc7bd49fd814bfa0f4a57e`
-- **VAPID Key**: `BNv9ljt-ZUDS9r7hSN9K4d3EfVRwdBh4y5ZmlkyPS_4ql5HNP5BOJLOMQ_d1W2nVQ4ziGv7m3IAzUetIjpML7zo`
+- **Project ID**: `YOUR_PROJECT_ID`
+- **API Key**: (in "Your apps" > Web app config)
+- **Auth Domain**: `YOUR_PROJECT_ID.firebaseapp.com`
+- **Messaging Sender ID**: (in "Your apps" > Web app config)
+- **App ID**: (in "Your apps" > Web app config)
+- **VAPID Key**: Firebase Console > Cloud Messaging > Web Push certificates
 
 ## Backend Configuration (FCM V1 API - Recommended)
 
@@ -20,7 +20,7 @@ The backend uses the **FCM V1 API** which is more secure and modern than the leg
 ### Step 1: Generate Service Account Key
 
 1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Select your project `sfs-crm-5f038`
+2. Select your project (use your Project ID from Firebase Console)
 3. Click the **gear icon** (⚙️) next to "Project Overview" and select **Project Settings**
 4. Go to the **Service Accounts** tab
 5. Click **"Generate new private key"**

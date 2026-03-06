@@ -2,15 +2,15 @@ import styled from '@emotion/styled';
 import { useLingui } from '@lingui/react/macro';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
-import { IconX, IconCheck, IconBell } from 'twenty-ui/display';
+import { IconBell, IconCheck, IconX } from 'twenty-ui/display';
 import { Button } from 'twenty-ui/input';
 
 import { NotificationList } from './NotificationList';
 import { useNotifications } from '../hooks/useNotifications';
 import {
   notificationsState,
-  unreadNotificationsCountState,
   showNotificationCenterState,
+  unreadNotificationsCountState,
 } from '../states/notificationsState';
 
 const StyledOverlay = styled.div`

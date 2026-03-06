@@ -39,10 +39,16 @@ export const RecordTableHeaderLabelIdentifierCellPlusButton = () => {
 
   const hasObjectUpdatePermissions = objectPermissions.canUpdateObjectRecords;
 
+  const isLeadObject =
+    objectMetadataItem.nameSingular.toLowerCase() === 'lead';
+  // Lead creation is only allowed via webhooks, not from the UI
+  const isLeadNoCreateInUi = isLeadObject;
+
   return (
     !isMobile &&
     !isReadOnly &&
     hasObjectUpdatePermissions &&
+    !isLeadNoCreateInUi &&
     !hasAnySoftDeleteFilterOnView && (
       <StyledHeaderIcon>
         <LightIconButton

@@ -101,10 +101,22 @@ export const DEFAULT_RECORD_ACTIONS_CONFIG: Record<
     position: 2,
     isPinned: true,
     Icon: IconPlus,
-    shouldBeRegistered: ({ objectPermissions, hasAnySoftDeleteFilterOnView }) =>
-      (objectPermissions.canUpdateObjectRecords &&
-        !hasAnySoftDeleteFilterOnView) ??
-      false,
+    shouldBeRegistered: ({
+      objectMetadataItem,
+      objectPermissions,
+      hasAnySoftDeleteFilterOnView,
+    }) => {
+      const isLead =
+        objectMetadataItem?.nameSingular?.toLowerCase() === 'lead';
+      // Lead creation is only allowed via webhooks, not from the UI
+      if (isLead) return false;
+
+      return (
+        (objectPermissions.canUpdateObjectRecords &&
+          !hasAnySoftDeleteFilterOnView) ??
+        false
+      );
+    },
     availableOn: [ActionViewType.INDEX_PAGE_NO_SELECTION],
     component: <CreateNewIndexRecordNoSelectionRecordAction />,
   },
