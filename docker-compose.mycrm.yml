@@ -15,8 +15,16 @@ services:
       args:
         REACT_APP_SERVER_BASE_URL: ${SERVER_URL:-http://localhost:3000}
         VITE_MAIN_CHUNK_SIZE_LIMIT_MB: ${VITE_MAIN_CHUNK_SIZE_LIMIT_MB:-7.2}
+        VITE_FIREBASE_API_KEY: ${VITE_FIREBASE_API_KEY:-}
+        VITE_FIREBASE_AUTH_DOMAIN: ${VITE_FIREBASE_AUTH_DOMAIN:-}
+        VITE_FIREBASE_PROJECT_ID: ${VITE_FIREBASE_PROJECT_ID:-}
+        VITE_FIREBASE_MESSAGING_SENDER_ID: ${VITE_FIREBASE_MESSAGING_SENDER_ID:-}
+        VITE_FIREBASE_APP_ID: ${VITE_FIREBASE_APP_ID:-}
+        VITE_FIREBASE_VAPID_KEY: ${VITE_FIREBASE_VAPID_KEY:-}
     volumes:
       - server-local-data:/app/packages/twenty-server/.local-storage
+      # Optional: mount FCM service account for push notifications. Set FCM_SERVICE_ACCOUNT_HOST_PATH in .env to path on host.
+      - ${FCM_SERVICE_ACCOUNT_HOST_PATH:-/dev/null}:/app/fcm-service-account.json:ro
     ports:
       - "127.0.0.1:3000:3000"
     environment:
@@ -61,6 +69,10 @@ services:
       LOGGER_DRIVER: ${LOGGER_DRIVER:-CONSOLE}
       LOG_LEVELS: ${LOG_LEVELS:-error,warn,log}
 
+      # Firebase Cloud Messaging (push notifications). Set FCM_SERVICE_ACCOUNT_HOST_PATH and mount volume for V1 API.
+      FCM_NOTIFICATIONS_ENABLED: ${FCM_NOTIFICATIONS_ENABLED:-false}
+      FCM_SERVICE_ACCOUNT_PATH: /app/fcm-service-account.json
+
     depends_on:
       db:
         condition: service_healthy
@@ -82,6 +94,7 @@ services:
         VITE_MAIN_CHUNK_SIZE_LIMIT_MB: ${VITE_MAIN_CHUNK_SIZE_LIMIT_MB:-7}
     volumes:
       - server-local-data:/app/packages/twenty-server/.local-storage
+      - ${FCM_SERVICE_ACCOUNT_HOST_PATH:-/dev/null}:/app/fcm-service-account.json:ro
     command: ["yarn", "worker:prod"]
     environment:
       NODE_ENV: production
@@ -91,6 +104,9 @@ services:
       DISABLE_DB_MIGRATIONS: "true"
       DISABLE_CRON_JOBS_REGISTRATION: "true"
       APP_SECRET: ${APP_SECRET:-replace_me_with_a_random_string}
+
+      FCM_NOTIFICATIONS_ENABLED: ${FCM_NOTIFICATIONS_ENABLED:-false}
+      FCM_SERVICE_ACCOUNT_PATH: /app/fcm-service-account.json
 
       # Storage
       STORAGE_TYPE: ${STORAGE_TYPE:-local}
