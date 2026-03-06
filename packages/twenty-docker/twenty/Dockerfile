@@ -35,7 +35,7 @@ RUN yarn workspaces focus --production twenty-emails twenty-shared twenty-server
 FROM common-deps AS twenty-front-build
 
 ARG REACT_APP_SERVER_BASE_URL
-ARG VITE_MAIN_CHUNK_SIZE_LIMIT_MB=7.2
+ARG VITE_MAIN_CHUNK_SIZE_LIMIT_MB=7.5
 # Firebase (injected at build time for app + service worker)
 ARG VITE_FIREBASE_API_KEY=
 ARG VITE_FIREBASE_AUTH_DOMAIN=

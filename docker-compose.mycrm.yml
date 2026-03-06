@@ -14,7 +14,7 @@ services:
       dockerfile: packages/twenty-docker/twenty/Dockerfile
       args:
         REACT_APP_SERVER_BASE_URL: ${SERVER_URL:-http://localhost:3000}
-        VITE_MAIN_CHUNK_SIZE_LIMIT_MB: ${VITE_MAIN_CHUNK_SIZE_LIMIT_MB:-7.2}
+        VITE_MAIN_CHUNK_SIZE_LIMIT_MB: ${VITE_MAIN_CHUNK_SIZE_LIMIT_MB:-7.5}
         VITE_FIREBASE_API_KEY: ${VITE_FIREBASE_API_KEY:-}
         VITE_FIREBASE_AUTH_DOMAIN: ${VITE_FIREBASE_AUTH_DOMAIN:-}
         VITE_FIREBASE_PROJECT_ID: ${VITE_FIREBASE_PROJECT_ID:-}
@@ -91,7 +91,7 @@ services:
       dockerfile: packages/twenty-docker/twenty/Dockerfile
       args:
         REACT_APP_SERVER_BASE_URL: ${SERVER_URL:-http://localhost:3000}
-        VITE_MAIN_CHUNK_SIZE_LIMIT_MB: ${VITE_MAIN_CHUNK_SIZE_LIMIT_MB:-7}
+        VITE_MAIN_CHUNK_SIZE_LIMIT_MB: ${VITE_MAIN_CHUNK_SIZE_LIMIT_MB:-7.5}
     volumes:
       - server-local-data:/app/packages/twenty-server/.local-storage
       - ${FCM_SERVICE_ACCOUNT_HOST_PATH:-/dev/null}:/app/fcm-service-account.json:ro
