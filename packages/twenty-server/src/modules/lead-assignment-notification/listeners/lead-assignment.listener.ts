@@ -31,6 +31,9 @@ type LeadRecord = {
 export class LeadAssignmentListener {
   private readonly logger = new Logger(LeadAssignmentListener.name);
   private static readonly BUILD_MARKER = '2026-03-06-lead-assignment-v3';
+  private static readonly DEDUPE_WINDOW_MS = 5000;
+
+  private readonly recentAssignments = new Map<string, number>();
 
   onModuleInit() {
     this.logger.log(
@@ -72,6 +75,19 @@ export class LeadAssignmentListener {
       if (!nextAssigneeId || nextAssigneeId === previousAssigneeId) {
         this.logger.debug(
           `Skipping lead ${event.recordId}: previousAssigneeId=${previousAssigneeId ?? 'null'} nextAssigneeId=${nextAssigneeId ?? 'null'}`,
+        );
+        continue;
+      }
+
+      const dedupeKey = this.buildDedupeKey(
+        payload.workspaceId,
+        event.recordId,
+        nextAssigneeId,
+      );
+
+      if (this.shouldSkipDuplicateAssignment(dedupeKey)) {
+        this.logger.debug(
+          `Skipping duplicate notification for lead ${event.recordId} and assignee ${nextAssigneeId} within dedupe window`,
         );
         continue;
       }
@@ -187,5 +203,35 @@ export class LeadAssignmentListener {
     }
 
     return null;
+  }
+
+  private buildDedupeKey(
+    workspaceId: string,
+    leadId: string,
+    assigneeId: string,
+  ): string {
+    return `${workspaceId}:${leadId}:${assigneeId}`;
+  }
+
+  private shouldSkipDuplicateAssignment(dedupeKey: string): boolean {
+    const now = Date.now();
+    const seenAt = this.recentAssignments.get(dedupeKey);
+
+    if (seenAt && now - seenAt < LeadAssignmentListener.DEDUPE_WINDOW_MS) {
+      return true;
+    }
+
+    this.recentAssignments.set(dedupeKey, now);
+    this.cleanupRecentAssignments(now);
+
+    return false;
+  }
+
+  private cleanupRecentAssignments(now: number): void {
+    for (const [key, timestamp] of this.recentAssignments.entries()) {
+      if (now - timestamp >= LeadAssignmentListener.DEDUPE_WINDOW_MS) {
+        this.recentAssignments.delete(key);
+      }
+    }
   }
 }

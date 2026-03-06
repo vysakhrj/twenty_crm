@@ -155,6 +155,7 @@ export class FcmPushNotificationService {
 
       // Get OAuth2 access token
       const accessToken = await this.getOAuth2Token(credentials);
+      const webPushIconUrl = this.getDefaultWebPushIconUrl();
 
       // Send to each token individually (V1 API requires batch endpoint or individual calls)
       for (const token of tokens) {
@@ -189,8 +190,12 @@ export class FcmPushNotificationService {
                       Urgency: 'high',
                     },
                     notification: {
-                      icon: '/icons/notification-icon.png',
-                      badge: '/icons/notification-badge.png',
+                      ...(webPushIconUrl
+                        ? {
+                            icon: webPushIconUrl,
+                            badge: webPushIconUrl,
+                          }
+                        : {}),
                       tag: metadata.notificationId || type,
                       requireInteraction: true,
                     },
@@ -360,6 +365,20 @@ export class FcmPushNotificationService {
       const message = error instanceof Error ? error.message : String(error);
       throw new Error(`Failed to get OAuth2 token: ${message}`);
     }
+  }
+
+  private getDefaultWebPushIconUrl(): string | undefined {
+    const frontendUrl = this.twentyConfigService.get('FRONTEND_URL');
+
+    if (!frontendUrl) {
+      return undefined;
+    }
+
+    const trimmedUrl = frontendUrl.endsWith('/')
+      ? frontendUrl.slice(0, -1)
+      : frontendUrl;
+
+    return `${trimmedUrl}/favicon.ico`;
   }
 
   private async signJwt(data: string, privateKey: string): Promise<string> {
