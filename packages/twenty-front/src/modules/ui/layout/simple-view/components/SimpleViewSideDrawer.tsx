@@ -212,7 +212,7 @@ export const SimpleViewSideDrawer = () => {
   };
 
   const handleSettingsClick = () => {
-    navigate('/settings/profile');
+    navigate('/simple/settings');
     setIsOpen(false);
   };
 
@@ -280,7 +280,10 @@ export const SimpleViewSideDrawer = () => {
             </StyledNavSection>
 
             <StyledFooter>
-              <StyledNavItem onClick={handleSettingsClick}>
+              <StyledNavItem
+                isActive={currentPath === '/simple/settings'}
+                onClick={handleSettingsClick}
+              >
                 <IconSettings size={16} />
                 Settings
               </StyledNavItem>

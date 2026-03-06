@@ -9,6 +9,8 @@ import { KeyboardShortcutMenu } from '@/keyboard-shortcut-menu/components/Keyboa
 import { AppNavigationDrawer } from '@/navigation/components/AppNavigationDrawer';
 import { MobileNavigationBar } from '@/navigation/components/MobileNavigationBar';
 import { useIsSettingsPage } from '@/navigation/hooks/useIsSettingsPage';
+import { NotificationCenter } from '@/notifications/components/NotificationCenter';
+import { useFirebaseNotifications } from '@/notifications/hooks/useFirebaseNotifications';
 import { OBJECT_SETTINGS_WIDTH } from '@/settings/data-model/constants/ObjectSettings';
 import { SignInAppNavigationDrawerMock } from '@/sign-in-background-mock/components/SignInAppNavigationDrawerMock';
 import { SignInBackgroundMockPage } from '@/sign-in-background-mock/components/SignInBackgroundMockPage';
@@ -69,6 +71,8 @@ export const DefaultLayout = () => {
   const useShowFullScreen = useShowFullscreen();
   const isSimpleViewEnabled = useRecoilValue(isSimpleViewEnabledState);
 
+  useFirebaseNotifications();
+
   // When simple view is enabled and not on auth/settings pages, use simplified layout
   const shouldUseSimpleView =
     isSimpleViewEnabled && !showAuthModal && !isSettingsPage;
@@ -87,6 +91,7 @@ export const DefaultLayout = () => {
           <AppErrorBoundary FallbackComponent={AppFullScreenErrorFallback}>
             <SimpleViewLayout />
           </AppErrorBoundary>
+          <NotificationCenter />
         </StyledLayout>
       </>
     );
@@ -147,6 +152,7 @@ export const DefaultLayout = () => {
             )}
           </StyledPageContainer>
           {isMobile && !showAuthModal && <MobileNavigationBar />}
+          {!showAuthModal && <NotificationCenter />}
         </AppErrorBoundary>
       </StyledLayout>
     </>

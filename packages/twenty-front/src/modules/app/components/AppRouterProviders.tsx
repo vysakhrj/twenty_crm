@@ -10,6 +10,7 @@ import { ClientConfigProviderEffect } from '@/client-config/components/ClientCon
 import { MainContextStoreProvider } from '@/context-store/components/MainContextStoreProvider';
 import { ErrorMessageEffect } from '@/error-handler/components/ErrorMessageEffect';
 import { PromiseRejectionEffect } from '@/error-handler/components/PromiseRejectionEffect';
+import { ensureFirebaseMessagingServiceWorkerRegistration } from '@/firebase/services/firebase-messaging.service';
 import { ApolloCoreProvider } from '@/object-metadata/components/ApolloCoreProvider';
 import { ObjectMetadataItemsLoadEffect } from '@/object-metadata/components/ObjectMetadataItemsLoadEffect';
 import { ObjectMetadataItemsProvider } from '@/object-metadata/components/ObjectMetadataItemsProvider';
@@ -26,13 +27,17 @@ import { PageTitle } from '@/ui/utilities/page-title/components/PageTitle';
 import { UserAndViewsProviderEffect } from '@/users/components/UserAndViewsProviderEffect';
 import { UserProvider } from '@/users/components/UserProvider';
 import { WorkspaceProviderEffect } from '@/workspace/components/WorkspaceProviderEffect';
-import { StrictMode } from 'react';
+import { StrictMode, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { getPageTitleFromPath } from '~/utils/title-utils';
 
 export const AppRouterProviders = () => {
   const { pathname } = useLocation();
   const pageTitle = getPageTitleFromPath(pathname);
+
+  useEffect(() => {
+    void ensureFirebaseMessagingServiceWorkerRegistration();
+  }, []);
 
   return (
     <ApolloProvider>

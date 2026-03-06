@@ -6,6 +6,7 @@ import { VerifyEmailEffect } from '@/auth/components/VerifyEmailEffect';
 import indexAppPath from '@/navigation/utils/indexAppPath';
 import { BlankLayout } from '@/ui/layout/page/components/BlankLayout';
 import { DefaultLayout } from '@/ui/layout/page/components/DefaultLayout';
+import { SimpleSettingsPage } from '@/ui/layout/simple-view/components/SimpleSettingsPage';
 import { AppPath } from 'twenty-shared/types';
 
 import {
@@ -61,6 +62,7 @@ export const useCreateAppRouter = (
           />
           <Route path={AppPath.BookCall} element={<BookCall />} />
           <Route path={indexAppPath.getIndexAppPath()} element={<></>} />
+          <Route path="/simple/settings" element={<SimpleSettingsPage />} />
           <Route path={AppPath.RecordIndexPage} element={<RecordIndexPage />} />
           <Route path={AppPath.RecordShowPage} element={<RecordShowPage />} />
           <Route

@@ -73,6 +73,7 @@ import { DashboardModule } from 'src/modules/dashboard/dashboard.module';
 import { AuditModule } from './audit/audit.module';
 import { ClientConfigModule } from './client-config/client-config.module';
 import { FileModule } from './file/file.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -158,6 +159,7 @@ import { FileModule } from './file/file.module';
     DashboardModule,
     RowLevelPermissionModule,
     LeadModule,
+    NotificationModule,
   ],
   exports: [
     AuditModule,

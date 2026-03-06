@@ -24,6 +24,7 @@ import {
 import { getWorkspaceUrl } from '~/utils/getWorkspaceUrl';
 import { dynamicActivate } from '~/utils/i18n/dynamicActivate';
 import { UPSERT_FCM_TOKEN } from '@/users/graphql/mutations/upsertFcmToken';
+import { initializeFirebaseMessaging } from '@/firebase/services/firebase-messaging.service';
 
 const FCM_TOKEN_STORAGE_KEY = 'fcmToken';
 const FCM_DEVICE_ID_STORAGE_KEY = 'fcmDeviceId';
@@ -200,6 +201,10 @@ export const useLoadCurrentUser = () => {
         workspaceUrl: getWorkspaceUrl(workspace.workspaceUrls),
       });
 
+      // Initialize Firebase messaging and get FCM token
+      await initializeFirebaseMessaging();
+
+      // Register FCM token with backend
       await registerStoredFcmToken(workspace.id);
     }
 

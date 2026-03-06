@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 
 import { SimpleViewSideDrawer } from '@/ui/layout/simple-view/components/SimpleViewSideDrawer';
 import { SimpleViewTopBar } from '@/ui/layout/simple-view/components/SimpleViewTopBar';
@@ -24,9 +24,13 @@ const StyledMainContent = styled.div`
 `;
 
 export const SimpleViewLayout = ({ title }: { title?: string }) => {
+  const location = useLocation();
+  const computedTitle =
+    title ?? (location.pathname === '/simple/settings' ? 'Settings' : 'CRM');
+
   return (
     <StyledLayout>
-      <SimpleViewTopBar title={title ?? 'CRM'} />
+      <SimpleViewTopBar title={computedTitle} />
       <StyledMainContent>
         <Outlet />
       </StyledMainContent>

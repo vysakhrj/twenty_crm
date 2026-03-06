@@ -15,6 +15,15 @@ import {
 import checker from 'vite-plugin-checker';
 import svgr from 'vite-plugin-svgr';
 import tsconfigPaths from 'vite-tsconfig-paths';
+
+// Firebase environment variables for service worker
+const getFirebaseEnvVars = (env: Record<string, string>) => ({
+  VITE_FIREBASE_API_KEY: env.VITE_FIREBASE_API_KEY || '',
+  VITE_FIREBASE_AUTH_DOMAIN: env.VITE_FIREBASE_AUTH_DOMAIN || '',
+  VITE_FIREBASE_PROJECT_ID: env.VITE_FIREBASE_PROJECT_ID || '',
+  VITE_FIREBASE_MESSAGING_SENDER_ID: env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
+  VITE_FIREBASE_APP_ID: env.VITE_FIREBASE_APP_ID || '',
+});
 type Checkers = Parameters<typeof checker>[0];
 
 export default defineConfig(({ command, mode }) => {
@@ -206,6 +215,44 @@ export default defineConfig(({ command, mode }) => {
         brotliSize: true,
         filename: 'dist/stats.html',
       }) as PluginOption, // https://github.com/btd/rollup-plugin-visualizer/issues/162#issuecomment-1538265997,
+      // Copy and transform Firebase service worker
+      {
+        name: 'firebase-service-worker',
+        writeBundle() {
+          const firebaseEnv = getFirebaseEnvVars(env);
+          const swPath = path.resolve(__dirname, 'public/firebase-messaging-sw.js');
+          const outPath = path.resolve(__dirname, 'build/firebase-messaging-sw.js');
+
+          if (fs.existsSync(swPath)) {
+            let content = fs.readFileSync(swPath, 'utf-8');
+
+            // Replace environment variable placeholders
+            content = content.replace(
+              /self\.__FIREBASE_API_KEY__/g,
+              `'${firebaseEnv.VITE_FIREBASE_API_KEY}'`,
+            );
+            content = content.replace(
+              /self\.__FIREBASE_AUTH_DOMAIN__/g,
+              `'${firebaseEnv.VITE_FIREBASE_AUTH_DOMAIN}'`,
+            );
+            content = content.replace(
+              /self\.__FIREBASE_PROJECT_ID__/g,
+              `'${firebaseEnv.VITE_FIREBASE_PROJECT_ID}'`,
+            );
+            content = content.replace(
+              /self\.__FIREBASE_MESSAGING_SENDER_ID__/g,
+              `'${firebaseEnv.VITE_FIREBASE_MESSAGING_SENDER_ID}'`,
+            );
+            content = content.replace(
+              /self\.__FIREBASE_APP_ID__/g,
+              `'${firebaseEnv.VITE_FIREBASE_APP_ID}'`,
+            );
+
+            fs.writeFileSync(outPath, content);
+            console.log('Firebase service worker copied to build directory');
+          }
+        },
+      },
     ],
 
     optimizeDeps: {
@@ -303,7 +350,7 @@ export default defineConfig(({ command, mode }) => {
       },
     },
 
-    envPrefix: 'REACT_APP_',
+    envPrefix: ['REACT_APP_', 'VITE_'],
 
     define: {
       _env_: {

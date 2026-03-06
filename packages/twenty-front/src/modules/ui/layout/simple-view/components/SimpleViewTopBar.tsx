@@ -1,8 +1,10 @@
 import styled from '@emotion/styled';
 import { useSetRecoilState } from 'recoil';
 
+import { useNotifications } from '@/notifications/hooks/useNotifications';
+import { showNotificationCenterState } from '@/notifications/states/notificationsState';
 import { isSimpleViewDrawerOpenState } from '@/ui/layout/simple-view/states/isSimpleViewDrawerOpenState';
-import { IconList } from 'twenty-ui/display';
+import { IconBell, IconList } from 'twenty-ui/display';
 
 const StyledTopBar = styled.div`
   align-items: center;
@@ -40,12 +42,43 @@ const StyledTitle = styled.div`
   text-align: center;
 `;
 
-const StyledSpacer = styled.div`
+const StyledNotificationButton = styled.button<{ hasUnread: boolean }>`
+  align-items: center;
+  background: none;
+  border: none;
+  border-radius: ${({ theme }) => theme.border.radius.sm};
+  color: ${({ theme }) => theme.font.color.primary};
+  cursor: pointer;
+  display: flex;
+  height: ${({ theme }) => theme.spacing(8)};
+  justify-content: center;
+  padding: 0;
+  position: relative;
   width: ${({ theme }) => theme.spacing(8)};
+
+  &:hover {
+    background: ${({ theme }) => theme.background.transparent.light};
+  }
+
+  &::after {
+    background: ${({ theme }) => theme.color.red};
+    border-radius: 50%;
+    content: '';
+    display: ${({ hasUnread }) => (hasUnread ? 'block' : 'none')};
+    height: 8px;
+    position: absolute;
+    right: 6px;
+    top: 6px;
+    width: 8px;
+  }
 `;
 
 export const SimpleViewTopBar = ({ title }: { title: string }) => {
   const setIsDrawerOpen = useSetRecoilState(isSimpleViewDrawerOpenState);
+  const setShowNotificationCenter = useSetRecoilState(
+    showNotificationCenterState,
+  );
+  const { unreadCount } = useNotifications({ skipFullFetch: true });
 
   return (
     <StyledTopBar>
@@ -53,7 +86,13 @@ export const SimpleViewTopBar = ({ title }: { title: string }) => {
         <IconList size={20} />
       </StyledHamburgerButton>
       <StyledTitle>{title}</StyledTitle>
-      <StyledSpacer />
+      <StyledNotificationButton
+        onClick={() => setShowNotificationCenter(true)}
+        hasUnread={unreadCount > 0}
+        aria-label="Notifications"
+      >
+        <IconBell size={20} />
+      </StyledNotificationButton>
     </StyledTopBar>
   );
 };

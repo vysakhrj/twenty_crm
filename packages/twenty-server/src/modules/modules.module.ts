@@ -8,6 +8,7 @@ import { FavoriteModule } from 'src/modules/favorite/favorite.module';
 import { LeadAssignmentNotificationModule } from 'src/modules/lead-assignment-notification/lead-assignment-notification.module';
 import { MessagingModule } from 'src/modules/messaging/messaging.module';
 import { WorkflowModule } from 'src/modules/workflow/workflow.module';
+import { NotificationJobModule } from 'src/modules/notification/notification.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { WorkflowModule } from 'src/modules/workflow/workflow.module';
     FavoriteFolderModule,
     FavoriteModule,
     LeadAssignmentNotificationModule,
+    NotificationJobModule,
   ],
   providers: [],
   exports: [],

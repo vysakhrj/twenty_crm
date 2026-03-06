@@ -16,6 +16,13 @@ export const useCanEditProfileField = (field: EditableProfileField) => {
   const currentUserWorkspace = useRecoilValue(currentUserWorkspaceState);
   const availableWorkspaces = useRecoilValue(availableWorkspacesState);
 
+  const isAlwaysEditableProfileField =
+    field === 'firstName' || field === 'lastName' || field === 'profilePicture';
+
+  if (isAlwaysEditableProfileField) {
+    return { canEdit: true };
+  }
+
   if (!currentWorkspace || !currentUserWorkspace) {
     return { canEdit: false };
   }

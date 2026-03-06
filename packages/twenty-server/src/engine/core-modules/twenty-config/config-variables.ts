@@ -88,12 +88,20 @@ export class ConfigVariables {
 
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.OTHER,
-    description: 'Server key used to send Firebase Cloud Messaging push notifications',
+    description: 'Server key used to send Firebase Cloud Messaging push notifications (Legacy API)',
     type: ConfigVariableType.STRING,
     isSensitive: true,
   })
   @IsOptionalOrEmptyString()
   FCM_SERVER_KEY = '';
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.OTHER,
+    description: 'Path to service account JSON file for FCM V1 API authentication',
+    type: ConfigVariableType.STRING,
+  })
+  @IsOptionalOrEmptyString()
+  FCM_SERVICE_ACCOUNT_PATH = '';
 
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.TOKENS_DURATION,

@@ -1,5 +1,6 @@
 import { useOpenAskAIPageInCommandMenu } from '@/command-menu/hooks/useOpenAskAIPageInCommandMenu';
 import { useOpenRecordsSearchPageInCommandMenu } from '@/command-menu/hooks/useOpenRecordsSearchPageInCommandMenu';
+import { showNotificationCenterState } from '@/notifications/states/notificationsState';
 import { isSimpleViewEnabledState } from '@/ui/layout/simple-view/states/isSimpleViewEnabledState';
 import { NavigationDrawerItem } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerItem';
 import { isNavigationDrawerExpandedState } from '@/ui/navigation/states/isNavigationDrawerExpanded';
@@ -13,6 +14,7 @@ import { useRecoilState, useSetRecoilState } from 'recoil';
 import { SettingsPath } from 'twenty-shared/types';
 import { getSettingsPath } from 'twenty-shared/utils';
 import {
+  IconBell,
   IconEye,
   IconMoon,
   IconSearch,
@@ -21,6 +23,7 @@ import {
   IconSun,
 } from 'twenty-ui/display';
 import { useIsMobile } from 'twenty-ui/utilities';
+import { useNotifications } from '@/notifications/hooks/useNotifications';
 import { FeatureFlagKey } from '~/generated/graphql';
 
 export const MainNavigationDrawerFixedItems = () => {
@@ -46,6 +49,13 @@ export const MainNavigationDrawerFixedItems = () => {
   const isAiEnabled = useIsFeatureEnabled(FeatureFlagKey.IS_AI_ENABLED);
   const { colorScheme, setColorScheme } = useColorScheme();
 
+  const setShowNotificationCenter = useSetRecoilState(showNotificationCenterState);
+  const { unreadCount } = useNotifications({ skipFullFetch: true });
+
+  const handleOpenNotificationCenter = () => {
+    setShowNotificationCenter(true);
+  };
+
   return (
     !isMobile && (
       <>
@@ -65,6 +75,12 @@ export const MainNavigationDrawerFixedItems = () => {
             mouseUpNavigation={true}
           />
         )}
+        <NavigationDrawerItem
+          label={t`Notifications`}
+          Icon={IconBell}
+          onClick={handleOpenNotificationCenter}
+          count={unreadCount > 0 ? unreadCount : undefined}
+        />
         <NavigationDrawerItem
           label={t`Dark mode`}
           Icon={colorScheme === 'Dark' ? IconSun : IconMoon}
