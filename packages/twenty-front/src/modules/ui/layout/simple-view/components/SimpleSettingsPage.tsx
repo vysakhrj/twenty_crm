@@ -573,13 +573,13 @@ export const SimpleSettingsPage = () => {
                   type="date"
                   value={leaveStartDate}
                   onChange={(event) => setLeaveStartDate(event.target.value)}
-                  aria-label="Leave start date"
+                  aria-label={t`Leave start date`}
                 />
                 <StyledDateInput
                   type="date"
                   value={leaveEndDate}
                   onChange={(event) => setLeaveEndDate(event.target.value)}
-                  aria-label="Leave end date"
+                  aria-label={t`Leave end date`}
                 />
               </StyledDateGrid>
               <StyledLeaveActions>
@@ -695,13 +695,13 @@ export const SimpleSettingsPage = () => {
                 type="time"
                 value={availabilityStartTime}
                 onChange={(event) => setAvailabilityStartTime(event.target.value)}
-                aria-label="Availability start time"
+                aria-label={t`Availability start time`}
               />
               <StyledDateInput
                 type="time"
                 value={availabilityEndTime}
                 onChange={(event) => setAvailabilityEndTime(event.target.value)}
-                aria-label="Availability end time"
+                aria-label={t`Availability end time`}
               />
             </StyledDateGrid>
 

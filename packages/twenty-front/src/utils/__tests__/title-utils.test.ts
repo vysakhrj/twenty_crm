@@ -47,7 +47,7 @@ describe('title-utils', () => {
     expect(getPageTitleFromPath('/settings/general')).toBe(
       'General - Settings',
     );
-    expect(getPageTitleFromPath('/')).toBe('Imprezz');
-    expect(getPageTitleFromPath('/random')).toBe('Imprezz');
+    expect(getPageTitleFromPath('/')).toBe('Imprezz CRM');
+    expect(getPageTitleFromPath('/random')).toBe('Imprezz CRM');
   });
 });

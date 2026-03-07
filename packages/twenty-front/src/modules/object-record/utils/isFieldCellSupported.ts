@@ -8,6 +8,10 @@ export const isFieldCellSupported = (
   fieldMetadataItem: FieldMetadataItem,
   objectMetadataItems: ObjectMetadataItem[],
 ) => {
+  if (fieldMetadataItem.name === 'readAt') {
+    return false;
+  }
+
   if (
     [FieldMetadataType.POSITION, FieldMetadataType.RICH_TEXT].includes(
       fieldMetadataItem.type,

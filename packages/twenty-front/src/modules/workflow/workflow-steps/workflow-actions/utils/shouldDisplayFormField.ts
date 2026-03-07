@@ -31,6 +31,10 @@ export const shouldDisplayFormField = ({
   fieldMetadataItem: FieldMetadataItem;
   actionType: WorkflowActionType;
 }) => {
+  if (fieldMetadataItem.name === 'readAt') {
+    return false;
+  }
+
   if (!SUPPORTED_FORM_FIELD_TYPES.includes(fieldMetadataItem.type)) {
     return false;
   }

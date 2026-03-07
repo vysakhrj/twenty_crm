@@ -3,6 +3,10 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';
 
+import {
+  formatDateISOStringToUnifiedDate,
+  formatDateISOStringToUnifiedDateTime,
+} from '@/localization/utils/formatDateISOStringToUnified';
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
 import { useGenerateDepthRecordGqlFieldsFromObject } from '@/object-record/graphql/record-gql-fields/hooks/useGenerateDepthRecordGqlFieldsFromObject';
@@ -327,7 +331,7 @@ const SYSTEM_FIELD_NAMES = new Set([
   '__typename',
 ]);
 
-const PRIORITY_FIELD_NAMES = new Set(['body']);
+const PRIORITY_FIELD_NAMES = new Set(['body', 'convenientTime']);
 const AUTO_MANAGED_FIELD_NAMES = new Set(['readAt']);
 
 const getInitials = (value: string): string => {
@@ -343,39 +347,14 @@ const getInitials = (value: string): string => {
 };
 
 const formatDate = (dateString: string): string => {
-  try {
-    const date = new Date(dateString);
-    const month = date.toLocaleString('en-US', {
-      month: 'short',
-    });
-    const day = date.toLocaleString('en-US', {
-      day: 'numeric',
-    });
-    const time = date
-      .toLocaleString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      })
-      .replace(' ', '')
-      .toLowerCase();
-
-    return `${month} ${day} ${time}`;
-  } catch {
-    return dateString;
-  }
+  const formatted =
+    formatDateISOStringToUnifiedDateTime(dateString);
+  return formatted || dateString;
 };
 
 const formatDateOnly = (dateString: string): string => {
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  } catch {
-    return dateString;
-  }
+  const formatted = formatDateISOStringToUnifiedDate(dateString);
+  return formatted || dateString;
 };
 
 const formatFieldValue = (
@@ -664,6 +643,7 @@ export const SimpleRecordDetailPage = ({
   const navigate = useNavigate();
   const { updateOneRecord } = useUpdateOneRecord();
   const followUpPickerInputRef = useRef<HTMLInputElement>(null);
+  const convenientTimePickerInputRef = useRef<HTMLInputElement>(null);
   const hasMarkedReadAtRef = useRef(false);
   const currentWorkspaceMember = useRecoilValue(currentWorkspaceMemberState);
 
@@ -754,10 +734,19 @@ export const SimpleRecordDetailPage = ({
   const convenientTimeText = useMemo(() => {
     if (!record) return undefined;
 
+    const formatConvenientTimeValue = (raw: string): string => {
+      const trimmed = raw.trim();
+      const date = new Date(trimmed);
+      if (!Number.isNaN(date.getTime())) {
+        return formatDate(trimmed);
+      }
+      return trimmed;
+    };
+
     if (convenientTimeField) {
       const value = record[convenientTimeField.name];
       if (typeof value === 'string' && value.trim().length > 0) {
-        return value.trim();
+        return formatConvenientTimeValue(value);
       }
     }
 
@@ -766,7 +755,7 @@ export const SimpleRecordDetailPage = ({
       if (typeof value !== 'string' || value.trim().length === 0) continue;
       const normalizedKey = key.toLowerCase();
       if (normalizedKey.includes('convenient') && normalizedKey.includes('time')) {
-        return value.trim();
+        return formatConvenientTimeValue(value);
       }
     }
 
@@ -1015,6 +1004,7 @@ export const SimpleRecordDetailPage = ({
       if (fieldMeta.type === FieldMetadataType.DATE_TIME) continue;
       if (fieldMeta.type === FieldMetadataType.RELATION) continue;
       if (PRIORITY_FIELD_NAMES.has(fieldMeta.name)) continue;
+      if (fieldMeta.label.toLowerCase() === 'convenient time') continue;
       if (fieldMeta.id === objectMetadataItem.labelIdentifierFieldMetadataId)
         continue;
 
@@ -1051,6 +1041,29 @@ export const SimpleRecordDetailPage = ({
   const handleFollowUpChange = (newValue: string) => {
     if (!followUpField) return;
     handleDateChange(followUpField.name, newValue);
+  };
+
+  const handleConvenientTimeChange = (newValue: string) => {
+    if (!convenientTimeField) return;
+    const isoValue = newValue ? new Date(newValue).toISOString() : '';
+    updateOneRecord({
+      idToUpdate: objectRecordId,
+      objectNameSingular,
+      updateOneRecordInput: {
+        [convenientTimeField.name]: isoValue,
+      },
+    });
+  };
+
+  const openConvenientTimePicker = () => {
+    const input = convenientTimePickerInputRef.current;
+    if (!input) return;
+    if ('showPicker' in input && typeof input.showPicker === 'function') {
+      input.showPicker();
+      return;
+    }
+    input.focus();
+    input.click();
   };
 
   useEffect(() => {
@@ -1236,7 +1249,40 @@ export const SimpleRecordDetailPage = ({
                 <StyledFollowUpLabel>
                   {convenientTimeField?.label ?? 'Convenient Time'}
                 </StyledFollowUpLabel>
-                <StyledTopMetaValue>{convenientTimeText ?? '-'}</StyledTopMetaValue>
+                {convenientTimeField ? (
+                  <StyledFollowUpValueRow
+                    role="button"
+                    onClick={openConvenientTimePicker}
+                  >
+                    <StyledTopMetaValue>
+                      {convenientTimeText ?? '-'}
+                    </StyledTopMetaValue>
+                    <StyledFollowUpCalendarButton
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        openConvenientTimePicker();
+                      }}
+                      aria-label="Set convenient time"
+                    >
+                      <IconCalendar size={16} />
+                    </StyledFollowUpCalendarButton>
+                    <StyledHiddenFollowUpInput
+                      ref={convenientTimePickerInputRef}
+                      type="datetime-local"
+                      value={toDateTimeInputValue(
+                        record[convenientTimeField.name] as string,
+                      )}
+                      onChange={(event) =>
+                        handleConvenientTimeChange(event.target.value)
+                      }
+                    />
+                  </StyledFollowUpValueRow>
+                ) : (
+                  <StyledTopMetaValue>
+                    {convenientTimeText ?? '-'}
+                  </StyledTopMetaValue>
+                )}
               </StyledTopMetaItem>
             </StyledTopMetaRow>
           )}
@@ -1282,9 +1328,19 @@ export const SimpleRecordDetailPage = ({
               </StyledReadOnlyDateValue>
             ) : (
               <StyledDateInput
-                type="date"
-                value={toDateInputValue(record[field.name] as string)}
-                onChange={(event) => handleDateChange(field.name, event.target.value)}
+                type={
+                  field.type === FieldMetadataType.DATE_TIME
+                    ? 'datetime-local'
+                    : 'date'
+                }
+                value={
+                  field.type === FieldMetadataType.DATE_TIME
+                    ? toDateTimeInputValue(record[field.name] as string)
+                    : toDateInputValue(record[field.name] as string)
+                }
+                onChange={(event) =>
+                  handleDateChange(field.name, event.target.value)
+                }
               />
             )}
           </StyledDateSection>

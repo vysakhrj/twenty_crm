@@ -410,6 +410,11 @@ msgstr "{totalCost} tín dụng"
 msgid "{totalCount} selected"
 msgstr ""
 
+#. js-lingui-id: vS7xCV
+#: src/modules/notifications/components/NotificationCenter.tsx
+msgid "{unreadCount} unread"
+msgstr ""
+
 #. js-lingui-id: ITVweg
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownDefaultView.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCustomView.tsx
@@ -1244,6 +1249,11 @@ msgstr "Tất cả ({relationRecordsCount})"
 msgid "All Actions Access"
 msgstr "Truy cập tất cả các hành động"
 
+#. js-lingui-id: 7/XOrv
+#: src/modules/notifications/components/NotificationCenter.tsx
+msgid "All caught up!"
+msgstr ""
+
 #. js-lingui-id: 1kLn6M
 #: src/modules/activities/calendar/components/CalendarEventRow.tsx
 msgid "All day"
@@ -1638,6 +1648,7 @@ msgid "Apply"
 msgstr ""
 
 #. js-lingui-id: /q0HFa
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Apply leave"
 msgstr ""
@@ -1942,6 +1953,27 @@ msgstr "Tự động tạo bản ghi Người khi nhận hoặc gửi email"
 msgid "Availability"
 msgstr "Có sẵn"
 
+#. js-lingui-id: b5XKJ7
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Availability end time"
+msgstr ""
+
+#. js-lingui-id: 25lvcM
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Availability schedule"
+msgstr ""
+
+#. js-lingui-id: a8DVhy
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Availability start time"
+msgstr ""
+
+#. js-lingui-id: 0Y64zT
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Availability updated"
+msgstr ""
+
 #. js-lingui-id: csDS2L
 #: src/modules/settings/data-model/new-object/components/SettingsAvailableStandardObjectsSection.tsx
 msgid "Available"
@@ -1979,6 +2011,11 @@ msgstr "Quay lại {linkText}"
 #: src/pages/not-found/NotFound.tsx
 msgid "Back to content"
 msgstr "Quay lại nội dung"
+
+#. js-lingui-id: PFeHMa
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Back to records"
+msgstr ""
 
 #. js-lingui-id: OvBnOM
 #: src/modules/ui/navigation/bread-crumb/components/MobileBreadcrumb.tsx
@@ -2220,6 +2257,7 @@ msgstr "Không thể quét? Sao chép"
 
 #. js-lingui-id: dEgA5A
 #: src/pages/auth/Authorize.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/ui/layout/modal/components/ConfirmationModal.tsx
 #: src/modules/ui/feedback/snack-bar-manager/components/SnackBar.tsx
 #: src/modules/spreadsheet-import/steps/components/ImportDataStep.tsx
@@ -2476,6 +2514,7 @@ msgid "Clear"
 msgstr "Xóa"
 
 #. js-lingui-id: kT0eae
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Clear leave"
 msgstr ""
@@ -2532,6 +2571,7 @@ msgstr "Cài Đặt Khách Hàng"
 
 #. js-lingui-id: yz7wBu
 #: src/modules/ui/feedback/snack-bar-manager/components/SnackBar.tsx
+#: src/modules/notifications/components/NotificationCenter.tsx
 msgid "Close"
 msgstr "Đóng"
 
@@ -2679,6 +2719,11 @@ msgstr "Biến cấu hình"
 msgid "Configuration"
 msgstr "Cấu Hình"
 
+#. js-lingui-id: cWB2l4
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Configure active days and work hours"
+msgstr ""
+
 #. js-lingui-id: 9px+al
 #: src/pages/settings/ai/components/SettingsAIRouterSettings.tsx
 msgid "Configure AI models for routing and planning"
@@ -2728,6 +2773,11 @@ msgstr "Định cấu hình cách chúng tôi nên hiển thị sự kiện củ
 #: src/modules/settings/accounts/components/SettingsAccountsConnectionForm.tsx
 msgid "Configure IMAP settings to receive and sync your emails."
 msgstr "Cấu hình cài đặt IMAP để nhận và đồng bộ email của bạn."
+
+#. js-lingui-id: TI8QDs
+#: src/modules/ui/layout/simple-view/components/SimpleViewSideDrawer.tsx
+msgid "Configure simple view objects"
+msgstr ""
 
 #. js-lingui-id: gk/8eh
 #: src/modules/settings/accounts/components/SettingsAccountsConnectionForm.tsx
@@ -3478,6 +3528,8 @@ msgid "Dark"
 msgstr "Giao diện tối"
 
 #. js-lingui-id: yB1YpA
+#: src/modules/ui/layout/simple-view/components/SimpleViewSideDrawer.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/navigation/components/MainNavigationDrawerFixedItems.tsx
 msgid "Dark mode"
 msgstr ""
@@ -5799,6 +5851,7 @@ msgid "French"
 msgstr "\\"
 
 #. js-lingui-id: xVhQZV
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Fri"
 msgstr ""
@@ -7076,6 +7129,7 @@ msgid "Leave blank if you don't need to send emails."
 msgstr "Để trống nếu bạn không cần gửi email."
 
 #. js-lingui-id: 1qQfQy
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Leave cleared"
 msgstr ""
@@ -7086,18 +7140,31 @@ msgid "Leave dates updated"
 msgstr ""
 
 #. js-lingui-id: UjKqj6
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Leave end date"
 msgstr ""
 
 #. js-lingui-id: 79+i3R
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Leave end date must be after leave start date"
 msgstr ""
 
+#. js-lingui-id: JN2Xzl
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Leave setup"
+msgstr ""
+
 #. js-lingui-id: ekfMee
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Leave start date"
+msgstr ""
+
+#. js-lingui-id: e//6k/
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Leave updated"
 msgstr ""
 
 #. js-lingui-id: qvRaz1
@@ -7122,6 +7189,12 @@ msgstr "Nhỏ hơn hoặc bằng"
 #: src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownThemesComponents.tsx
 msgid "Light"
 msgstr "Giao diện sáng"
+
+#. js-lingui-id: s/fVw5
+#: src/modules/ui/layout/simple-view/components/SimpleViewSideDrawer.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Light mode"
+msgstr ""
 
 #. js-lingui-id: 9EqSGz
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
@@ -7231,6 +7304,11 @@ msgstr "Đang tải email"
 msgid "Loading jobs..."
 msgstr "Đang tải công việc..."
 
+#. js-lingui-id: ebnUGe
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Loading member leave status..."
+msgstr ""
+
 #. js-lingui-id: s1MstR
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminWorkerMetricsGraph.tsx
 msgid "Loading metrics data..."
@@ -7270,6 +7348,7 @@ msgstr "Đang tải..."
 #. js-lingui-id: FgAxTj
 #: src/pages/onboarding/internal/ChooseYourPlanContent.tsx
 #: src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownDefaultComponents.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleViewSideDrawer.tsx
 #: src/modules/auth/sign-in-up/components/SignInUpGlobalScopeForm.tsx
 msgid "Log out"
 msgstr "Đăng xuất"
@@ -7404,6 +7483,11 @@ msgstr "Các hàm serverless được quản lý không thể chỉnh sửa"
 msgid "Manual"
 msgstr ""
 
+#. js-lingui-id: onllUU
+#: src/modules/notifications/components/NotificationCenter.tsx
+msgid "Mark all as read"
+msgstr ""
+
 #. js-lingui-id: FCc+QF
 #: src/modules/spreadsheet-import/steps/components/MatchColumnsStep/components/UnmatchColumn.tsx
 msgid "Match {fieldLabel} ({unmatchedCount} Unmatched)"
@@ -7496,6 +7580,7 @@ msgstr ""
 #: src/pages/settings/members/SettingsWorkspaceMembers.tsx
 #: src/pages/settings/members/SettingsWorkspaceMembers.tsx
 #: src/pages/settings/members/SettingsWorkspaceMember.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/roles/role-assignment/components/SettingsRoleAssignmentTable.tsx
 #: src/modules/settings/hooks/useSettingsNavigationItems.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceContent.tsx
@@ -7626,6 +7711,7 @@ msgid "Mission accomplished!"
 msgstr "Nhiệm vụ đã hoàn thành!"
 
 #. js-lingui-id: fpMgHS
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Mon"
 msgstr ""
@@ -7685,6 +7771,7 @@ msgid "More ({remainingCount})"
 msgstr ""
 
 #. js-lingui-id: JcD7qf
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/action-menu/components/RecordIndexActionMenuDropdown.tsx
 msgid "More actions"
 msgstr "Hành động khác"
@@ -8288,6 +8375,11 @@ msgstr "Không có thành viên nào được chỉ định"
 msgid "No members match your search"
 msgstr "Không có thành viên nào phù hợp với tìm kiếm của bạn"
 
+#. js-lingui-id: eZgcw6
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "No members yet"
+msgstr ""
+
 #. js-lingui-id: JzzHsG
 #: src/pages/settings/ai/SettingsAgentTurnDetail.tsx
 msgid "No messages found for this turn"
@@ -8309,6 +8401,11 @@ msgstr "Không có mô hình nào có sẵn. Vui lòng cấu hình mô hình AI 
 #: src/modules/activities/notes/components/NotesCard.tsx
 msgid "No notes"
 msgstr "Không có ghi chú"
+
+#. js-lingui-id: HbXReU
+#: src/modules/notifications/components/NotificationCenter.tsx
+msgid "No notifications yet"
+msgstr ""
 
 #. js-lingui-id: daCzI1
 #: src/modules/ui/field/input/components/MultiSelectInput.tsx
@@ -8395,6 +8492,11 @@ msgstr "Không tìm thấy vai trò nào"
 #: src/modules/spreadsheet-import/steps/components/ValidationStep/ValidationStep.tsx
 msgid "No rows with errors"
 msgstr "Không có hàng nào có lỗi"
+
+#. js-lingui-id: R9ZWbG
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "No sales members available"
+msgstr ""
 
 #. js-lingui-id: Hsl+kr
 #: src/modules/views/view-picker/components/ViewPickerContentCreateMode.tsx
@@ -8514,6 +8616,12 @@ msgstr "Chưa đồng bộ hóa"
 #: src/modules/action-menu/actions/record-actions/constants/DefaultRecordActionsConfig.tsx
 msgid "Notes"
 msgstr "Ghi chú"
+
+#. js-lingui-id: iDNBZe
+#: src/modules/notifications/components/NotificationCenter.tsx
+#: src/modules/navigation/components/MainNavigationDrawerFixedItems.tsx
+msgid "Notifications"
+msgstr ""
 
 #. js-lingui-id: YwzE9K
 #: src/utils/date-utils.ts
@@ -9393,6 +9501,7 @@ msgstr "Đang xử lý..."
 #: src/pages/settings/SettingsTwoFactorAuthenticationMethod.tsx
 #: src/pages/settings/SettingsProfile.tsx
 #: src/pages/settings/SettingsProfile.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/hooks/useSettingsNavigationItems.tsx
 msgid "Profile"
 msgstr "Hồ sơ"
@@ -10148,6 +10257,7 @@ msgid "Sales availability updated"
 msgstr ""
 
 #. js-lingui-id: PiK6Ld
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Sat"
 msgstr ""
@@ -10178,6 +10288,17 @@ msgstr ""
 #: src/modules/action-menu/actions/record-actions/constants/DashboardActionsConfig.tsx
 msgid "Save Dashboard"
 msgstr "Lưu bảng điều khiển"
+
+#. js-lingui-id: x1fMXJ
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Save schedule"
+msgstr ""
+
+#. js-lingui-id: XvjC4F
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Saving..."
+msgstr ""
 
 #. js-lingui-id: gmB6oO
 #: src/modules/workflow/workflow-trigger/components/CronExpressionHelper.tsx
@@ -10564,6 +10685,14 @@ msgstr "Chọn một trường từ một bước trước đó"
 msgid "Select a field to display in this widget"
 msgstr "Chọn một trường để hiển thị trong tiện ích này"
 
+#. js-lingui-id: r2eQXl
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Select a member first"
+msgstr ""
+
 #. js-lingui-id: jL3gox
 #: src/modules/object-record/record-field/ui/form-types/components/FormBooleanFieldInput.tsx
 msgid "Select a value"
@@ -10596,6 +10725,16 @@ msgstr "Chọn một tuỳ chọn"
 #. js-lingui-id: YQvWIa
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Select at least one available day"
+msgstr ""
+
+#. js-lingui-id: 0U938S
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Select at least one day"
+msgstr ""
+
+#. js-lingui-id: 2ZD67W
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Select both leave dates"
 msgstr ""
 
 #. js-lingui-id: 21YIUv
@@ -10659,6 +10798,11 @@ msgstr "Chọn Nguồn"
 #: src/modules/workflow/workflow-trigger/components/WorkflowEditTriggerDatabaseEventForm.tsx
 msgid "Select specific fields to listen to"
 msgstr "Chọn các trường cụ thể để lắng nghe"
+
+#. js-lingui-id: UB6tvA
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Select start and end time"
+msgstr ""
 
 #. js-lingui-id: 8+U1XJ
 #: src/modules/workflow/workflow-variables/components/WorkflowVariablesDropdownSteps.tsx
@@ -10844,6 +10988,7 @@ msgstr "Thiết lập cơ sở dữ liệu của bạn..."
 #: src/pages/settings/applications/SettingsApplicationDetails.tsx
 #: src/pages/settings/ai/SettingsAgentForm.tsx
 #: src/pages/settings/ai/SettingsAI.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleViewSideDrawer.tsx
 #: src/modules/sign-in-background-mock/components/SignInAppNavigationDrawerMock.tsx
 #: src/modules/settings/roles/role-permissions/permission-flags/components/SettingsRolePermissionsSettingsSection.tsx
 #: src/modules/settings/roles/role/components/SettingsRole.tsx
@@ -10958,6 +11103,8 @@ msgid "Sign up"
 msgstr "Đăng ký"
 
 #. js-lingui-id: ffWWmG
+#: src/modules/ui/layout/simple-view/components/SimpleViewSideDrawer.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/navigation/components/MainNavigationDrawerFixedItems.tsx
 msgid "Simple View"
 msgstr ""
@@ -11438,6 +11585,7 @@ msgid "Sum"
 msgstr "Tổng cộng"
 
 #. js-lingui-id: D89zck
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Sun"
 msgstr ""
@@ -11987,6 +12135,7 @@ msgid "This will revert the database value to environment/default value. The dat
 msgstr "Điều này sẽ khôi phục giá trị cơ sở dữ liệu về giá trị mặc định của môi trường. Ghi đè cơ sở dữ liệu sẽ bị loại bỏ và hệ thống sẽ sử dụng các cài đặt môi trường."
 
 #. js-lingui-id: +FjWgX
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Thu"
 msgstr ""
@@ -12008,6 +12157,11 @@ msgstr "Sắp xếp lại quy trình làm việc"
 #: src/modules/settings/members/components/MemberNameFields.tsx
 msgid "Tim"
 msgstr "Tim"
+
+#. js-lingui-id: 790Cgb
+#: src/modules/workspace/components/WorkspaceInviteTeam.tsx
+msgid "tim@apple.com, jony.ive@apple.dev"
+msgstr ""
 
 #. js-lingui-id: n9nSNJ
 #: src/pages/settings/profile/appearance/components/DateTimeSettingsTimeFormatSelect.tsx
@@ -12240,6 +12394,7 @@ msgid "TTL"
 msgstr "TTL"
 
 #. js-lingui-id: vq2WxD
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Tue"
 msgstr ""
@@ -12345,6 +12500,7 @@ msgid "ul"
 msgstr ""
 
 #. js-lingui-id: CZT+vy
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Unable to clear leave"
 msgstr ""
@@ -12359,7 +12515,13 @@ msgstr ""
 msgid "Unable to Reach Back-end"
 msgstr "Không Thể Kết Nối Back-end"
 
+#. js-lingui-id: D6SMmU
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Unable to update availability"
+msgstr ""
+
 #. js-lingui-id: 0e4GSb
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Unable to update leave"
 msgstr ""
@@ -13036,6 +13198,7 @@ msgid "Webhooks"
 msgstr "Webhooks"
 
 #. js-lingui-id: 0f7U0k
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Wed"
 msgstr ""
@@ -13180,6 +13343,7 @@ msgstr "Quy Trình Làm Việc"
 #: src/pages/settings/ai/SettingsAgentForm.tsx
 #: src/pages/settings/ai/SettingsAI.tsx
 #: src/modules/views/view-picker/components/ViewPickerListContent.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleViewSideDrawer.tsx
 #: src/modules/sign-in-background-mock/components/SignInAppNavigationDrawerMock.tsx
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useSettingsRolePermissionFlagConfig.ts
 #: src/modules/settings/roles/role-permissions/object-level-permissions/object-form/components/SettingsRolePermissionsObjectLevelObjectForm.tsx

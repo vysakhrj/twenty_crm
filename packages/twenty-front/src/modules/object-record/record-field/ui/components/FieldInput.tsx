@@ -38,11 +38,13 @@ import { isFieldRichTextV2 } from '@/object-record/record-field/ui/types/guards/
 import { isFieldSelect } from '@/object-record/record-field/ui/types/guards/isFieldSelect';
 import { FieldContext } from '@/object-record/record-field/ui/contexts/FieldContext';
 import { BooleanFieldInput } from '@/object-record/record-field/ui/meta-types/input/components/BooleanFieldInput';
+import { ConvenientTimeFieldInput } from '@/object-record/record-field/ui/meta-types/input/components/ConvenientTimeFieldInput';
 import { CurrencyFieldInput } from '@/object-record/record-field/ui/meta-types/input/components/CurrencyFieldInput';
 import { DateTimeFieldInput } from '@/object-record/record-field/ui/meta-types/input/components/DateTimeFieldInput';
 import { NumberFieldInput } from '@/object-record/record-field/ui/meta-types/input/components/NumberFieldInput';
 import { RatingFieldInput } from '@/object-record/record-field/ui/meta-types/input/components/RatingFieldInput';
 import { TextFieldInput } from '@/object-record/record-field/ui/meta-types/input/components/TextFieldInput';
+import { isConvenientTimeField } from '@/object-record/record-field/ui/types/guards/isConvenientTimeField';
 import { isFieldText } from '@/object-record/record-field/ui/types/guards/isFieldText';
 
 export const FieldInput = () => {
@@ -60,6 +62,8 @@ export const FieldInput = () => {
         <MorphRelationOneToManyFieldInput />
       ) : isFieldPhones(fieldDefinition) ? (
         <PhonesFieldInput />
+      ) : isFieldText(fieldDefinition) && isConvenientTimeField(fieldDefinition) ? (
+        <ConvenientTimeFieldInput />
       ) : isFieldText(fieldDefinition) ? (
         <TextFieldInput />
       ) : isFieldEmails(fieldDefinition) ? (

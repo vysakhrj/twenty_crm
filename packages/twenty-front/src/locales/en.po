@@ -405,6 +405,11 @@ msgstr "{totalCost} credits"
 msgid "{totalCount} selected"
 msgstr "{totalCount} selected"
 
+#. js-lingui-id: vS7xCV
+#: src/modules/notifications/components/NotificationCenter.tsx
+msgid "{unreadCount} unread"
+msgstr "{unreadCount} unread"
+
 #. js-lingui-id: ITVweg
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownDefaultView.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownCustomView.tsx
@@ -1239,6 +1244,11 @@ msgstr "All ({relationRecordsCount})"
 msgid "All Actions Access"
 msgstr "All Actions Access"
 
+#. js-lingui-id: 7/XOrv
+#: src/modules/notifications/components/NotificationCenter.tsx
+msgid "All caught up!"
+msgstr "All caught up!"
+
 #. js-lingui-id: 1kLn6M
 #: src/modules/activities/calendar/components/CalendarEventRow.tsx
 msgid "All day"
@@ -1633,6 +1643,7 @@ msgid "Apply"
 msgstr "Apply"
 
 #. js-lingui-id: /q0HFa
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Apply leave"
 msgstr "Apply leave"
@@ -1937,6 +1948,27 @@ msgstr "Automatically create People records when receiving or sending emails"
 msgid "Availability"
 msgstr "Availability"
 
+#. js-lingui-id: b5XKJ7
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Availability end time"
+msgstr "Availability end time"
+
+#. js-lingui-id: 25lvcM
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Availability schedule"
+msgstr "Availability schedule"
+
+#. js-lingui-id: a8DVhy
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Availability start time"
+msgstr "Availability start time"
+
+#. js-lingui-id: 0Y64zT
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Availability updated"
+msgstr "Availability updated"
+
 #. js-lingui-id: csDS2L
 #: src/modules/settings/data-model/new-object/components/SettingsAvailableStandardObjectsSection.tsx
 msgid "Available"
@@ -1974,6 +2006,11 @@ msgstr "Back to {linkText}"
 #: src/pages/not-found/NotFound.tsx
 msgid "Back to content"
 msgstr "Back to content"
+
+#. js-lingui-id: PFeHMa
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Back to records"
+msgstr "Back to records"
 
 #. js-lingui-id: OvBnOM
 #: src/modules/ui/navigation/bread-crumb/components/MobileBreadcrumb.tsx
@@ -2215,6 +2252,7 @@ msgstr "Can't scan? Copy the"
 
 #. js-lingui-id: dEgA5A
 #: src/pages/auth/Authorize.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/ui/layout/modal/components/ConfirmationModal.tsx
 #: src/modules/ui/feedback/snack-bar-manager/components/SnackBar.tsx
 #: src/modules/spreadsheet-import/steps/components/ImportDataStep.tsx
@@ -2471,6 +2509,7 @@ msgid "Clear"
 msgstr "Clear"
 
 #. js-lingui-id: kT0eae
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Clear leave"
 msgstr "Clear leave"
@@ -2527,6 +2566,7 @@ msgstr "Client Settings"
 
 #. js-lingui-id: yz7wBu
 #: src/modules/ui/feedback/snack-bar-manager/components/SnackBar.tsx
+#: src/modules/notifications/components/NotificationCenter.tsx
 msgid "Close"
 msgstr "Close"
 
@@ -2674,6 +2714,11 @@ msgstr "Config Variables"
 msgid "Configuration"
 msgstr "Configuration"
 
+#. js-lingui-id: cWB2l4
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Configure active days and work hours"
+msgstr "Configure active days and work hours"
+
 #. js-lingui-id: 9px+al
 #: src/pages/settings/ai/components/SettingsAIRouterSettings.tsx
 msgid "Configure AI models for routing and planning"
@@ -2723,6 +2768,11 @@ msgstr "Configure how we should display your events in your calendar"
 #: src/modules/settings/accounts/components/SettingsAccountsConnectionForm.tsx
 msgid "Configure IMAP settings to receive and sync your emails."
 msgstr "Configure IMAP settings to receive and sync your emails."
+
+#. js-lingui-id: TI8QDs
+#: src/modules/ui/layout/simple-view/components/SimpleViewSideDrawer.tsx
+msgid "Configure simple view objects"
+msgstr "Configure simple view objects"
 
 #. js-lingui-id: gk/8eh
 #: src/modules/settings/accounts/components/SettingsAccountsConnectionForm.tsx
@@ -3473,6 +3523,8 @@ msgid "Dark"
 msgstr "Dark"
 
 #. js-lingui-id: yB1YpA
+#: src/modules/ui/layout/simple-view/components/SimpleViewSideDrawer.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/navigation/components/MainNavigationDrawerFixedItems.tsx
 msgid "Dark mode"
 msgstr "Dark mode"
@@ -5794,6 +5846,7 @@ msgid "French"
 msgstr "French"
 
 #. js-lingui-id: xVhQZV
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Fri"
 msgstr "Fri"
@@ -7071,6 +7124,7 @@ msgid "Leave blank if you don't need to send emails."
 msgstr "Leave blank if you don't need to send emails."
 
 #. js-lingui-id: 1qQfQy
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Leave cleared"
 msgstr "Leave cleared"
@@ -7081,19 +7135,32 @@ msgid "Leave dates updated"
 msgstr "Leave dates updated"
 
 #. js-lingui-id: UjKqj6
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Leave end date"
 msgstr "Leave end date"
 
 #. js-lingui-id: 79+i3R
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Leave end date must be after leave start date"
 msgstr "Leave end date must be after leave start date"
 
+#. js-lingui-id: JN2Xzl
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Leave setup"
+msgstr "Leave setup"
+
 #. js-lingui-id: ekfMee
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Leave start date"
 msgstr "Leave start date"
+
+#. js-lingui-id: e//6k/
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Leave updated"
+msgstr "Leave updated"
 
 #. js-lingui-id: qvRaz1
 #: src/modules/settings/profile/components/DeleteAccount.tsx
@@ -7117,6 +7184,12 @@ msgstr "Less than or equal"
 #: src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownThemesComponents.tsx
 msgid "Light"
 msgstr "Light"
+
+#. js-lingui-id: s/fVw5
+#: src/modules/ui/layout/simple-view/components/SimpleViewSideDrawer.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Light mode"
+msgstr "Light mode"
 
 #. js-lingui-id: 9EqSGz
 #: src/modules/settings/data-model/fields/forms/select/components/SettingsDataModelFieldSelectFormOptionRow.tsx
@@ -7226,6 +7299,11 @@ msgstr "Loading emails"
 msgid "Loading jobs..."
 msgstr "Loading jobs..."
 
+#. js-lingui-id: ebnUGe
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Loading member leave status..."
+msgstr "Loading member leave status..."
+
 #. js-lingui-id: s1MstR
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminWorkerMetricsGraph.tsx
 msgid "Loading metrics data..."
@@ -7265,6 +7343,7 @@ msgstr "Loading..."
 #. js-lingui-id: FgAxTj
 #: src/pages/onboarding/internal/ChooseYourPlanContent.tsx
 #: src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownDefaultComponents.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleViewSideDrawer.tsx
 #: src/modules/auth/sign-in-up/components/SignInUpGlobalScopeForm.tsx
 msgid "Log out"
 msgstr "Log out"
@@ -7399,6 +7478,11 @@ msgstr "Managed serverless functions are not editable"
 msgid "Manual"
 msgstr "Manual"
 
+#. js-lingui-id: onllUU
+#: src/modules/notifications/components/NotificationCenter.tsx
+msgid "Mark all as read"
+msgstr "Mark all as read"
+
 #. js-lingui-id: FCc+QF
 #: src/modules/spreadsheet-import/steps/components/MatchColumnsStep/components/UnmatchColumn.tsx
 msgid "Match {fieldLabel} ({unmatchedCount} Unmatched)"
@@ -7491,6 +7575,7 @@ msgstr "Member removed from workspace"
 #: src/pages/settings/members/SettingsWorkspaceMembers.tsx
 #: src/pages/settings/members/SettingsWorkspaceMembers.tsx
 #: src/pages/settings/members/SettingsWorkspaceMember.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/roles/role-assignment/components/SettingsRoleAssignmentTable.tsx
 #: src/modules/settings/hooks/useSettingsNavigationItems.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceContent.tsx
@@ -7621,6 +7706,7 @@ msgid "Mission accomplished!"
 msgstr "Mission accomplished!"
 
 #. js-lingui-id: fpMgHS
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Mon"
 msgstr "Mon"
@@ -7680,6 +7766,7 @@ msgid "More ({remainingCount})"
 msgstr "More ({remainingCount})"
 
 #. js-lingui-id: JcD7qf
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/action-menu/components/RecordIndexActionMenuDropdown.tsx
 msgid "More actions"
 msgstr "More actions"
@@ -8283,6 +8370,11 @@ msgstr "No members assigned"
 msgid "No members match your search"
 msgstr "No members match your search"
 
+#. js-lingui-id: eZgcw6
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "No members yet"
+msgstr "No members yet"
+
 #. js-lingui-id: JzzHsG
 #: src/pages/settings/ai/SettingsAgentTurnDetail.tsx
 msgid "No messages found for this turn"
@@ -8304,6 +8396,11 @@ msgstr "No models available. Please configure AI models in your workspace settin
 #: src/modules/activities/notes/components/NotesCard.tsx
 msgid "No notes"
 msgstr "No notes"
+
+#. js-lingui-id: HbXReU
+#: src/modules/notifications/components/NotificationCenter.tsx
+msgid "No notifications yet"
+msgstr "No notifications yet"
 
 #. js-lingui-id: daCzI1
 #: src/modules/ui/field/input/components/MultiSelectInput.tsx
@@ -8390,6 +8487,11 @@ msgstr "No roles found"
 #: src/modules/spreadsheet-import/steps/components/ValidationStep/ValidationStep.tsx
 msgid "No rows with errors"
 msgstr "No rows with errors"
+
+#. js-lingui-id: R9ZWbG
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "No sales members available"
+msgstr "No sales members available"
 
 #. js-lingui-id: Hsl+kr
 #: src/modules/views/view-picker/components/ViewPickerContentCreateMode.tsx
@@ -8509,6 +8611,12 @@ msgstr "Not synced"
 #: src/modules/action-menu/actions/record-actions/constants/DefaultRecordActionsConfig.tsx
 msgid "Notes"
 msgstr "Notes"
+
+#. js-lingui-id: iDNBZe
+#: src/modules/notifications/components/NotificationCenter.tsx
+#: src/modules/navigation/components/MainNavigationDrawerFixedItems.tsx
+msgid "Notifications"
+msgstr "Notifications"
 
 #. js-lingui-id: YwzE9K
 #: src/utils/date-utils.ts
@@ -9388,6 +9496,7 @@ msgstr "Processing..."
 #: src/pages/settings/SettingsTwoFactorAuthenticationMethod.tsx
 #: src/pages/settings/SettingsProfile.tsx
 #: src/pages/settings/SettingsProfile.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/hooks/useSettingsNavigationItems.tsx
 msgid "Profile"
 msgstr "Profile"
@@ -10143,6 +10252,7 @@ msgid "Sales availability updated"
 msgstr "Sales availability updated"
 
 #. js-lingui-id: PiK6Ld
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Sat"
 msgstr "Sat"
@@ -10173,6 +10283,17 @@ msgstr "Save availability"
 #: src/modules/action-menu/actions/record-actions/constants/DashboardActionsConfig.tsx
 msgid "Save Dashboard"
 msgstr "Save Dashboard"
+
+#. js-lingui-id: x1fMXJ
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Save schedule"
+msgstr "Save schedule"
+
+#. js-lingui-id: XvjC4F
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Saving..."
+msgstr "Saving..."
 
 #. js-lingui-id: gmB6oO
 #: src/modules/workflow/workflow-trigger/components/CronExpressionHelper.tsx
@@ -10559,6 +10680,14 @@ msgstr "Select a field from a previous step"
 msgid "Select a field to display in this widget"
 msgstr "Select a field to display in this widget"
 
+#. js-lingui-id: r2eQXl
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Select a member first"
+msgstr "Select a member first"
+
 #. js-lingui-id: jL3gox
 #: src/modules/object-record/record-field/ui/form-types/components/FormBooleanFieldInput.tsx
 msgid "Select a value"
@@ -10592,6 +10721,16 @@ msgstr "Select an option"
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Select at least one available day"
 msgstr "Select at least one available day"
+
+#. js-lingui-id: 0U938S
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Select at least one day"
+msgstr "Select at least one day"
+
+#. js-lingui-id: 2ZD67W
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Select both leave dates"
+msgstr "Select both leave dates"
 
 #. js-lingui-id: 21YIUv
 #: src/modules/spreadsheet-import/steps/components/MatchColumnsStep/components/TemplateColumn.tsx
@@ -10654,6 +10793,11 @@ msgstr "Select Source"
 #: src/modules/workflow/workflow-trigger/components/WorkflowEditTriggerDatabaseEventForm.tsx
 msgid "Select specific fields to listen to"
 msgstr "Select specific fields to listen to"
+
+#. js-lingui-id: UB6tvA
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Select start and end time"
+msgstr "Select start and end time"
 
 #. js-lingui-id: 8+U1XJ
 #: src/modules/workflow/workflow-variables/components/WorkflowVariablesDropdownSteps.tsx
@@ -10839,6 +10983,7 @@ msgstr "Setting up your database..."
 #: src/pages/settings/applications/SettingsApplicationDetails.tsx
 #: src/pages/settings/ai/SettingsAgentForm.tsx
 #: src/pages/settings/ai/SettingsAI.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleViewSideDrawer.tsx
 #: src/modules/sign-in-background-mock/components/SignInAppNavigationDrawerMock.tsx
 #: src/modules/settings/roles/role-permissions/permission-flags/components/SettingsRolePermissionsSettingsSection.tsx
 #: src/modules/settings/roles/role/components/SettingsRole.tsx
@@ -10953,6 +11098,8 @@ msgid "Sign up"
 msgstr "Sign up"
 
 #. js-lingui-id: ffWWmG
+#: src/modules/ui/layout/simple-view/components/SimpleViewSideDrawer.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/navigation/components/MainNavigationDrawerFixedItems.tsx
 msgid "Simple View"
 msgstr "Simple View"
@@ -11433,6 +11580,7 @@ msgid "Sum"
 msgstr "Sum"
 
 #. js-lingui-id: D89zck
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Sun"
 msgstr "Sun"
@@ -11984,6 +12132,7 @@ msgid "This will revert the database value to environment/default value. The dat
 msgstr "This will revert the database value to environment/default value. The database override will be removed and the system will use the environment settings."
 
 #. js-lingui-id: +FjWgX
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Thu"
 msgstr "Thu"
@@ -12005,6 +12154,11 @@ msgstr "Tidy up workflow"
 #: src/modules/settings/members/components/MemberNameFields.tsx
 msgid "Tim"
 msgstr "Tim"
+
+#. js-lingui-id: 790Cgb
+#: src/modules/workspace/components/WorkspaceInviteTeam.tsx
+msgid "tim@apple.com, jony.ive@apple.dev"
+msgstr "tim@apple.com, jony.ive@apple.dev"
 
 #. js-lingui-id: n9nSNJ
 #: src/pages/settings/profile/appearance/components/DateTimeSettingsTimeFormatSelect.tsx
@@ -12237,6 +12391,7 @@ msgid "TTL"
 msgstr "TTL"
 
 #. js-lingui-id: vq2WxD
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Tue"
 msgstr "Tue"
@@ -12342,6 +12497,7 @@ msgid "ul"
 msgstr "ul"
 
 #. js-lingui-id: CZT+vy
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Unable to clear leave"
 msgstr "Unable to clear leave"
@@ -12356,7 +12512,13 @@ msgstr "Unable to delete member right now"
 msgid "Unable to Reach Back-end"
 msgstr "Unable to Reach Back-end"
 
+#. js-lingui-id: D6SMmU
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+msgid "Unable to update availability"
+msgstr "Unable to update availability"
+
 #. js-lingui-id: 0e4GSb
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Unable to update leave"
 msgstr "Unable to update leave"
@@ -13033,6 +13195,7 @@ msgid "Webhooks"
 msgstr "Webhooks"
 
 #. js-lingui-id: 0f7U0k
+#: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Wed"
 msgstr "Wed"
@@ -13177,6 +13340,7 @@ msgstr "Workflows"
 #: src/pages/settings/ai/SettingsAgentForm.tsx
 #: src/pages/settings/ai/SettingsAI.tsx
 #: src/modules/views/view-picker/components/ViewPickerListContent.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleViewSideDrawer.tsx
 #: src/modules/sign-in-background-mock/components/SignInAppNavigationDrawerMock.tsx
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useSettingsRolePermissionFlagConfig.ts
 #: src/modules/settings/roles/role-permissions/object-level-permissions/object-form/components/SettingsRolePermissionsObjectLevelObjectForm.tsx
@@ -13442,33 +13606,6 @@ msgstr "Your workspace doesn't have an active subscription."
 #: src/modules/information-banner/components/billing/InformationBannerNoBillingSubscription.tsx
 msgid "Your workspace doesn't have an active subscription. Please contact your admin."
 msgstr "Your workspace doesn't have an active subscription. Please contact your admin."
-
-#[ Notification center ]
-#. js-lingui-id: TODO-Notifications
-#: src/modules/navigation/components/MainNavigationDrawerFixedItems.tsx
-#: src/modules/notifications/components/NotificationCenter.tsx
-msgid "Notifications"
-msgstr "Notifications"
-
-#. js-lingui-id: TODO-NoNotificationsYet
-#: src/modules/notifications/components/NotificationCenter.tsx
-msgid "No notifications yet"
-msgstr "No notifications yet"
-
-#. js-lingui-id: TODO-UnreadCountUnread
-#: src/modules/notifications/components/NotificationCenter.tsx
-msgid "{unreadCount} unread"
-msgstr "{unreadCount} unread"
-
-#. js-lingui-id: TODO-AllCaughtUp
-#: src/modules/notifications/components/NotificationCenter.tsx
-msgid "All caught up!"
-msgstr "All caught up!"
-
-#. js-lingui-id: TODO-MarkAllAsRead
-#: src/modules/notifications/components/NotificationCenter.tsx
-msgid "Mark all as read"
-msgstr "Mark all as read"
 
 #. js-lingui-id: RhNbPE
 #: src/modules/billing/components/SettingsBillingContent.tsx

@@ -240,7 +240,7 @@ export const SimpleViewSideDrawer = () => {
           >
             <StyledDrawerHeader>
               <StyledWorkspaceName>
-                {currentWorkspace?.displayName ?? 'Workspace'}
+                {currentWorkspace?.displayName ?? t`Workspace`}
               </StyledWorkspaceName>
               <StyledCloseButton onClick={() => setIsOpen(false)}>
                 <IconArrowLeft size={16} />
@@ -285,7 +285,7 @@ export const SimpleViewSideDrawer = () => {
                 onClick={handleSettingsClick}
               >
                 <IconSettings size={16} />
-                Settings
+                {t`Settings`}
               </StyledNavItem>
 
               <StyledNavItem onClick={signOut}>
@@ -299,7 +299,7 @@ export const SimpleViewSideDrawer = () => {
                 onClick={() => setShowObjectConfig((prev) => !prev)}
               >
                 <IconSettings2 size={14} />
-                Configure simple view objects
+                {t`Configure simple view objects`}
               </StyledConfigButton>
 
               {showObjectConfig && <SimpleViewObjectConfig />}
@@ -310,11 +310,11 @@ export const SimpleViewSideDrawer = () => {
                 <StyledToggleLabel>
                   {colorScheme === 'Dark' ? (
                     <>
-                      <IconSun size={14} /> Light mode
+                      <IconSun size={14} /> {t`Light mode`}
                     </>
                   ) : (
                     <>
-                      <IconMoon size={14} /> Dark mode
+                      <IconMoon size={14} /> {t`Dark mode`}
                     </>
                   )}
                 </StyledToggleLabel>
@@ -329,7 +329,7 @@ export const SimpleViewSideDrawer = () => {
               <StyledToggleRow>
                 <StyledToggleLabel>
                   <IconLayoutSidebarRightCollapse size={14} />
-                  {' Simple View'}
+                  {t`Simple View`}
                 </StyledToggleLabel>
                 <StyledToggle
                   isOn={isSimpleViewEnabled}
