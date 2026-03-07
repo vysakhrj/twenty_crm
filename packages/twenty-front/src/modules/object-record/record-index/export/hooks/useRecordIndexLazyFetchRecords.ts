@@ -11,6 +11,7 @@ import { type ObjectMetadataItem } from '@/object-metadata/types/ObjectMetadataI
 import { useLazyFetchAllRecords } from '@/object-record/hooks/useLazyFetchAllRecords';
 import { EXPORT_TABLE_DATA_DEFAULT_PAGE_SIZE } from '@/object-record/object-options-dropdown/constants/ExportTableDataDefaultPageSize';
 import { useObjectOptionsForBoard } from '@/object-record/object-options-dropdown/hooks/useObjectOptionsForBoard';
+import { useRecordsFieldVisibleGqlFields } from '@/object-record/record-field/hooks/useRecordsFieldVisibleGqlFields';
 import { visibleRecordFieldsComponentSelector } from '@/object-record/record-field/states/visibleRecordFieldsComponentSelector';
 import { type RecordField } from '@/object-record/record-field/types/RecordField';
 import { useFilterValueDependencies } from '@/object-record/record-filter/hooks/useFilterValueDependencies';
@@ -102,6 +103,10 @@ export const useRecordIndexLazyFetchRecords = ({
     visibleRecordFieldsComponentSelector,
   );
 
+  const recordGqlFields = useRecordsFieldVisibleGqlFields({
+    objectMetadataItem,
+  });
+
   const finalColumns: Pick<
     ColumnDefinition<FieldMetadata>,
     'label' | 'type' | 'metadata'
@@ -138,6 +143,7 @@ export const useRecordIndexLazyFetchRecords = ({
     limit: pageSize,
     delayMs,
     maximumRequests,
+    recordGqlFields,
   });
 
   const getTableData = async () => {

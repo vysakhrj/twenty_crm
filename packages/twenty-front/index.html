@@ -6,10 +6,10 @@
     <link
       rel="icon"
       type="image/x-icon"
-      href="/images/icons/android/android-launchericon-48-48.png"
+      href="/inceptra-favicon.png"
       data-rh="true"
     />
-    <link rel="apple-touch-icon" href="/images/icons/ios/192.png" />
+    <link rel="apple-touch-icon" href="/inceptra-favicon.png" />
     <link rel="manifest" href="/manifest.json" />
 
     <meta name="theme-color" content="#000000" />
@@ -89,11 +89,26 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root">
       <div
-        style="align-items: center; display: flex; font-family: inherit; font-size: 1.25rem; height: 100dvh; justify-content: center; margin: 0;"
+        style="align-items: center; background-color: #1d1d1d; display: flex; height: 100dvh; justify-content: center; margin: 0; width: 100%;"
       >
-        Imprezz CRM
+        <div style="position: relative; height: 48px; width: 48px;">
+          <img
+            src="/inceptra-favicon.png"
+            alt="Loading"
+            style="border-radius: 8px; height: 100%; object-fit: cover; position: relative; width: 100%; z-index: 2;"
+          />
+          <div
+            style="animation: skeleton-pulse 1.5s ease-in-out infinite; background: linear-gradient(90deg, rgba(42,42,42,0) 25%, rgba(58,58,58,0.5) 50%, rgba(42,42,42,0) 75%); background-size: 200% 100%; border-radius: 8px; height: 100%; left: 0; position: absolute; top: 0; width: 100%; z-index: 3;"
+          ></div>
+        </div>
       </div>
     </div>
+    <style>
+      @keyframes skeleton-pulse {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+    </style>
     <script type="module" src="/src/index.tsx"></script>
   </body>
 </html>

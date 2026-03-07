@@ -1,11 +1,8 @@
 import styled from '@emotion/styled';
 import { isNonEmptyString } from '@sniptt/guards';
-import { AppPath } from 'twenty-shared/types';
 import { getImageAbsoluteURI, isDefined } from 'twenty-shared/utils';
 import { Avatar } from 'twenty-ui/display';
-import { UndecoratedLink } from 'twenty-ui/navigation';
 import { REACT_APP_SERVER_BASE_URL } from '~/config';
-import { useRedirectToDefaultDomain } from '~/modules/domain-manager/hooks/useRedirectToDefaultDomain';
 
 type LogoProps = {
   primaryLogo?: string | null;
@@ -50,29 +47,13 @@ const StyledPrimaryLogo = styled.div<{ src: string }>`
   width: 100%;
 `;
 
-const DEFAULT_APP_TITLE = 'Imprezz CRM';
-
-const StyledDefaultTitle = styled.div`
-  align-items: center;
-  display: flex;
-  font-size: ${({ theme }) => theme.font.size.sm};
-  font-weight: ${({ theme }) => theme.font.weight.medium};
-  height: 100%;
-  justify-content: center;
-  line-height: 1.2;
-  text-align: center;
-  width: 100%;
-  word-break: break-word;
-`;
-
 export const Logo = ({
   primaryLogo,
   secondaryLogo,
   placeholder,
   onClick,
 }: LogoProps) => {
-  const { redirectToDefaultDomain } = useRedirectToDefaultDomain();
-  const defaultPrimaryLogoUrl = `${window.location.origin}/images/icons/android/android-launchericon-192-192.png`;
+  const defaultPrimaryLogoUrl = `${window.location.origin}/inceptra-favicon.png`;
 
   const primaryLogoUrl = getImageAbsoluteURI({
     imageUrl: primaryLogo ?? defaultPrimaryLogoUrl,
@@ -86,20 +67,9 @@ export const Logo = ({
       })
     : null;
 
-  const isUsingDefaultLogo = !isDefined(primaryLogo);
-
   return (
     <StyledContainer onClick={() => onClick?.()}>
-      {isUsingDefaultLogo ? (
-        <UndecoratedLink
-          to={AppPath.SignInUp}
-          onClick={redirectToDefaultDomain}
-        >
-          <StyledDefaultTitle>{DEFAULT_APP_TITLE}</StyledDefaultTitle>
-        </UndecoratedLink>
-      ) : (
-        <StyledPrimaryLogo src={primaryLogoUrl} />
-      )}
+      <StyledPrimaryLogo src={primaryLogoUrl} />
       {isDefined(secondaryLogoUrl) ? (
         <StyledSecondaryLogoContainer>
           <StyledSecondaryLogo src={secondaryLogoUrl} />

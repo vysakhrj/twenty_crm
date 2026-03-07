@@ -11,7 +11,7 @@ export const formatDateISOStringToUnifiedDateTime = (isoString: string): string 
   const date = new Date(isoString);
   if (!isValid(date)) return '';
   const formatted = format(date, UNIFIED_DATE_TIME_FORMAT, { locale: enUS });
-  return formatted.replace(/\s+([AP]M)$/i, (_, ampm) => ` ${ampm.toLowerCase()}`);
+  return formatted.replace(/\s*([ap]m)$/i, (_, ampm) => ampm.toUpperCase());
 };
 
 export const formatDateISOStringToUnifiedDate = (isoString: string): string => {

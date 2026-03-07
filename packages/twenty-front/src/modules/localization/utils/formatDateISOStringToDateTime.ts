@@ -29,5 +29,5 @@ export const formatDateISOStringToDateTime = ({
     UNIFIED_DATE_TIME_FORMAT,
     { locale: localeCatalog },
   );
-  return formatted.replace(/\s+([AP]M)$/i, (_, ampm) => ` ${ampm.toLowerCase()}`);
+  return formatted.replace(/\s*([ap]m)$/i, (_, ampm) => ampm.toUpperCase());
 };

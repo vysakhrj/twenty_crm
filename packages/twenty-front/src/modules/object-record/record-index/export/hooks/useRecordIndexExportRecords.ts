@@ -37,6 +37,14 @@ type ExportProgress = {
   displayType: 'percentage' | 'number';
 };
 
+const shouldExcludeCompositeSubFieldFromExport = (
+  columnType: string,
+  subFieldKey: string,
+): boolean =>
+  (columnType === FieldMetadataType.ACTOR && subFieldKey === 'context') ||
+  (columnType === FieldMetadataType.RICH_TEXT_V2 &&
+    subFieldKey === 'blocknote');
+
 export const generateCsv: GenerateExport = ({
   columns,
   rows,
@@ -47,24 +55,19 @@ export const generateCsv: GenerateExport = ({
       col.metadata.relationType === RelationType.MANY_TO_ONE,
   );
 
-  const objectIdColumn: ColumnDefinition<FieldMetadata> = {
-    fieldMetadataId: '',
-    type: FieldMetadataType.UUID,
-    iconName: '',
-    label: `Id`,
-    metadata: {
-      fieldName: 'id',
-    },
-    position: 0,
-    size: 0,
-  };
+  const columnsToExportWithIdColumn = columnsToExport;
 
-  const columnsToExportWithIdColumn = [objectIdColumn, ...columnsToExport];
+  const isRelationColumnWithDisplayName =
+    (col: (typeof columnsToExportWithIdColumn)[number]) =>
+      col.type === 'RELATION' || col.type === 'MORPH_RELATION';
 
   const keys = columnsToExportWithIdColumn.flatMap((col) => {
-    const headerLabel = `${col.label}${col.type === 'RELATION' ? ' Id' : ''}`;
+    const headerLabel = col.label;
+    const field = isRelationColumnWithDisplayName(col)
+      ? col.metadata.fieldName
+      : `${col.metadata.fieldName}${col.type === 'RELATION' ? 'Id' : ''}`;
     const column = {
-      field: `${col.metadata.fieldName}${col.type === 'RELATION' ? 'Id' : ''}`,
+      field,
       title: formatValueForCSV(sanitizeValueForCSVExport(headerLabel)),
     };
 
@@ -82,6 +85,10 @@ export const generateCsv: GenerateExport = ({
 
     const nestedFieldsWithoutTypename = Object.keys(firstRowCompositeFieldValue)
       .filter((key) => key !== '__typename')
+      .filter(
+        (key) =>
+          !shouldExcludeCompositeSubFieldFromExport(columnType, key),
+      )
       .map((key) => {
         const subFieldLabel = COMPOSITE_FIELD_SUB_FIELD_LABELS[columnType][key];
         return {
@@ -145,37 +152,32 @@ export const generateXlsx = ({
       col.metadata.relationType === RelationType.MANY_TO_ONE,
   );
 
-  const objectIdColumn: ColumnDefinition<FieldMetadata> = {
-    fieldMetadataId: '',
-    type: FieldMetadataType.UUID,
-    iconName: '',
-    label: `Id`,
-    metadata: {
-      fieldName: 'id',
-    },
-    position: 0,
-    size: 0,
-  };
+  const columnsToExportWithIdColumn = columnsToExport;
 
-  const columnsToExportWithIdColumn = [objectIdColumn, ...columnsToExport];
+  const isRelationColumnWithDisplayName =
+    (col: (typeof columnsToExportWithIdColumn)[number]) =>
+      col.type === 'RELATION' || col.type === 'MORPH_RELATION';
 
   const flattenedColumns = columnsToExportWithIdColumn.flatMap((col) => {
-    const headerLabel = `${col.label}${col.type === 'RELATION' ? ' Id' : ''}`;
-    const fieldName = `${col.metadata.fieldName}${
-      col.type === 'RELATION' ? 'Id' : ''
-    }`;
+    const headerLabel = col.label;
+    const fieldName = isRelationColumnWithDisplayName(col)
+      ? col.metadata.fieldName
+      : `${col.metadata.fieldName}${col.type === 'RELATION' ? 'Id' : ''}`;
 
     const columnType = col.type;
     if (!isCompositeFieldType(columnType)) {
       return [{ field: fieldName, header: headerLabel }];
     }
 
-    return Object.entries(COMPOSITE_FIELD_SUB_FIELD_LABELS[columnType]).map(
-      ([subFieldKey, subFieldLabel]) => ({
+    return Object.entries(COMPOSITE_FIELD_SUB_FIELD_LABELS[columnType])
+      .filter(
+        ([subFieldKey]) =>
+          !shouldExcludeCompositeSubFieldFromExport(columnType, subFieldKey),
+      )
+      .map(([subFieldKey, subFieldLabel]) => ({
         field: `${fieldName}.${subFieldKey}`,
         header: `${headerLabel} / ${subFieldLabel}`,
-      }),
-    );
+      }));
   });
 
   const headers = flattenedColumns.map((column) => column.header);
