@@ -296,6 +296,7 @@ const StyledTopMetaValue = styled.div`
   border-radius: ${({ theme }) => theme.border.radius.md};
   color: ${({ theme }) => theme.font.color.primary};
   display: flex;
+  flex: 1;
   font-size: ${({ theme }) => theme.font.size.sm};
   font-weight: ${({ theme }) => theme.font.weight.medium};
   min-height: ${({ theme }) => theme.spacing(9)};
