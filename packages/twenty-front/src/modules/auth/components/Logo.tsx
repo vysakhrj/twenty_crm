@@ -50,6 +50,21 @@ const StyledPrimaryLogo = styled.div<{ src: string }>`
   width: 100%;
 `;
 
+const DEFAULT_APP_TITLE = 'Imprezz CRM';
+
+const StyledDefaultTitle = styled.div`
+  align-items: center;
+  display: flex;
+  font-size: ${({ theme }) => theme.font.size.sm};
+  font-weight: ${({ theme }) => theme.font.weight.medium};
+  height: 100%;
+  justify-content: center;
+  line-height: 1.2;
+  text-align: center;
+  width: 100%;
+  word-break: break-word;
+`;
+
 export const Logo = ({
   primaryLogo,
   secondaryLogo,
@@ -80,7 +95,7 @@ export const Logo = ({
           to={AppPath.SignInUp}
           onClick={redirectToDefaultDomain}
         >
-          <StyledPrimaryLogo src={primaryLogoUrl} />
+          <StyledDefaultTitle>{DEFAULT_APP_TITLE}</StyledDefaultTitle>
         </UndecoratedLink>
       ) : (
         <StyledPrimaryLogo src={primaryLogoUrl} />
