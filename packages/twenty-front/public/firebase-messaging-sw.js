@@ -12,7 +12,7 @@ const firebaseConfig = {
   messagingSenderId: self.__FIREBASE_MESSAGING_SENDER_ID__ || '',
   appId: self.__FIREBASE_APP_ID__ || '',
 };
-const SW_VERSION = '2026-03-06-01';
+const SW_VERSION = '2026-03-07-02';
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
@@ -54,6 +54,12 @@ const shouldSkipDuplicateNotification = (payload) => {
   return false;
 };
 
+// Absolute URL for notification icon (Chrome needs 96x96+ for reliable display)
+const getDefaultNotificationIconUrl = () => {
+  const base = self.registration?.scope || self.location.origin + '/';
+  return new URL('/inceptra-favicon.png', base).href;
+};
+
 const showNotificationFromPayload = (payload, fallbackTitle = 'New Notification') => {
   if (shouldSkipDuplicateNotification(payload)) {
     return Promise.resolve();
@@ -63,8 +69,15 @@ const showNotificationFromPayload = (payload, fallbackTitle = 'New Notification'
     payload?.notification?.title ||
     payload?.data?.title ||
     `${fallbackTitle} (SW ${SW_VERSION})`;
+  const payloadIcon =
+    payload?.notification?.icon || payload?.data?.icon;
+  const iconUrl =
+    typeof payloadIcon === 'string' && payloadIcon.trim()
+      ? payloadIcon
+      : getDefaultNotificationIconUrl();
   const notificationOptions = {
     body: payload?.notification?.body || payload?.data?.body || '',
+    icon: iconUrl,
     tag:
       payload?.notification?.tag ||
       payload?.data?.notificationId ||
@@ -74,10 +87,6 @@ const showNotificationFromPayload = (payload, fallbackTitle = 'New Notification'
     data: payload?.data || {},
     requireInteraction: true,
   };
-
-  if (payload?.notification?.icon) {
-    notificationOptions.icon = payload.notification.icon;
-  }
 
   if (payload?.notification?.badge) {
     notificationOptions.badge = payload.notification.badge;
@@ -120,10 +129,9 @@ const parsePushEventPayload = (event) => {
   }
 };
 
-// Handle Firebase SDK background callback
+// Handle Firebase SDK background callback (notification is shown by push listener below)
 messaging.onBackgroundMessage((payload) => {
   notifyClientsAboutPush(payload);
-  showNotificationFromPayload(payload);
 });
 
 // Handle raw Push API events (works for DevTools push test and FCM push payloads)

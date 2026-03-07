@@ -215,9 +215,50 @@ export default defineConfig(({ command, mode }) => {
         brotliSize: true,
         filename: 'dist/stats.html',
       }) as PluginOption, // https://github.com/btd/rollup-plugin-visualizer/issues/162#issuecomment-1538265997,
-      // Copy and transform Firebase service worker
+      // Copy and transform Firebase service worker (build + dev)
       {
         name: 'firebase-service-worker',
+        configureServer(server) {
+          server.middlewares.use((req, res, next) => {
+            if (!req.url?.startsWith('/firebase-messaging-sw.js')) {
+              next();
+              return;
+            }
+            const swPath = path.resolve(
+              __dirname,
+              'public/firebase-messaging-sw.js',
+            );
+            if (!fs.existsSync(swPath)) {
+              next();
+              return;
+            }
+            let content = fs.readFileSync(swPath, 'utf-8');
+            const firebaseEnv = getFirebaseEnvVars(env);
+            content = content.replace(
+              /self\.__FIREBASE_API_KEY__/g,
+              `'${firebaseEnv.VITE_FIREBASE_API_KEY}'`,
+            );
+            content = content.replace(
+              /self\.__FIREBASE_AUTH_DOMAIN__/g,
+              `'${firebaseEnv.VITE_FIREBASE_AUTH_DOMAIN}'`,
+            );
+            content = content.replace(
+              /self\.__FIREBASE_PROJECT_ID__/g,
+              `'${firebaseEnv.VITE_FIREBASE_PROJECT_ID}'`,
+            );
+            content = content.replace(
+              /self\.__FIREBASE_MESSAGING_SENDER_ID__/g,
+              `'${firebaseEnv.VITE_FIREBASE_MESSAGING_SENDER_ID}'`,
+            );
+            content = content.replace(
+              /self\.__FIREBASE_APP_ID__/g,
+              `'${firebaseEnv.VITE_FIREBASE_APP_ID}'`,
+            );
+            res.setHeader('Content-Type', 'application/javascript');
+            res.setHeader('Cache-Control', 'no-store');
+            res.end(content);
+          });
+        },
         writeBundle() {
           const firebaseEnv = getFirebaseEnvVars(env);
           const swPath = path.resolve(__dirname, 'public/firebase-messaging-sw.js');

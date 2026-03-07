@@ -36,10 +36,12 @@ export const useFirebaseNotifications = () => {
 
       // Show browser system notification
       if (Notification.permission === 'granted') {
+        const iconUrl = `${window.location.origin}/inceptra-favicon.png`;
         const systemNotification = new Notification(
           fcmNotification.title ?? 'New Notification',
           {
             body: fcmNotification.body ?? '',
+            icon: iconUrl,
             tag: data?.notificationId ?? data?.type ?? 'default',
             requireInteraction: true,
           },

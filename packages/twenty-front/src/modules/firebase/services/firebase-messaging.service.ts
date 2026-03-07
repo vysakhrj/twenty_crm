@@ -17,7 +17,7 @@ const firebaseConfig = {
 
 let messaging: Messaging | null = null;
 let messagingSwRegistration: ServiceWorkerRegistration | null = null;
-const FIREBASE_MESSAGING_SW_VERSION = '2026-03-06-01';
+const FIREBASE_MESSAGING_SW_VERSION = '2026-03-07-02';
 const FIREBASE_MESSAGING_SW_URL =
   `/firebase-messaging-sw.js?v=${FIREBASE_MESSAGING_SW_VERSION}`;
 type ForegroundMessagePayload = {

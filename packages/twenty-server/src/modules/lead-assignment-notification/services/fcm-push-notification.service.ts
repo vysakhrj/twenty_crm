@@ -378,7 +378,7 @@ export class FcmPushNotificationService {
       ? frontendUrl.slice(0, -1)
       : frontendUrl;
 
-    return `${trimmedUrl}/favicon.ico`;
+    return `${trimmedUrl}/inceptra-favicon.png`;
   }
 
   private async signJwt(data: string, privateKey: string): Promise<string> {
