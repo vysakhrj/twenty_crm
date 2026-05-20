@@ -21,6 +21,10 @@ const StyledMainContent = styled.div`
   min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
+
+  > * {
+    min-height: 0;
+  }
 `;
 
 export const SimpleViewLayout = ({ title }: { title?: string }) => {

@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, type ReactNode } from 'react';
 import { useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,18 +8,27 @@ import {
   formatDateISOStringToUnifiedDateTime,
 } from '@/localization/utils/formatDateISOStringToUnified';
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
+import { currentWorkspaceMembersState } from '@/auth/states/currentWorkspaceMembersState';
+import { CoreObjectNameSingular } from '@/object-metadata/types/CoreObjectNameSingular';
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
 import { useGenerateDepthRecordGqlFieldsFromObject } from '@/object-record/graphql/record-gql-fields/hooks/useGenerateDepthRecordGqlFieldsFromObject';
 import { useFindOneRecord } from '@/object-record/hooks/useFindOneRecord';
 import { useUpdateOneRecord } from '@/object-record/hooks/useUpdateOneRecord';
+import {
+  BasicInfoIcons,
+  SimpleRecordDetailBasicInfo,
+  type BasicInfoIconVariant,
+} from '@/ui/layout/simple-view/components/SimpleRecordDetailBasicInfo';
 import { SimpleRecordDetailNotes } from '@/ui/layout/simple-view/components/SimpleRecordDetailNotes';
 import {
-    SimpleRecordDetailSection,
-    type SectionField,
+  SimpleRecordDetailSection,
+  type SectionField,
 } from '@/ui/layout/simple-view/components/SimpleRecordDetailSection';
 import { SimpleRecordDetailStageSelect } from '@/ui/layout/simple-view/components/SimpleRecordDetailStageSelect';
 import { FieldMetadataType } from 'twenty-shared/types';
+import { isDefined } from 'twenty-shared/utils';
 import { IconArrowLeft, IconCalendar } from 'twenty-ui/display';
+import { MOBILE_VIEWPORT } from 'twenty-ui/theme';
 
 const StyledContainer = styled.div`
   display: flex;
@@ -77,68 +86,44 @@ const StyledBody = styled.div`
   padding-bottom: ${({ theme }) => theme.spacing(10)};
 `;
 
-const StyledTopCard = styled.div`
-  background: ${({ theme }) => theme.background.secondary};
-  border: 1px solid ${({ theme }) => theme.border.color.medium};
-  border-radius: ${({ theme }) => theme.border.radius.md};
+const StyledContentGrid = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing(2)};
-  padding: ${({ theme }) => theme.spacing(3)};
+  gap: ${({ theme }) => theme.spacing(3)};
+
+  @media (min-width: ${MOBILE_VIEWPORT}px) {
+    align-items: flex-start;
+    flex-direction: row;
+  }
 `;
 
-const StyledNameRow = styled.div`
-  align-items: center;
-  display: flex;
-  gap: ${({ theme }) => theme.spacing(2.5)};
-`;
-
-const StyledRecordName = styled.div`
-  color: ${({ theme }) => theme.font.color.primary};
-  flex: 1;
-  font-size: ${({ theme }) => theme.font.size.lg};
-  font-weight: ${({ theme }) => theme.font.weight.semiBold};
-`;
-
-const StyledCreatedDate = styled.div`
-  color: ${({ theme }) => theme.font.color.tertiary};
-  font-size: ${({ theme }) => theme.font.size.sm};
-`;
-
-const StyledAvatar = styled.div`
-  align-items: center;
-  background: ${({ theme }) => theme.background.transparent.medium};
-  border-radius: 50%;
-  color: ${({ theme }) => theme.font.color.secondary};
-  display: inline-flex;
-  flex-shrink: 0;
-  font-size: ${({ theme }) => theme.font.size.md};
-  font-weight: ${({ theme }) => theme.font.weight.medium};
-  height: ${({ theme }) => theme.spacing(8)};
-  justify-content: center;
-  width: ${({ theme }) => theme.spacing(8)};
-`;
-
-const StyledPrimaryInfo = styled.div`
+const StyledLeftColumn = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: ${({ theme }) => theme.spacing(0.25)};
+  gap: ${({ theme }) => theme.spacing(3)};
   min-width: 0;
+  width: 100%;
+
+  @media (min-width: ${MOBILE_VIEWPORT}px) {
+    max-width: 50%;
+  }
 `;
 
-const StyledChip = styled.div`
-  background: ${({ theme }) => theme.background.transparent.light};
-  border: 1px solid ${({ theme }) => theme.border.color.medium};
-  border-radius: ${({ theme }) => theme.border.radius.xl};
-  color: ${({ theme }) => theme.font.color.secondary};
-  font-size: ${({ theme }) => theme.font.size.sm};
-  font-weight: ${({ theme }) => theme.font.weight.medium};
-  padding: ${({ theme }) => theme.spacing(0.75)} ${({ theme }) => theme.spacing(1.5)};
+const StyledRightColumn = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing(3)};
+  min-width: 0;
+  width: 100%;
+
+  @media (min-width: ${MOBILE_VIEWPORT}px) {
+    max-width: 50%;
+  }
 `;
 
-const StyledTopActionRow = styled.div`
-  align-items: stretch;
+const StyledCompactMetaRow = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: ${({ theme }) => theme.spacing(2)};
@@ -161,20 +146,6 @@ const StyledStatusLabel = styled.div`
 const StyledFollowUpDue = styled.div`
   display: flex;
   flex: 1;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing(0.75)};
-  min-width: 0;
-`;
-
-const StyledTopMetaRow = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: ${({ theme }) => theme.spacing(2)};
-`;
-
-const StyledTopMetaItem = styled.div`
-  display: flex;
-  flex: 1 1 100%;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing(0.75)};
   min-width: 0;
@@ -289,22 +260,6 @@ const StyledReadOnlyDateValue = styled.div`
   width: 100%;
 `;
 
-const StyledTopMetaValue = styled.div`
-  align-items: center;
-  background: ${({ theme }) => theme.background.primary};
-  border: 1px solid ${({ theme }) => theme.border.color.medium};
-  border-radius: ${({ theme }) => theme.border.radius.md};
-  color: ${({ theme }) => theme.font.color.primary};
-  display: flex;
-  flex: 1;
-  font-size: ${({ theme }) => theme.font.size.sm};
-  font-weight: ${({ theme }) => theme.font.weight.medium};
-  min-height: ${({ theme }) => theme.spacing(9)};
-  min-width: 0;
-  padding: ${({ theme }) => theme.spacing(2)} ${({ theme }) => theme.spacing(2.5)};
-  word-break: break-word;
-`;
-
 const CONTACT_FIELD_TYPES = new Set([
   FieldMetadataType.EMAILS,
   FieldMetadataType.PHONES,
@@ -334,18 +289,6 @@ const SYSTEM_FIELD_NAMES = new Set([
 
 const PRIORITY_FIELD_NAMES = new Set(['body', 'convenientTime']);
 const AUTO_MANAGED_FIELD_NAMES = new Set(['readAt']);
-
-const getInitials = (value: string): string => {
-  const cleaned = value.trim();
-  if (!cleaned) return '--';
-
-  const parts = cleaned.split(/\s+/).filter((part) => part.length > 0);
-  if (parts.length === 1) {
-    return parts[0].slice(0, 2).toUpperCase();
-  }
-
-  return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-};
 
 const formatDate = (dateString: string): string => {
   const formatted =
@@ -620,6 +563,11 @@ const findCustomerRecord = (
     return customer as Record<string, unknown>;
   }
 
+  const person = record.person;
+  if (person && typeof person === 'object' && !Array.isArray(person)) {
+    return person as Record<string, unknown>;
+  }
+
   for (const value of Object.values(record)) {
     if (
       value &&
@@ -634,6 +582,81 @@ const findCustomerRecord = (
   return undefined;
 };
 
+const ASSIGNEE_FIELD_CANDIDATE_NAMES = [
+  'assignedTo',
+  'assignee',
+  'owner',
+  'manager',
+] as const;
+
+const getAssigneeJoinColumnId = (
+  record: Record<string, unknown>,
+  objectMetadataItem: { fields: { name: string; type: FieldMetadataType; isActive?: boolean | null; relation?: { targetObjectMetadata?: { nameSingular?: string | null } | null } | null; settings?: { joinColumnName?: string | null } | null }[] },
+): string | null => {
+  const workspaceMemberRelationFields = objectMetadataItem.fields.filter(
+    (field) =>
+      field.type === FieldMetadataType.RELATION &&
+      field.isActive &&
+      field.relation?.targetObjectMetadata?.nameSingular ===
+        CoreObjectNameSingular.WorkspaceMember &&
+      isDefined(field.settings?.joinColumnName),
+  );
+
+  if (workspaceMemberRelationFields.length === 0) {
+    return null;
+  }
+
+  const preferredRelationField =
+    workspaceMemberRelationFields.find((field) =>
+      ASSIGNEE_FIELD_CANDIDATE_NAMES.includes(
+        field.name as (typeof ASSIGNEE_FIELD_CANDIDATE_NAMES)[number],
+      ),
+    ) ?? workspaceMemberRelationFields[0];
+
+  const joinColumnName = preferredRelationField.settings?.joinColumnName;
+
+  if (!isDefined(joinColumnName)) {
+    return null;
+  }
+
+  const idValue = record[joinColumnName];
+
+  return typeof idValue === 'string' && idValue.length > 0 ? idValue : null;
+};
+
+const getCustomerLocation = (
+  customerRecord: Record<string, unknown> | undefined,
+): string | undefined => {
+  if (!customerRecord) {
+    return undefined;
+  }
+
+  const city =
+    typeof customerRecord.city === 'string' ? customerRecord.city.trim() : '';
+  const address = customerRecord.address;
+
+  let addressCity = '';
+  let addressState = '';
+
+  if (address && typeof address === 'object' && !Array.isArray(address)) {
+    const addressObject = address as Record<string, unknown>;
+    addressCity =
+      typeof addressObject.addressCity === 'string'
+        ? addressObject.addressCity.trim()
+        : '';
+    addressState =
+      typeof addressObject.addressState === 'string'
+        ? addressObject.addressState.trim()
+        : '';
+  }
+
+  const locationParts = [city || addressCity, addressState].filter(
+    (part) => part.length > 0,
+  );
+
+  return locationParts.length > 0 ? locationParts.join(', ') : undefined;
+};
+
 export const SimpleRecordDetailPage = ({
   objectNameSingular,
   objectRecordId,
@@ -644,9 +667,9 @@ export const SimpleRecordDetailPage = ({
   const navigate = useNavigate();
   const { updateOneRecord } = useUpdateOneRecord();
   const followUpPickerInputRef = useRef<HTMLInputElement>(null);
-  const convenientTimePickerInputRef = useRef<HTMLInputElement>(null);
   const hasMarkedReadAtRef = useRef(false);
   const currentWorkspaceMember = useRecoilValue(currentWorkspaceMemberState);
+  const workspaceMembers = useRecoilValue(currentWorkspaceMembersState);
 
   const { objectMetadataItem } = useObjectMetadataItem({
     objectNameSingular,
@@ -664,21 +687,6 @@ export const SimpleRecordDetailPage = ({
     objectRecordId,
     recordGqlFields,
   });
-
-  const labelField = objectMetadataItem.fields.find(
-    (field) => field.id === objectMetadataItem.labelIdentifierFieldMetadataId,
-  );
-
-  const displayName = useMemo(() => {
-    if (!record || !labelField) return '';
-    const value = record[labelField.name];
-    if (labelField.type === FieldMetadataType.FULL_NAME) {
-      const firstName = value?.firstName ?? '';
-      const lastName = value?.lastName ?? '';
-      return `${firstName} ${lastName}`.trim();
-    }
-    return String(value ?? '');
-  }, [record, labelField]);
 
   const primaryEmail = useMemo(() => {
     if (!record) return undefined;
@@ -849,43 +857,6 @@ export const SimpleRecordDetailPage = ({
     return fields;
   }, [record, objectMetadataItem.fields]);
 
-  const originChip = useMemo(() => {
-    if (!record) return undefined;
-
-    const typedRecord = record as Record<string, unknown>;
-    const originValue = typedRecord.origin;
-
-    if (typeof originValue === 'string' && originValue.trim().length > 0) {
-      return originValue.trim();
-    }
-
-    if (originValue && typeof originValue === 'object' && !Array.isArray(originValue)) {
-      const displayName = getRelatedRecordDisplayName(
-        originValue as Record<string, unknown>,
-      );
-      if (displayName) return displayName;
-    }
-
-    const originField = objectMetadataItem.fields.find(
-      (field) => field.isActive && field.label.toLowerCase() === 'origin',
-    );
-    if (!originField) return undefined;
-
-    const fallbackValue = typedRecord[originField.name];
-    if (
-      fallbackValue &&
-      typeof fallbackValue === 'object' &&
-      !Array.isArray(fallbackValue)
-    ) {
-      return getRelatedRecordDisplayName(fallbackValue as Record<string, unknown>) ?? undefined;
-    }
-    if (typeof fallbackValue === 'string' && fallbackValue.trim().length > 0) {
-      return fallbackValue.trim();
-    }
-
-    return undefined;
-  }, [record, objectMetadataItem.fields]);
-
   // Extract relation fields (Customer, Property, etc.)
   const relationFields = useMemo((): SectionField[] => {
     if (!record) return [];
@@ -917,67 +888,6 @@ export const SimpleRecordDetailPage = ({
 
     return fields;
   }, [record, objectMetadataItem.fields, customerPriorityFields]);
-
-  const contactFields = useMemo((): SectionField[] => {
-    if (!record) return [];
-    const fields: SectionField[] = [];
-
-    if (primaryEmail) {
-      fields.push({
-        label: 'Email address',
-        value: primaryEmail,
-        href: `mailto:${primaryEmail}`,
-        actions: [{ type: 'email', href: `mailto:${primaryEmail}` }],
-      });
-    }
-
-    if (primaryPhone) {
-      fields.push({
-        label: 'Phone number',
-        value: primaryPhone,
-        href: `tel:${primaryPhone}`,
-        actions: [{ type: 'call', href: `tel:${primaryPhone}` }],
-      });
-    }
-
-    if (primaryWhatsapp) {
-      const whatsappHref = getWhatsappHref(primaryWhatsapp);
-      fields.push({
-        label: 'WhatsApp',
-        value: primaryWhatsapp,
-        href: whatsappHref,
-        actions: [{ type: 'whatsapp', href: whatsappHref }],
-      });
-    }
-
-    for (const fieldMeta of objectMetadataItem.fields) {
-      if (!fieldMeta.isActive || fieldMeta.isSystem) continue;
-      if (fieldMeta.type === FieldMetadataType.LINKS) {
-        const links = record[fieldMeta.name];
-        const primaryUrl =
-          links && typeof links === 'object'
-            ? (links as Record<string, string>).primaryLinkUrl
-            : null;
-        if (primaryUrl) {
-          fields.push({
-            label: fieldMeta.label,
-            value: primaryUrl,
-            href: primaryUrl.startsWith('http')
-              ? primaryUrl
-              : `https://${primaryUrl}`,
-          });
-        }
-      }
-    }
-
-    return fields;
-  }, [
-    record,
-    objectMetadataItem.fields,
-    primaryEmail,
-    primaryPhone,
-    primaryWhatsapp,
-  ]);
 
   const dateFields = useMemo(() => {
     return objectMetadataItem.fields.filter(
@@ -1042,29 +952,6 @@ export const SimpleRecordDetailPage = ({
   const handleFollowUpChange = (newValue: string) => {
     if (!followUpField) return;
     handleDateChange(followUpField.name, newValue);
-  };
-
-  const handleConvenientTimeChange = (newValue: string) => {
-    if (!convenientTimeField) return;
-    const isoValue = newValue ? new Date(newValue).toISOString() : '';
-    updateOneRecord({
-      idToUpdate: objectRecordId,
-      objectNameSingular,
-      updateOneRecordInput: {
-        [convenientTimeField.name]: isoValue,
-      },
-    });
-  };
-
-  const openConvenientTimePicker = () => {
-    const input = convenientTimePickerInputRef.current;
-    if (!input) return;
-    if ('showPicker' in input && typeof input.showPicker === 'function') {
-      input.showPicker();
-      return;
-    }
-    input.focus();
-    input.click();
   };
 
   useEffect(() => {
@@ -1162,6 +1049,145 @@ export const SimpleRecordDetailPage = ({
     input.click();
   };
 
+  const assigneeName = useMemo(() => {
+    if (!record) return undefined;
+
+    const typedRecord = record as Record<string, unknown>;
+    const assigneeRelation =
+      typedRecord.assignee &&
+      typeof typedRecord.assignee === 'object' &&
+      !Array.isArray(typedRecord.assignee)
+        ? (typedRecord.assignee as Record<string, unknown>)
+        : null;
+
+    if (assigneeRelation) {
+      const relationName = getRelatedRecordDisplayName(assigneeRelation);
+      if (relationName) {
+        return relationName;
+      }
+    }
+
+    const assigneeId = getAssigneeJoinColumnId(typedRecord, objectMetadataItem);
+    const assigneeMember = isDefined(assigneeId)
+      ? workspaceMembers.find((member) => member.id === assigneeId)
+      : undefined;
+
+    if (!assigneeMember) {
+      return undefined;
+    }
+
+    return `${assigneeMember.name.firstName} ${assigneeMember.name.lastName}`.trim();
+  }, [objectMetadataItem, record, workspaceMembers]);
+
+  const basicInfoItems = useMemo(() => {
+    if (!record) return [];
+
+    const typedRecord = record as Record<string, unknown>;
+    const customerRecord = findCustomerRecord(typedRecord);
+    const items: {
+      href?: string;
+      icon: ReactNode;
+      iconVariant: BasicInfoIconVariant;
+      value: string;
+    }[] = [];
+
+    const customerName = customerRecord
+      ? getRelatedRecordDisplayName(customerRecord)
+      : null;
+
+    if (customerName) {
+      items.push({
+        icon: <BasicInfoIcons.User size={16} />,
+        iconVariant: 'blue',
+        value: customerName,
+      });
+    }
+
+    const location = getCustomerLocation(customerRecord);
+    if (location) {
+      items.push({
+        icon: <BasicInfoIcons.Map size={16} />,
+        iconVariant: 'red',
+        value: location,
+      });
+    }
+
+    if (primaryEmail) {
+      items.push({
+        href: `mailto:${primaryEmail}`,
+        icon: <BasicInfoIcons.Mail size={16} />,
+        iconVariant: 'purple',
+        value: primaryEmail,
+      });
+    }
+
+    if (primaryPhone) {
+      items.push({
+        href: `tel:${primaryPhone}`,
+        icon: <BasicInfoIcons.Phone size={16} />,
+        iconVariant: 'green',
+        value: primaryPhone,
+      });
+    }
+
+    if (primaryWhatsapp) {
+      items.push({
+        href: getWhatsappHref(primaryWhatsapp),
+        icon: <BasicInfoIcons.Message size={16} />,
+        iconVariant: 'green',
+        value: primaryWhatsapp,
+      });
+    }
+
+    const propertyRecord =
+      typedRecord.property &&
+      typeof typedRecord.property === 'object' &&
+      !Array.isArray(typedRecord.property)
+        ? (typedRecord.property as Record<string, unknown>)
+        : undefined;
+    const propertyName = propertyRecord
+      ? getRelatedRecordDisplayName(propertyRecord)
+      : null;
+
+    if (propertyName) {
+      items.push({
+        icon: <BasicInfoIcons.Briefcase size={16} />,
+        iconVariant: 'orange',
+        value: propertyName,
+      });
+    }
+
+    if (convenientTimeText) {
+      items.push({
+        icon: <BasicInfoIcons.Clock size={16} />,
+        iconVariant: 'teal',
+        value: convenientTimeText,
+      });
+    }
+
+    return items;
+  }, [
+    convenientTimeText,
+    primaryEmail,
+    primaryPhone,
+    primaryWhatsapp,
+    record,
+  ]);
+
+  const filteredCustomerPriorityFields = useMemo(
+    () =>
+      customerPriorityFields.filter(
+        (field) =>
+          !['customer', 'property'].includes(field.label.toLowerCase()),
+      ),
+    [customerPriorityFields],
+  );
+
+  const recordCreatedDate = useMemo(() => {
+    if (!record?.createdAt) return undefined;
+    return formatDateOnly(record.createdAt);
+  }, [record?.createdAt]);
+
   if (loading && !record) {
     return <StyledLoading>Loading...</StyledLoading>;
   }
@@ -1184,172 +1210,128 @@ export const SimpleRecordDetailPage = ({
       </StyledHeader>
 
       <StyledBody>
-        <StyledTopCard>
-          <StyledNameRow>
-            <StyledAvatar>{getInitials(displayName || 'Untitled')}</StyledAvatar>
-            <StyledPrimaryInfo>
-              <StyledRecordName>{displayName || 'Untitled'}</StyledRecordName>
-              {record.createdAt && (
-                <StyledCreatedDate>
-                  Created: {formatDate(record.createdAt)}
-                </StyledCreatedDate>
-              )}
-            </StyledPrimaryInfo>
-            {originChip && <StyledChip>{originChip}</StyledChip>}
-          </StyledNameRow>
+        <StyledContentGrid>
+          <StyledLeftColumn>
+            <SimpleRecordDetailBasicInfo
+              assigneeName={assigneeName}
+              createdDate={recordCreatedDate}
+              infoItems={basicInfoItems}
+            >
+              <StyledCompactMetaRow>
+                <StyledStageSlot>
+                  <StyledStatusLabel>Status</StyledStatusLabel>
+                  <SimpleRecordDetailStageSelect
+                    compact
+                    record={record}
+                    objectMetadataItem={objectMetadataItem}
+                  />
+                </StyledStageSlot>
+                {followUpField && (
+                  <StyledFollowUpDue>
+                    <StyledFollowUpLabel>Follow up due</StyledFollowUpLabel>
+                    <StyledFollowUpValueRow
+                      role="button"
+                      onClick={openFollowUpPicker}
+                    >
+                      <StyledFollowUpValue>
+                        {followUpDue ?? '-'}
+                      </StyledFollowUpValue>
+                      <StyledFollowUpCalendarButton
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          openFollowUpPicker();
+                        }}
+                        aria-label="Set follow up due"
+                      >
+                        <IconCalendar size={16} />
+                      </StyledFollowUpCalendarButton>
+                      <StyledHiddenFollowUpInput
+                        ref={followUpPickerInputRef}
+                        type={
+                          followUpField.type === FieldMetadataType.DATE_TIME
+                            ? 'datetime-local'
+                            : 'date'
+                        }
+                        value={
+                          followUpField.type === FieldMetadataType.DATE_TIME
+                            ? toDateTimeInputValue(followUpValue)
+                            : toDateInputValue(followUpValue)
+                        }
+                        onChange={(event) =>
+                          handleFollowUpChange(event.target.value)
+                        }
+                      />
+                    </StyledFollowUpValueRow>
+                  </StyledFollowUpDue>
+                )}
+              </StyledCompactMetaRow>
+            </SimpleRecordDetailBasicInfo>
 
-          <StyledTopActionRow>
-            <StyledStageSlot>
-              <StyledStatusLabel>Status</StyledStatusLabel>
-              <SimpleRecordDetailStageSelect
-                compact
-                record={record}
-                objectMetadataItem={objectMetadataItem}
+            {filteredCustomerPriorityFields.length > 0 && (
+              <SimpleRecordDetailSection
+                title="Details"
+                fields={filteredCustomerPriorityFields}
               />
-            </StyledStageSlot>
-            {followUpField && (
-              <StyledFollowUpDue>
-                <StyledFollowUpLabel>Follow up due</StyledFollowUpLabel>
-                <StyledFollowUpValueRow
-                  role="button"
-                  onClick={openFollowUpPicker}
-                >
-                  <StyledFollowUpValue>{followUpDue ?? '-'}</StyledFollowUpValue>
-                  <StyledFollowUpCalendarButton
-                    type="button"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      openFollowUpPicker();
-                    }}
-                    aria-label="Set follow up due"
-                  >
-                    <IconCalendar size={16} />
-                  </StyledFollowUpCalendarButton>
-                  <StyledHiddenFollowUpInput
-                    ref={followUpPickerInputRef}
+            )}
+
+            {relationFields.length > 0 && (
+              <SimpleRecordDetailSection
+                title="Related"
+                fields={relationFields}
+              />
+            )}
+
+            {dateFields.map((field) => (
+              <StyledDateSection key={field.id}>
+                <StyledDateLabel>{field.label}</StyledDateLabel>
+                {field.name === 'dueDate' ||
+                field.label.toLowerCase() === 'due date' ? (
+                  <StyledReadOnlyDateValue>
+                    <span>
+                      {field.type === FieldMetadataType.DATE_TIME
+                        ? formatDate(String(record[field.name] ?? ''))
+                        : formatDateOnly(String(record[field.name] ?? ''))}
+                    </span>
+                    <IconCalendar size={20} />
+                  </StyledReadOnlyDateValue>
+                ) : (
+                  <StyledDateInput
                     type={
-                      followUpField.type === FieldMetadataType.DATE_TIME
+                      field.type === FieldMetadataType.DATE_TIME
                         ? 'datetime-local'
                         : 'date'
                     }
                     value={
-                      followUpField.type === FieldMetadataType.DATE_TIME
-                        ? toDateTimeInputValue(followUpValue)
-                        : toDateInputValue(followUpValue)
+                      field.type === FieldMetadataType.DATE_TIME
+                        ? toDateTimeInputValue(record[field.name] as string)
+                        : toDateInputValue(record[field.name] as string)
                     }
-                    onChange={(event) => handleFollowUpChange(event.target.value)}
+                    onChange={(event) =>
+                      handleDateChange(field.name, event.target.value)
+                    }
                   />
-                </StyledFollowUpValueRow>
-              </StyledFollowUpDue>
-            )}
-          </StyledTopActionRow>
-
-          {(convenientTimeField || convenientTimeText !== undefined) && (
-            <StyledTopMetaRow>
-              <StyledTopMetaItem>
-                <StyledFollowUpLabel>
-                  {convenientTimeField?.label ?? 'Convenient Time'}
-                </StyledFollowUpLabel>
-                {convenientTimeField ? (
-                  <StyledFollowUpValueRow
-                    role="button"
-                    onClick={openConvenientTimePicker}
-                  >
-                    <StyledTopMetaValue>
-                      {convenientTimeText ?? '-'}
-                    </StyledTopMetaValue>
-                    <StyledFollowUpCalendarButton
-                      type="button"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        openConvenientTimePicker();
-                      }}
-                      aria-label="Set convenient time"
-                    >
-                      <IconCalendar size={16} />
-                    </StyledFollowUpCalendarButton>
-                    <StyledHiddenFollowUpInput
-                      ref={convenientTimePickerInputRef}
-                      type="datetime-local"
-                      value={toDateTimeInputValue(
-                        record[convenientTimeField.name] as string,
-                      )}
-                      onChange={(event) =>
-                        handleConvenientTimeChange(event.target.value)
-                      }
-                    />
-                  </StyledFollowUpValueRow>
-                ) : (
-                  <StyledTopMetaValue>
-                    {convenientTimeText ?? '-'}
-                  </StyledTopMetaValue>
                 )}
-              </StyledTopMetaItem>
-            </StyledTopMetaRow>
-          )}
-        </StyledTopCard>
+              </StyledDateSection>
+            ))}
 
-        {customerPriorityFields.length > 0 && (
-          <SimpleRecordDetailSection
-            title="Details"
-            fields={customerPriorityFields}
-          />
-        )}
-
-        {contactFields.length > 0 && (
-          <SimpleRecordDetailSection
-            title="Contact info"
-            fields={contactFields}
-          />
-        )}
-
-        <SimpleRecordDetailNotes
-          objectMetadataItem={objectMetadataItem}
-          objectNameSingular={objectNameSingular}
-          objectRecordId={objectRecordId}
-          record={record}
-        />
-
-        {relationFields.length > 0 && (
-          <SimpleRecordDetailSection title="Related" fields={relationFields} />
-        )}
-
-        {dateFields.map((field) => (
-          <StyledDateSection key={field.id}>
-            <StyledDateLabel>{field.label}</StyledDateLabel>
-            {field.name === 'dueDate' ||
-            field.label.toLowerCase() === 'due date' ? (
-              <StyledReadOnlyDateValue>
-                <span>
-                  {field.type === FieldMetadataType.DATE_TIME
-                    ? formatDate(String(record[field.name] ?? ''))
-                    : formatDateOnly(String(record[field.name] ?? ''))}
-                </span>
-                <IconCalendar size={20} />
-              </StyledReadOnlyDateValue>
-            ) : (
-              <StyledDateInput
-                type={
-                  field.type === FieldMetadataType.DATE_TIME
-                    ? 'datetime-local'
-                    : 'date'
-                }
-                value={
-                  field.type === FieldMetadataType.DATE_TIME
-                    ? toDateTimeInputValue(record[field.name] as string)
-                    : toDateInputValue(record[field.name] as string)
-                }
-                onChange={(event) =>
-                  handleDateChange(field.name, event.target.value)
-                }
+            {detailFields.length > 0 && (
+              <SimpleRecordDetailSection
+                title="Additional details"
+                fields={detailFields}
               />
             )}
-          </StyledDateSection>
-        ))}
+          </StyledLeftColumn>
 
-        {detailFields.length > 0 && (
-          <SimpleRecordDetailSection title="Details" fields={detailFields} />
-        )}
+          <StyledRightColumn>
+            <SimpleRecordDetailNotes
+              objectMetadataItem={objectMetadataItem}
+              objectNameSingular={objectNameSingular}
+              objectRecordId={objectRecordId}
+              record={record}
+            />
+          </StyledRightColumn>
+        </StyledContentGrid>
       </StyledBody>
     </StyledContainer>
   );
