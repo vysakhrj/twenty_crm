@@ -34,6 +34,10 @@ export type SimpleRecordListColumn = {
   width: string;
 };
 
+export type SimpleRecordListColumnOptions = {
+  isAdminLeadList?: boolean;
+};
+
 const CONTACT_FIELD_TYPES = new Set([
   FieldMetadataType.EMAILS,
   FieldMetadataType.PHONES,
@@ -51,6 +55,15 @@ const HIDDEN_FIELD_TYPES = new Set([
 ]);
 
 const CUSTOMER_OBJECT_NAMES = new Set(['customer', 'person']);
+
+const CONTACT_RELATION_KEYS = ['customer', 'person'] as const;
+
+const EXCLUDED_CONTACT_RELATION_KEYS = new Set([
+  'assignee',
+  'assigneeId',
+  'createdBy',
+  'updatedBy',
+]);
 
 const formatCreatedAt = (value: unknown): string => {
   if (typeof value !== 'string' || value.trim().length === 0) {
@@ -107,6 +120,24 @@ export const getSimpleRecordDisplayName = (
   return String(value ?? record.id ?? '-');
 };
 
+const findCustomerRecord = (
+  record: Record<string, unknown>,
+): Record<string, unknown> | undefined => {
+  const customer = record.customer;
+
+  if (isRecordLike(customer)) {
+    return customer;
+  }
+
+  const person = record.person;
+
+  if (isRecordLike(person)) {
+    return person;
+  }
+
+  return undefined;
+};
+
 const getRelatedRecordDisplayName = (value: unknown): string | undefined => {
   if (!isRecordLike(value)) {
     return undefined;
@@ -133,12 +164,17 @@ const findValueInRecord = (
   record: Record<string, unknown>,
   predicate: (value: unknown, key: string) => string | undefined,
   depth = 0,
+  excludedKeys: ReadonlySet<string> = new Set(),
 ): string | undefined => {
   if (depth > 2) {
     return undefined;
   }
 
   for (const [key, value] of Object.entries(record)) {
+    if (depth === 0 && excludedKeys.has(key)) {
+      continue;
+    }
+
     const directValue = predicate(value, key);
 
     if (directValue !== undefined) {
@@ -157,53 +193,138 @@ const findValueInRecord = (
   return undefined;
 };
 
+const extractContactValueFromRelation = (
+  record: Record<string, unknown>,
+  predicate: (value: unknown, key: string) => string | undefined,
+): string | undefined => {
+  for (const relationKey of CONTACT_RELATION_KEYS) {
+    const relationRecord = record[relationKey];
+
+    if (!isRecordLike(relationRecord)) {
+      continue;
+    }
+
+    const contactValue = findValueInRecord(relationRecord, predicate);
+
+    if (contactValue !== undefined) {
+      return contactValue;
+    }
+  }
+
+  return undefined;
+};
+
 export const extractSimpleRecordPrimaryEmail = (
   record: ObjectRecord | Record<string, unknown>,
-): string | undefined =>
-  findValueInRecord(record, (value, key) => {
-    if (isRecordLike(value) && typeof value.primaryEmail === 'string') {
-      return value.primaryEmail;
-    }
+): string | undefined => {
+  const customerEmail = extractContactValueFromRelation(
+    record,
+    (value, key) => {
+      if (isRecordLike(value) && typeof value.primaryEmail === 'string') {
+        return value.primaryEmail;
+      }
 
-    if (
-      key.toLowerCase().includes('email') &&
-      typeof value === 'string' &&
-      value.includes('@')
-    ) {
-      return value;
-    }
+      if (
+        key.toLowerCase().includes('email') &&
+        typeof value === 'string' &&
+        value.includes('@')
+      ) {
+        return value;
+      }
 
-    return undefined;
-  });
+      return undefined;
+    },
+  );
+
+  if (customerEmail !== undefined) {
+    return customerEmail;
+  }
+
+  return findValueInRecord(
+    record,
+    (value, key) => {
+      if (isRecordLike(value) && typeof value.primaryEmail === 'string') {
+        return value.primaryEmail;
+      }
+
+      if (
+        key.toLowerCase().includes('email') &&
+        typeof value === 'string' &&
+        value.includes('@')
+      ) {
+        return value;
+      }
+
+      return undefined;
+    },
+    0,
+    EXCLUDED_CONTACT_RELATION_KEYS,
+  );
+};
 
 export const extractSimpleRecordPrimaryPhone = (
   record: ObjectRecord | Record<string, unknown>,
-): string | undefined =>
-  findValueInRecord(record, (value, key) => {
-    if (isRecordLike(value) && typeof value.primaryPhoneNumber === 'string') {
-      const callingCode =
-        typeof value.primaryPhoneCallingCode === 'string'
-          ? value.primaryPhoneCallingCode
-          : '';
+): string | undefined => {
+  const customerPhone = extractContactValueFromRelation(
+    record,
+    (value, key) => {
+      if (isRecordLike(value) && typeof value.primaryPhoneNumber === 'string') {
+        const callingCode =
+          typeof value.primaryPhoneCallingCode === 'string'
+            ? value.primaryPhoneCallingCode
+            : '';
 
-      return `${callingCode}${value.primaryPhoneNumber}`.trim();
-    }
+        return `${callingCode}${value.primaryPhoneNumber}`.trim();
+      }
 
-    if (
-      key.toLowerCase().includes('phone') &&
-      typeof value === 'string' &&
-      value.trim().length > 0
-    ) {
-      return value;
-    }
+      if (
+        key.toLowerCase().includes('phone') &&
+        typeof value === 'string' &&
+        value.trim().length > 0
+      ) {
+        return value;
+      }
 
-    return undefined;
-  });
+      return undefined;
+    },
+  );
+
+  if (customerPhone !== undefined) {
+    return customerPhone;
+  }
+
+  return findValueInRecord(
+    record,
+    (value, key) => {
+      if (isRecordLike(value) && typeof value.primaryPhoneNumber === 'string') {
+        const callingCode =
+          typeof value.primaryPhoneCallingCode === 'string'
+            ? value.primaryPhoneCallingCode
+            : '';
+
+        return `${callingCode}${value.primaryPhoneNumber}`.trim();
+      }
+
+      if (
+        key.toLowerCase().includes('phone') &&
+        typeof value === 'string' &&
+        value.trim().length > 0
+      ) {
+        return value;
+      }
+
+      return undefined;
+    },
+    0,
+    EXCLUDED_CONTACT_RELATION_KEYS,
+  );
+};
 
 export const getSimpleRecordListOrderBy = (sort: SimpleRecordListSort) => [
   {
     createdAt:
-      sort.direction === 'asc' && sort.field === 'createdAt'
+      sort.direction === 'asc' &&
+      (sort.field === 'createdAt' || sort.field === 'date')
         ? ('AscNullsLast' as const)
         : ('DescNullsLast' as const),
   },
@@ -228,6 +349,7 @@ const isDisplayableMetadataField = (
 
 export const getSimpleRecordListColumns = (
   objectMetadataItem: SimpleRecordListObjectMetadataItem,
+  options?: SimpleRecordListColumnOptions,
 ): SimpleRecordListColumn[] => {
   const labelField = getLabelField(objectMetadataItem);
 
@@ -241,6 +363,30 @@ export const getSimpleRecordListColumns = (
         ? 'minmax(128px, 0.75fr)'
         : 'minmax(180px, 1fr)',
   };
+
+  if (
+    objectMetadataItem.nameSingular === 'lead' &&
+    options?.isAdminLeadList === true
+  ) {
+    return [
+      nameColumn,
+      {
+        key: 'date',
+        label: 'Date',
+        width: 'minmax(140px, 0.9fr)',
+      },
+      {
+        key: 'customerName',
+        label: 'Customer Name',
+        width: 'minmax(180px, 1fr)',
+      },
+      {
+        key: 'assigneeName',
+        label: 'Assignee Name',
+        width: 'minmax(180px, 1fr)',
+      },
+    ];
+  }
 
   if (objectMetadataItem.nameSingular === 'lead') {
     return [
@@ -338,7 +484,22 @@ export const getSimpleRecordFieldValue = (
     case 'phone':
       return extractSimpleRecordPrimaryPhone(record) ?? '-';
     case 'createdAt':
+    case 'date':
       return formatCreatedAt(record.createdAt);
+    case 'customerName': {
+      const customerRecord = findCustomerRecord(record);
+
+      return customerRecord
+        ? (getRelatedRecordDisplayName(customerRecord) ?? '-')
+        : '-';
+    }
+    case 'assigneeName': {
+      const assigneeRecord = record.assignee;
+
+      return isRecordLike(assigneeRecord)
+        ? (getRelatedRecordDisplayName(assigneeRecord) ?? '-')
+        : '-';
+    }
     case 'name':
       return getSimpleRecordDisplayName(record, objectMetadataItem);
   }
@@ -399,7 +560,8 @@ export const sortSimpleRecordsForList = <TRecord extends ObjectRecord>(
     }
 
     const valueA =
-      sortColumn.key === 'createdAt' && typeof recordA.createdAt === 'string'
+      (sortColumn.key === 'createdAt' || sortColumn.key === 'date') &&
+      typeof recordA.createdAt === 'string'
         ? recordA.createdAt
         : getSimpleRecordFieldValue(
             recordA,
@@ -407,7 +569,8 @@ export const sortSimpleRecordsForList = <TRecord extends ObjectRecord>(
             objectMetadataItem,
           ).toLocaleLowerCase();
     const valueB =
-      sortColumn.key === 'createdAt' && typeof recordB.createdAt === 'string'
+      (sortColumn.key === 'createdAt' || sortColumn.key === 'date') &&
+      typeof recordB.createdAt === 'string'
         ? recordB.createdAt
         : getSimpleRecordFieldValue(
             recordB,

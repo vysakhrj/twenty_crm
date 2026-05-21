@@ -9,7 +9,10 @@ import {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trans, useLingui } from '@lingui/react/macro';
+import { useRecoilValue } from 'recoil';
 
+import { useCurrentUserRole } from '@/auth/hooks/useCurrentUserRole';
+import { currentWorkspaceMembersState } from '@/auth/states/currentWorkspaceMembersState';
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
 import { useGenerateDepthRecordGqlFieldsFromObject } from '@/object-record/graphql/record-gql-fields/hooks/useGenerateDepthRecordGqlFieldsFromObject';
 import { useFindManyRecords } from '@/object-record/hooks/useFindManyRecords';
@@ -20,12 +23,19 @@ import {
   sortSimpleRecordsForList,
   type SimpleRecordListSort,
 } from '@/ui/layout/simple-view/utils/simple-record-table.utils';
+import {
+  buildContactSearchFilter,
+  buildSimpleRecordListFilter,
+  getLeadCustomerRelationInfo,
+} from '@/ui/layout/simple-view/utils/simple-record-list-filter.utils';
 import { Table } from '@/ui/layout/table/components/Table';
 import { TableBody } from '@/ui/layout/table/components/TableBody';
 import { TableCell } from '@/ui/layout/table/components/TableCell';
 import { TableRow } from '@/ui/layout/table/components/TableRow';
-import { FieldMetadataType } from 'twenty-shared/types';
 import { IconSearch } from 'twenty-ui/display';
+import { MOBILE_VIEWPORT } from 'twenty-ui/theme';
+
+const TOOLBAR_STACKED_LAYOUT_MAX_WIDTH = MOBILE_VIEWPORT + 120;
 
 const StyledContainer = styled.div`
   display: flex;
@@ -53,10 +63,15 @@ const StyledTitle = styled.h1`
 `;
 
 const StyledToolbar = styled.div`
-  align-items: center;
+  container-type: inline-size;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: ${({ theme }) => theme.spacing(2)};
+
+  @container (min-width: ${TOOLBAR_STACKED_LAYOUT_MAX_WIDTH}px) {
+    align-items: center;
+    flex-direction: row;
+  }
 `;
 
 const StyledSearchRow = styled.div`
@@ -67,8 +82,25 @@ const StyledSearchRow = styled.div`
   display: flex;
   flex: 1;
   gap: ${({ theme }) => theme.spacing(2)};
-  min-width: 260px;
+  min-width: 0;
   padding: ${({ theme }) => theme.spacing(2)} ${({ theme }) => theme.spacing(4)};
+  width: 100%;
+
+  @container (min-width: ${TOOLBAR_STACKED_LAYOUT_MAX_WIDTH}px) {
+    min-width: 260px;
+    width: auto;
+  }
+`;
+
+const StyledFiltersRow = styled.div`
+  display: flex;
+  gap: ${({ theme }) => theme.spacing(2)};
+  width: 100%;
+
+  @container (min-width: ${TOOLBAR_STACKED_LAYOUT_MAX_WIDTH}px) {
+    flex-shrink: 0;
+    width: auto;
+  }
 `;
 
 const StyledSearchIcon = styled.div`
@@ -98,11 +130,16 @@ const StyledSortControl = styled.div`
   border-radius: ${({ theme }) => theme.border.radius.pill};
   color: ${({ theme }) => theme.font.color.secondary};
   display: flex;
-  flex-shrink: 0;
+  flex: 1;
   gap: ${({ theme }) => theme.spacing(1)};
   height: ${({ theme }) => theme.spacing(8)};
+  min-width: 0;
   padding: 0 ${({ theme }) => theme.spacing(2)} 0
     ${({ theme }) => theme.spacing(3)};
+
+  @container (min-width: ${TOOLBAR_STACKED_LAYOUT_MAX_WIDTH}px) {
+    flex: 0 0 auto;
+  }
 `;
 
 const StyledSortLabel = styled.label`
@@ -117,10 +154,38 @@ const StyledSortSelect = styled.select`
   border: none;
   color: ${({ theme }) => theme.font.color.primary};
   cursor: pointer;
+  flex: 1;
   font-family: ${({ theme }) => theme.font.family};
   font-size: ${({ theme }) => theme.font.size.md};
   font-weight: ${({ theme }) => theme.font.weight.medium};
+  min-width: 0;
   outline: none;
+
+  @container (min-width: ${TOOLBAR_STACKED_LAYOUT_MAX_WIDTH}px) {
+    flex: 0 1 auto;
+  }
+
+  &:focus-visible {
+    border-radius: ${({ theme }) => theme.border.radius.sm};
+    outline: 1px solid ${({ theme }) => theme.color.blue};
+  }
+`;
+
+const StyledDateInput = styled.input`
+  background: transparent;
+  border: none;
+  color: ${({ theme }) => theme.font.color.primary};
+  cursor: pointer;
+  flex: 1;
+  font-family: ${({ theme }) => theme.font.family};
+  font-size: ${({ theme }) => theme.font.size.md};
+  font-weight: ${({ theme }) => theme.font.weight.medium};
+  min-width: 0;
+  outline: none;
+
+  &::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+  }
 
   &:focus-visible {
     border-radius: ${({ theme }) => theme.border.radius.sm};
@@ -238,6 +303,10 @@ const StyledLoadingSentinel = styled.div`
   text-align: center;
 `;
 
+const getWorkspaceMemberDisplayName = (workspaceMember: {
+  name: { firstName?: string | null; lastName?: string | null };
+}) => `${workspaceMember.name.firstName ?? ''} ${workspaceMember.name.lastName ?? ''}`.trim();
+
 export const SimpleRecordListPage = ({
   objectNameSingular,
 }: {
@@ -245,7 +314,12 @@ export const SimpleRecordListPage = ({
 }) => {
   const navigate = useNavigate();
   const { t } = useLingui();
+  const { isAdmin } = useCurrentUserRole();
+  const workspaceMembers = useRecoilValue(currentWorkspaceMembersState);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedAssigneeId, setSelectedAssigneeId] = useState('all');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const [sort, setSort] = useState<SimpleRecordListSort>({
     direction: 'asc',
     field: 'name',
@@ -258,36 +332,102 @@ export const SimpleRecordListPage = ({
     objectNameSingular,
   });
 
+  const isAdminLeadList =
+    objectNameSingular === 'lead' && isAdmin === true;
+  const isLeadList = objectNameSingular === 'lead';
+
+  const customerRelationInfo = useMemo(
+    () => (isLeadList ? getLeadCustomerRelationInfo(objectMetadataItem) : null),
+    [isLeadList, objectMetadataItem],
+  );
+
+  const customerObjectNameSingular =
+    customerRelationInfo?.objectNameSingular ?? 'customer';
+
+  const { objectMetadataItem: customerObjectMetadataItem } =
+    useObjectMetadataItem({
+      objectNameSingular: customerObjectNameSingular,
+    });
+
   const labelField = objectMetadataItem.fields.find(
     (field) => field.id === objectMetadataItem.labelIdentifierFieldMetadataId,
   );
 
-  const filter = useMemo(() => {
-    if (!deferredSearchTerm || !labelField) return undefined;
+  const customerSearchFilter = useMemo(
+    () =>
+      buildContactSearchFilter(
+        deferredSearchTerm,
+        customerObjectMetadataItem.fields,
+      ),
+    [customerObjectMetadataItem.fields, deferredSearchTerm],
+  );
 
-    if (labelField.type === FieldMetadataType.FULL_NAME) {
-      return {
-        or: [
-          {
-            [labelField.name]: {
-              firstName: { ilike: `%${deferredSearchTerm}%` },
-            },
-          },
-          {
-            [labelField.name]: {
-              lastName: { ilike: `%${deferredSearchTerm}%` },
-            },
-          },
-        ],
-      };
-    }
+  const shouldSearchCustomers =
+    isLeadList &&
+    deferredSearchTerm.trim().length > 0 &&
+    customerRelationInfo !== null;
 
-    return { [labelField.name]: { ilike: `%${deferredSearchTerm}%` } };
-  }, [deferredSearchTerm, labelField]);
+  const { records: matchingCustomers, loading: matchingCustomersLoading } =
+    useFindManyRecords({
+      objectNameSingular: customerObjectNameSingular,
+      filter: customerSearchFilter,
+      limit: 200,
+      recordGqlFields: {
+        id: true,
+      },
+      skip: !shouldSearchCustomers,
+    });
+
+  const matchingCustomerIds = useMemo(
+    () => matchingCustomers.map((customer) => customer.id),
+    [matchingCustomers],
+  );
+
+  const filter = useMemo(
+    () =>
+      buildSimpleRecordListFilter({
+        searchTerm: deferredSearchTerm,
+        labelField,
+        isLeadList,
+        customerRelationInfo,
+        matchingCustomerIds,
+        selectedAssigneeId,
+        isAdminLeadList,
+        dateFrom,
+        dateTo,
+      }),
+    [
+      customerRelationInfo,
+      dateFrom,
+      dateTo,
+      deferredSearchTerm,
+      isAdminLeadList,
+      isLeadList,
+      labelField,
+      matchingCustomerIds,
+      selectedAssigneeId,
+    ],
+  );
+
+  const shouldWaitForCustomerSearch =
+    shouldSearchCustomers && matchingCustomersLoading;
 
   const columns = useMemo(
-    () => getSimpleRecordListColumns(objectMetadataItem),
-    [objectMetadataItem],
+    () =>
+      getSimpleRecordListColumns(objectMetadataItem, {
+        isAdminLeadList,
+      }),
+    [isAdminLeadList, objectMetadataItem],
+  );
+
+  const assigneeOptions = useMemo(
+    () =>
+      [...workspaceMembers].sort((memberA, memberB) =>
+        getWorkspaceMemberDisplayName(memberA).localeCompare(
+          getWorkspaceMemberDisplayName(memberB),
+        ),
+      ),
+    [workspaceMembers],
   );
 
   const effectiveSort = useMemo(
@@ -319,7 +459,10 @@ export const SimpleRecordListPage = ({
       orderBy,
       recordGqlFields,
       limit: 30,
+      skip: shouldWaitForCustomerSearch,
     });
+
+  const isLoadingRecords = loading || shouldWaitForCustomerSearch;
 
   const sortedRecords = useMemo(
     () =>
@@ -341,7 +484,7 @@ export const SimpleRecordListPage = ({
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
-        if (entry.isIntersecting && hasNextPage && !loading) {
+        if (entry.isIntersecting && hasNextPage && !isLoadingRecords) {
           fetchMoreRecords?.();
         }
       },
@@ -353,7 +496,7 @@ export const SimpleRecordListPage = ({
     return () => {
       observer.disconnect();
     };
-  }, [hasNextPage, loading, fetchMoreRecords]);
+  }, [hasNextPage, isLoadingRecords, fetchMoreRecords]);
 
   const handleViewButtonClick = useCallback(
     (recordId: string) => {
@@ -374,6 +517,17 @@ export const SimpleRecordListPage = ({
   const labelPlural = objectMetadataItem.labelPlural;
   const lowerCaseLabelPlural = objectMetadataItem.labelPlural.toLowerCase();
   const sortSelectId = `${objectMetadataItem.nameSingular}-simple-list-sort`;
+  const assigneeFilterSelectId = `${objectMetadataItem.nameSingular}-simple-list-assignee-filter`;
+  const dateFromInputId = `${objectMetadataItem.nameSingular}-simple-list-date-from`;
+  const dateToInputId = `${objectMetadataItem.nameSingular}-simple-list-date-to`;
+  const hasActiveFilters =
+    searchTerm.trim().length > 0 ||
+    selectedAssigneeId !== 'all' ||
+    dateFrom.length > 0 ||
+    dateTo.length > 0;
+  const searchPlaceholder = isLeadList
+    ? t`Search leads, customer name, email, phone...`
+    : t`Search ${lowerCaseLabelPlural}...`;
   const gridAutoColumns = `64px ${columns
     .map((column) => column.width)
     .join(' ')} 88px`;
@@ -390,37 +544,89 @@ export const SimpleRecordListPage = ({
             </StyledSearchIcon>
             <StyledSearchInput
               aria-label={t`Search ${labelPlural}`}
-              placeholder={t`Search ${lowerCaseLabelPlural}...`}
+              placeholder={searchPlaceholder}
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
             />
           </StyledSearchRow>
-          <StyledSortControl>
-            <StyledSortLabel htmlFor={sortSelectId}>
-              <Trans>Sort</Trans>
-            </StyledSortLabel>
-            <StyledSortSelect
-              id={sortSelectId}
-              value={`${effectiveSort.field}:${effectiveSort.direction}`}
-              onChange={(event) => handleSortChange(event.target.value)}
-            >
-              {columns.flatMap((column) => {
-                const columnLabel = column.label;
+          <StyledFiltersRow>
+            {isAdminLeadList && (
+              <StyledSortControl>
+                <StyledSortLabel htmlFor={assigneeFilterSelectId}>
+                  <Trans>Assignee</Trans>
+                </StyledSortLabel>
+                <StyledSortSelect
+                  id={assigneeFilterSelectId}
+                  value={selectedAssigneeId}
+                  onChange={(event) =>
+                    setSelectedAssigneeId(event.target.value)
+                  }
+                >
+                  <option value="all">{t`All assignees`}</option>
+                  {assigneeOptions.map((workspaceMember) => (
+                    <option key={workspaceMember.id} value={workspaceMember.id}>
+                      {getWorkspaceMemberDisplayName(workspaceMember)}
+                    </option>
+                  ))}
+                </StyledSortSelect>
+              </StyledSortControl>
+            )}
+            <StyledSortControl>
+              <StyledSortLabel htmlFor={sortSelectId}>
+                <Trans>Sort</Trans>
+              </StyledSortLabel>
+              <StyledSortSelect
+                id={sortSelectId}
+                value={`${effectiveSort.field}:${effectiveSort.direction}`}
+                onChange={(event) => handleSortChange(event.target.value)}
+              >
+                {columns.flatMap((column) => {
+                  const columnLabel = column.label;
 
-                return [
-                  <option key={`${column.key}:asc`} value={`${column.key}:asc`}>
-                    {t`${columnLabel} ascending`}
-                  </option>,
-                  <option
-                    key={`${column.key}:desc`}
-                    value={`${column.key}:desc`}
-                  >
-                    {t`${columnLabel} descending`}
-                  </option>,
-                ];
-              })}
-            </StyledSortSelect>
-          </StyledSortControl>
+                  return [
+                    <option
+                      key={`${column.key}:asc`}
+                      value={`${column.key}:asc`}
+                    >
+                      {t`${columnLabel} ascending`}
+                    </option>,
+                    <option
+                      key={`${column.key}:desc`}
+                      value={`${column.key}:desc`}
+                    >
+                      {t`${columnLabel} descending`}
+                    </option>,
+                  ];
+                })}
+              </StyledSortSelect>
+            </StyledSortControl>
+            {isLeadList && (
+              <>
+                <StyledSortControl>
+                  <StyledSortLabel htmlFor={dateFromInputId}>
+                    <Trans>From</Trans>
+                  </StyledSortLabel>
+                  <StyledDateInput
+                    id={dateFromInputId}
+                    type="date"
+                    value={dateFrom}
+                    onChange={(event) => setDateFrom(event.target.value)}
+                  />
+                </StyledSortControl>
+                <StyledSortControl>
+                  <StyledSortLabel htmlFor={dateToInputId}>
+                    <Trans>To</Trans>
+                  </StyledSortLabel>
+                  <StyledDateInput
+                    id={dateToInputId}
+                    type="date"
+                    value={dateTo}
+                    onChange={(event) => setDateTo(event.target.value)}
+                  />
+                </StyledSortControl>
+              </>
+            )}
+          </StyledFiltersRow>
         </StyledToolbar>
       </StyledHeader>
 
@@ -487,15 +693,15 @@ export const SimpleRecordListPage = ({
           </StyledTableWrapper>
         )}
 
-        {!loading && records.length === 0 && (
+        {!isLoadingRecords && records.length === 0 && (
           <StyledEmptyState>
-            {searchTerm
+            {hasActiveFilters
               ? t`No records match your search`
               : t`No ${lowerCaseLabelPlural} yet`}
           </StyledEmptyState>
         )}
 
-        {loading && records.length === 0 && (
+        {isLoadingRecords && records.length === 0 && (
           <StyledEmptyState>
             <Trans>Loading...</Trans>
           </StyledEmptyState>
@@ -503,7 +709,7 @@ export const SimpleRecordListPage = ({
 
         {hasNextPage && (
           <StyledLoadingSentinel ref={sentinelRef}>
-            {loading ? t`Loading more...` : ''}
+            {isLoadingRecords ? t`Loading more...` : ''}
           </StyledLoadingSentinel>
         )}
       </StyledList>
