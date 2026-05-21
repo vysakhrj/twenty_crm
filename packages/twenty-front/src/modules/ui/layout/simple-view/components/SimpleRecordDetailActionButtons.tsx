@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { useLingui } from '@lingui/react/macro';
 
 import { IconMail, IconMessage, IconPhone } from 'twenty-ui/display';
 
@@ -59,6 +60,8 @@ export const SimpleRecordDetailActionButtons = ({
   email?: string;
   whatsappNumber?: string;
 }) => {
+  const { t } = useLingui();
+
   const whatsappLink = whatsappNumber
     ? `https://wa.me/${whatsappNumber.replace(/\D/g, '')}`
     : undefined;
@@ -68,36 +71,36 @@ export const SimpleRecordDetailActionButtons = ({
       {phoneNumber ? (
         <StyledActionButton href={`tel:${phoneNumber}`}>
           <IconPhone size={22} />
-          Call
+          {t`Call`}
         </StyledActionButton>
       ) : (
         <StyledDisabledButton>
           <IconPhone size={22} />
-          Call
+          {t`Call`}
         </StyledDisabledButton>
       )}
 
       {email ? (
         <StyledActionButton href={`mailto:${email}`}>
           <IconMail size={22} />
-          Email
+          {t`Email`}
         </StyledActionButton>
       ) : (
         <StyledDisabledButton>
           <IconMail size={22} />
-          Email
+          {t`Email`}
         </StyledDisabledButton>
       )}
 
       {whatsappLink ? (
         <StyledActionButton href={whatsappLink} target="_blank" rel="noreferrer">
           <IconMessage size={22} />
-          WhatsApp
+          {t`WhatsApp`}
         </StyledActionButton>
       ) : (
         <StyledDisabledButton>
           <IconMessage size={22} />
-          WhatsApp
+          {t`WhatsApp`}
         </StyledDisabledButton>
       )}
     </StyledActionRow>

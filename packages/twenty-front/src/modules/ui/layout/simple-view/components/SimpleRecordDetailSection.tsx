@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { useLingui } from '@lingui/react/macro';
 import { useState } from 'react';
 import { IconMail, IconMessage, IconPhone } from 'twenty-ui/display';
 
@@ -131,9 +132,22 @@ export const SimpleRecordDetailSection = ({
   title: string;
   fields: SectionField[];
 }) => {
+  const { t } = useLingui();
   const [expandedFieldKeys, setExpandedFieldKeys] = useState<Set<string>>(
     () => new Set(),
   );
+
+  const getActionLabel = (actionType: 'call' | 'email' | 'whatsapp') => {
+    if (actionType === 'call') {
+      return t`Call`;
+    }
+
+    if (actionType === 'email') {
+      return t`Email`;
+    }
+
+    return t`WhatsApp`;
+  };
 
   if (fields.length === 0) return null;
 
@@ -181,12 +195,7 @@ export const SimpleRecordDetailSection = ({
             {field.actions && field.actions.length > 0 && (
               <StyledActions>
                 {field.actions.map((action) => {
-                  const actionLabel =
-                    action.type === 'call'
-                      ? 'Call'
-                      : action.type === 'email'
-                        ? 'Email'
-                        : 'WhatsApp';
+                  const actionLabel = getActionLabel(action.type);
                   const icon =
                     action.type === 'call' ? (
                       <IconPhone size={14} />

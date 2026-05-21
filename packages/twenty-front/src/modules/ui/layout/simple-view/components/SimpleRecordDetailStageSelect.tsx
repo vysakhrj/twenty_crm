@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { Trans } from '@lingui/react/macro';
 import { useState } from 'react';
 
 import { type ObjectMetadataItem } from '@/object-metadata/types/ObjectMetadataItem';
@@ -218,7 +219,7 @@ export const SimpleRecordDetailStageSelect = ({
                       type="button"
                       onClick={() => setOpenedFieldName(null)}
                     >
-                      Cancel
+                      <Trans>Cancel</Trans>
                     </StyledMobileCloseButton>
                   </StyledMobilePopup>
                 </>

@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { useLingui } from '@lingui/react/macro';
 import { Outlet, useLocation } from 'react-router-dom';
 
 import { SimpleViewSideDrawer } from '@/ui/layout/simple-view/components/SimpleViewSideDrawer';
@@ -28,9 +29,11 @@ const StyledMainContent = styled.div`
 `;
 
 export const SimpleViewLayout = ({ title }: { title?: string }) => {
+  const { t } = useLingui();
   const location = useLocation();
   const computedTitle =
-    title ?? (location.pathname === '/simple/settings' ? 'Settings' : 'CRM');
+    title ??
+    (location.pathname === '/simple/settings' ? t`Settings` : t`CRM`);
 
   return (
     <StyledLayout>

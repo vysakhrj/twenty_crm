@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { useEffect, useMemo, useRef, type ReactNode } from 'react';
 import { useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';
@@ -664,6 +665,7 @@ export const SimpleRecordDetailPage = ({
   objectNameSingular: string;
   objectRecordId: string;
 }) => {
+  const { t } = useLingui();
   const navigate = useNavigate();
   const { updateOneRecord } = useUpdateOneRecord();
   const followUpPickerInputRef = useRef<HTMLInputElement>(null);
@@ -1189,11 +1191,11 @@ export const SimpleRecordDetailPage = ({
   }, [record?.createdAt]);
 
   if (loading && !record) {
-    return <StyledLoading>Loading...</StyledLoading>;
+    return <StyledLoading>{t`Loading...`}</StyledLoading>;
   }
 
   if (!record) {
-    return <StyledLoading>Record not found</StyledLoading>;
+    return <StyledLoading>{t`Record not found`}</StyledLoading>;
   }
 
   return (
@@ -1219,7 +1221,9 @@ export const SimpleRecordDetailPage = ({
             >
               <StyledCompactMetaRow>
                 <StyledStageSlot>
-                  <StyledStatusLabel>Status</StyledStatusLabel>
+                  <StyledStatusLabel>
+                    <Trans>Status</Trans>
+                  </StyledStatusLabel>
                   <SimpleRecordDetailStageSelect
                     compact
                     record={record}
@@ -1228,7 +1232,9 @@ export const SimpleRecordDetailPage = ({
                 </StyledStageSlot>
                 {followUpField && (
                   <StyledFollowUpDue>
-                    <StyledFollowUpLabel>Follow up due</StyledFollowUpLabel>
+                    <StyledFollowUpLabel>
+                      <Trans>Follow up due</Trans>
+                    </StyledFollowUpLabel>
                     <StyledFollowUpValueRow
                       role="button"
                       onClick={openFollowUpPicker}
@@ -1242,7 +1248,7 @@ export const SimpleRecordDetailPage = ({
                           event.stopPropagation();
                           openFollowUpPicker();
                         }}
-                        aria-label="Set follow up due"
+                        aria-label={t`Set follow up due`}
                       >
                         <IconCalendar size={16} />
                       </StyledFollowUpCalendarButton>
@@ -1270,14 +1276,14 @@ export const SimpleRecordDetailPage = ({
 
             {filteredCustomerPriorityFields.length > 0 && (
               <SimpleRecordDetailSection
-                title="Details"
+                title={t`Details`}
                 fields={filteredCustomerPriorityFields}
               />
             )}
 
             {relationFields.length > 0 && (
               <SimpleRecordDetailSection
-                title="Related"
+                title={t`Related`}
                 fields={relationFields}
               />
             )}
@@ -1317,7 +1323,7 @@ export const SimpleRecordDetailPage = ({
 
             {detailFields.length > 0 && (
               <SimpleRecordDetailSection
-                title="Additional details"
+                title={t`Additional details`}
                 fields={detailFields}
               />
             )}

@@ -181,6 +181,16 @@ msgstr "{aggregateLabel} of {fieldLabel}"
 msgid "{appName} wants to access your account"
 msgstr "{appName} wants to access your account"
 
+#. js-lingui-id: +lbvIY
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "{columnLabel} ascending"
+msgstr "{columnLabel} ascending"
+
+#. js-lingui-id: CQ3u3s
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "{columnLabel} descending"
+msgstr "{columnLabel} descending"
+
 #. js-lingui-id: zi5SHH
 #: src/modules/object-record/record-index/components/RecordIndexPageHeader.tsx
 msgid "{contextStoreNumberOfSelectedRecords} selected"
@@ -676,6 +686,7 @@ msgstr "ACS Url copied to clipboard"
 
 #. js-lingui-id: bwRvnp
 #: src/modules/workflow/workflow-steps/workflow-actions/utils/getActionHeaderTypeOrThrow.ts
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
 #: src/modules/command-menu/components/CommandMenuWorkflowStepInfo.tsx
 #: src/modules/command-menu/components/CommandMenuWorkflowStepInfo.tsx
 #: src/modules/command-menu/components/CommandMenuWorkflowStepInfo.tsx
@@ -1032,6 +1043,11 @@ msgstr "Added {beautifyPastDateRelative}"
 msgid "Added to blocklist"
 msgstr "Added to blocklist"
 
+#. js-lingui-id: YFHEdN
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailPage.tsx
+msgid "Additional details"
+msgstr "Additional details"
+
 #. js-lingui-id: hW/fMg
 #: src/modules/ui/field/input/components/AddressInput.tsx
 #: src/modules/settings/data-model/fields/forms/address/constants/DefaultSelectionAddressWithMessages.ts
@@ -1243,6 +1259,11 @@ msgstr "All ({relationRecordsCount})"
 #: src/modules/settings/roles/role-permissions/permission-flags/components/SettingsRolePermissionsToolSection.tsx
 msgid "All Actions Access"
 msgstr "All Actions Access"
+
+#. js-lingui-id: Yah+aZ
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "All assignees"
+msgstr "All assignees"
 
 #. js-lingui-id: 7/XOrv
 #: src/modules/notifications/components/NotificationCenter.tsx
@@ -1794,9 +1815,15 @@ msgid "Assigned {roleTargetDisplayName}"
 msgstr "Assigned {roleTargetDisplayName}"
 
 #. js-lingui-id: lxQ+5m
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailBasicInfo.tsx
 #: src/modules/settings/roles/components/SettingsRolesTableHeader.tsx
 msgid "Assigned to"
 msgstr "Assigned to"
+
+#. js-lingui-id: ojKCLU
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "Assignee"
+msgstr "Assignee"
 
 #. js-lingui-id: 0dtKl9
 #: src/modules/settings/roles/role/components/SettingsRole.tsx
@@ -2032,6 +2059,11 @@ msgstr "Background Colors"
 msgid "Base Credits"
 msgstr "Base Credits"
 
+#. js-lingui-id: jIPNJG
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailBasicInfo.tsx
+msgid "Basic Information"
+msgstr "Basic Information"
+
 #. js-lingui-id: EmSrGB
 #: src/modules/object-record/record-calendar/month/hooks/useRecordCalendarQueryDateRangeFilter.tsx
 msgid "Before"
@@ -2240,6 +2272,13 @@ msgstr "Calendar View"
 msgid "Calendars"
 msgstr "Calendars"
 
+#. js-lingui-id: 8hvxGX
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailSection.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailActionButtons.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailActionButtons.tsx
+msgid "Call"
+msgstr "Call"
+
 #. js-lingui-id: msssZq
 #: src/modules/settings/data-model/objects/forms/components/SettingsDataModelObjectAboutForm.tsx
 msgid "Can't change API names for standard objects"
@@ -2253,6 +2292,7 @@ msgstr "Can't scan? Copy the"
 #. js-lingui-id: dEgA5A
 #: src/pages/auth/Authorize.tsx
 #: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailStageSelect.tsx
 #: src/modules/ui/layout/modal/components/ConfirmationModal.tsx
 #: src/modules/ui/feedback/snack-bar-manager/components/SnackBar.tsx
 #: src/modules/spreadsheet-import/steps/components/ImportDataStep.tsx
@@ -3348,6 +3388,11 @@ msgstr "Credits Used"
 msgid "Crimson"
 msgstr "Crimson"
 
+#. js-lingui-id: MSlbwg
+#: src/modules/ui/layout/simple-view/components/SimpleViewLayout.tsx
+msgid "CRM"
+msgstr "CRM"
+
 #. js-lingui-id: 6Oaeoc
 #: src/modules/settings/serverless-functions/components/tabs/SettingsServerlessFunctionTriggersTab.tsx
 msgid "Cron"
@@ -3373,6 +3418,11 @@ msgstr "CRUD"
 #: src/modules/action-menu/actions/record-actions/constants/DefaultRecordActionsConfig.tsx
 msgid "CSV"
 msgstr "CSV"
+
+#. js-lingui-id: MZGE4v
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "CSV{exportProgressText}"
+msgstr "CSV{exportProgressText}"
 
 #. js-lingui-id: J1QT+3
 #: src/modules/command-menu/pages/page-layout/constants/settings/ChartConfigurationSettingLabels.ts
@@ -4128,6 +4178,7 @@ msgid "Detach"
 msgstr "Detach"
 
 #. js-lingui-id: URmyfc
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailPage.tsx
 #: src/modules/ai/components/RoutingDebugDisplay.tsx
 msgid "Details"
 msgstr "Details"
@@ -4478,6 +4529,9 @@ msgstr "else if"
 #: src/pages/settings/members/SettingsWorkspaceMembers.tsx
 #: src/pages/auth/PasswordReset.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionSendEmail.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailSection.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailActionButtons.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailActionButtons.tsx
 #: src/modules/settings/security/components/SettingsSecurityEditableProfileFields.tsx
 #: src/modules/settings/roles/role-assignment/components/SettingsRoleAssignmentTableHeader.tsx
 #: src/modules/settings/roles/role-assignment/components/SettingsRoleAssignmentTable.tsx
@@ -5169,6 +5223,11 @@ msgstr "Everything"
 msgid "Excel"
 msgstr "Excel"
 
+#. js-lingui-id: Id3vB0
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "Excel{exportProgressText}"
+msgstr "Excel{exportProgressText}"
+
 #. js-lingui-id: QQlMid
 #: src/modules/settings/accounts/components/SettingsAccountsMessageChannelDetails.tsx
 msgid "Exclude group emails"
@@ -5603,6 +5662,12 @@ msgstr "Feature Flag"
 msgid "Feature Flags & Impersonation"
 msgstr "Feature Flags & Impersonation"
 
+#. js-lingui-id: X1fkvs
+#. placeholder {0}: formatFeedbackDisplayDateTime(entry.createdAt)
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailNotes.tsx
+msgid "Feedback {feedbackIndex} - {0}"
+msgstr "Feedback {feedbackIndex} - {0}"
+
 #. js-lingui-id: 2lOBKV
 #: src/modules/metadata-error-handler/hooks/useMetadataErrorHandler.ts
 msgid "field"
@@ -5795,6 +5860,11 @@ msgstr "Flow"
 msgid "Folders"
 msgstr "Folders"
 
+#. js-lingui-id: h+0V38
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailPage.tsx
+msgid "Follow up due"
+msgstr "Follow up due"
+
 #. js-lingui-id: glx6on
 #: src/modules/auth/sign-in-up/components/SignInUpWorkspaceScopeForm.tsx
 msgid "Forgot your password?"
@@ -5850,6 +5920,11 @@ msgstr "French"
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Fri"
 msgstr "Fri"
+
+#. js-lingui-id: ejVYRQ
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "From"
+msgstr "From"
 
 #. js-lingui-id: qR8gT9
 #: src/modules/workflow/workflow-trigger/utils/cron-to-human/descriptors/getDayOfWeekDescription.ts
@@ -7310,6 +7385,7 @@ msgid "Loading metrics data..."
 msgstr "Loading metrics data..."
 
 #. js-lingui-id: tVSmFT
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
 #: src/modules/ui/input/components/IconPicker.tsx
 #: src/modules/object-record/record-picker/multiple-record-picker/components/MultipleRecordPickerFetchMoreLoader.tsx
 #: src/modules/activities/components/CustomResolverFetchMoreLoader.tsx
@@ -7333,6 +7409,8 @@ msgstr "Loading thread"
 
 #. js-lingui-id: Z3FXyt
 #: src/pages/settings/emailing-domains/SettingsEmailingDomainDetail.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailPage.tsx
 #: src/modules/settings/roles/role-assignment/components/SettingsRoleAssignmentEntityPickerDropdown.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminVersionDisplay.tsx
 #: src/modules/activities/timeline-activities/rows/message/components/EventCardMessage.tsx
@@ -8098,6 +8176,7 @@ msgid "Ninth"
 msgstr "Ninth"
 
 #. js-lingui-id: 1UzENP
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
 #: src/modules/settings/roles/role-permissions/object-level-permissions/components/SettingsRolePermissionsObjectLevelUpdateFieldsValueForObject.tsx
 #: src/modules/settings/roles/role-permissions/object-level-permissions/components/SettingsRolePermissionsObjectLevelSeeFieldsValueForObject.tsx
 msgid "No"
@@ -8122,6 +8201,11 @@ msgstr "No {fieldLabel}"
 #: src/modules/object-record/record-field/ui/form-types/components/FormSelectFieldInput.tsx
 msgid "No {label}"
 msgstr "No {label}"
+
+#. js-lingui-id: ae4a/C
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "No {lowerCaseLabelPlural} yet"
+msgstr "No {lowerCaseLabelPlural} yet"
 
 #. js-lingui-id: 9CpMvJ
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateNoRecordFoundForFilter.tsx
@@ -8283,6 +8367,11 @@ msgstr "No Events"
 #: src/modules/activities/calendar/components/CalendarEventsCard.tsx
 msgid "No events have been scheduled with this {objectName} yet."
 msgstr "No events have been scheduled with this {objectName} yet."
+
+#. js-lingui-id: cZ8DR9
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailNotes.tsx
+msgid "No feedback yet."
+msgstr "No feedback yet."
 
 #. js-lingui-id: h+tLhU
 #: src/modules/page-layout/widgets/field/components/FieldWidget.tsx
@@ -8447,6 +8536,11 @@ msgstr "No records"
 #: src/modules/object-record/record-picker/components/RecordPickerNoRecordFoundMenuItem.tsx
 msgid "No records found"
 msgstr "No records found"
+
+#. js-lingui-id: RBK/qd
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "No records match your search"
+msgstr "No records match your search"
 
 #. js-lingui-id: FwUgy3
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateNoRecordFoundForFilter.tsx
@@ -9123,6 +9217,11 @@ msgstr "Paste the code below"
 msgid "Path"
 msgstr "Path"
 
+#. js-lingui-id: 0grOoh
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "PDF{exportProgressText}"
+msgstr "PDF{exportProgressText}"
+
 #. js-lingui-id: UbRKMZ
 #: src/pages/settings/emailing-domains/utils/getEmailingDomainStatusText.ts
 #: src/modules/settings/security/components/approvedAccessDomains/SettingsApprovedAccessDomainsListCard.tsx
@@ -9715,6 +9814,11 @@ msgstr "Record image"
 msgid "Record label"
 msgstr "Record label"
 
+#. js-lingui-id: kC4rhG
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailPage.tsx
+msgid "Record not found"
+msgstr "Record not found"
+
 #. js-lingui-id: mAHjRd
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownLayoutOpenInContent.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownLayoutContent.tsx
@@ -9781,6 +9885,11 @@ msgstr "Regenerate key"
 #: src/pages/settings/developers/api-keys/SettingsDevelopersApiKeyDetail.tsx
 msgid "Regenerate Key"
 msgstr "Regenerate Key"
+
+#. js-lingui-id: 8Ug9jB
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailPage.tsx
+msgid "Related"
+msgstr "Related"
 
 #. js-lingui-id: h9AYFD
 #: src/modules/settings/data-model/fields/forms/components/SettingsObjectNewFieldSelector.tsx
@@ -10337,6 +10446,16 @@ msgstr "Search"
 msgid "Search ''{commandMenuSearch}'' with..."
 msgstr "Search ''{commandMenuSearch}'' with..."
 
+#. js-lingui-id: AMWNlJ
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "Search {labelPlural}"
+msgstr "Search {labelPlural}"
+
+#. js-lingui-id: S7VTob
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "Search {lowerCaseLabelPlural}..."
+msgstr "Search {lowerCaseLabelPlural}..."
+
 #. js-lingui-id: g2dQp/
 #: src/modules/settings/roles/role-permissions/object-level-permissions/record-level-permissions/components/SettingsRolePermissionsObjectLevelRecordLevelPermissionMeValueSelect.tsx
 msgid "Search 1 {fieldTypeLabelLowercase} field"
@@ -10475,6 +10594,11 @@ msgstr "Search for an object..."
 #: src/modules/ui/input/components/IconPicker.tsx
 msgid "Search icon"
 msgstr "Search icon"
+
+#. js-lingui-id: AVIjH+
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "Search leads, customer name, email, phone..."
+msgstr "Search leads, customer name, email, phone..."
 
 #. js-lingui-id: two5rl
 #: src/modules/command-menu/pages/page-layout/components/dropdown-content/ChartDataSourceDropdownContent.tsx
@@ -10931,6 +11055,11 @@ msgstr "Set availability time range, active days, and leave period"
 msgid "Set email visibility, manage your blocklist and more."
 msgstr "Set email visibility, manage your blocklist and more."
 
+#. js-lingui-id: mxoE1x
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailPage.tsx
+msgid "Set follow up due"
+msgstr "Set follow up due"
+
 #. js-lingui-id: 6KA8xy
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useSettingsRolePermissionFlagConfig.ts
 msgid "Set global workspace preferences"
@@ -10984,6 +11113,7 @@ msgstr "Setting up your database..."
 #: src/pages/settings/ai/SettingsAgentForm.tsx
 #: src/pages/settings/ai/SettingsAI.tsx
 #: src/modules/ui/layout/simple-view/components/SimpleViewSideDrawer.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleViewLayout.tsx
 #: src/modules/sign-in-background-mock/components/SignInAppNavigationDrawerMock.tsx
 #: src/modules/settings/roles/role-permissions/permission-flags/components/SettingsRolePermissionsSettingsSection.tsx
 #: src/modules/settings/roles/role/components/SettingsRole.tsx
@@ -11267,6 +11397,7 @@ msgstr "Sorry, something went wrong"
 
 #. js-lingui-id: f6Hub0
 #: src/modules/workflow/workflow-steps/workflow-actions/find-records-action/components/WorkflowEditActionFindRecords.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
 #: src/modules/object-record/record-table/record-table-header/components/RecordTableColumnHeadDropdownMenu.tsx
 #: src/modules/object-record/object-sort-dropdown/components/ObjectSortDropdownButton.tsx
 #: src/modules/object-record/object-sort-dropdown/components/ObjectSortDropdownButton.tsx
@@ -11390,6 +11521,7 @@ msgstr "State"
 #. js-lingui-id: uAQUqI
 #: src/pages/settings/members/SettingsWorkspaceMembers.tsx
 #: src/pages/settings/admin-panel/SettingsAdminIndicatorHealthStatus.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailPage.tsx
 #: src/modules/settings/components/SettingsDnsRecordsTable.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceContent.tsx
 #: src/modules/settings/accounts/components/SettingsConnectedAccountsTableHeader.tsx
@@ -11497,10 +11629,21 @@ msgstr "Subject, body and attachments will be shared with your team."
 
 #. js-lingui-id: hQRttt
 #: src/modules/workflow/workflow-steps/workflow-actions/form-action/components/WorkflowEditActionFormFiller.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailNotes.tsx
 #: src/modules/spreadsheet-import/steps/components/ValidationStep/ValidationStep.tsx
 #: src/modules/auth/sign-in-up/components/internal/SignInUpTwoFactorAuthenticationVerification.tsx
 msgid "Submit"
 msgstr "Submit"
+
+#. js-lingui-id: ZQyX5Z
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailNotes.tsx
+msgid "Submit Feedback"
+msgstr "Submit Feedback"
+
+#. js-lingui-id: LMMGPr
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailNotes.tsx
+msgid "Submitting..."
+msgstr "Submitting..."
 
 #. js-lingui-id: EDl9kS
 #: src/modules/information-banner/components/billing/InformationBannerNoBillingSubscription.tsx
@@ -12197,6 +12340,11 @@ msgstr "Timing"
 msgid "title"
 msgstr "title"
 
+#. js-lingui-id: /jQctM
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "To"
+msgstr "To"
+
 #. js-lingui-id: ecUA8p
 #: src/utils/date-utils.ts
 #: src/modules/settings/admin-panel/health-status/constants/WorkerQueueMetricsSelectOptions.ts
@@ -12527,6 +12675,11 @@ msgstr "Unable to update leave"
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Unable to update sales availability"
 msgstr "Unable to update sales availability"
+
+#. js-lingui-id: EbMPZJ
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailBasicInfo.tsx
+msgid "Unassigned"
+msgstr "Unassigned"
 
 #. js-lingui-id: EUHN7i
 #: src/modules/settings/admin-panel/config-variables/components/ConfigVariableValueInput.tsx
@@ -12962,6 +13115,7 @@ msgid "view"
 msgstr "view"
 
 #. js-lingui-id: jpctdh
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
 #: src/modules/settings/data-model/object-details/components/SettingsObjectFieldDisabledActionDropdown.tsx
 msgid "View"
 msgstr "View"
@@ -13234,6 +13388,13 @@ msgstr "Welcome, {workspaceName}."
 msgid "What this API can do: Select a user role to define its permissions."
 msgstr "What this API can do: Select a user role to define its permissions."
 
+#. js-lingui-id: 2+ExvJ
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailSection.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailActionButtons.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailActionButtons.tsx
+msgid "WhatsApp"
+msgstr "WhatsApp"
+
 #. js-lingui-id: XD8J+H
 #: src/modules/settings/roles/role-permissions/objects-permissions/components/SettingsRolePermissionsObjectsSection.tsx
 msgid "When enabled, users can only see records they created"
@@ -13420,6 +13581,11 @@ msgstr "Write a description"
 #: src/pages/settings/ai/components/SettingsAgentSettingsTab.tsx
 msgid "Write a description for this agent"
 msgstr "Write a description for this agent"
+
+#. js-lingui-id: fGKEMh
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailNotes.tsx
+msgid "Write your feedback..."
+msgstr "Write your feedback..."
 
 #. js-lingui-id: zeCIJi
 #: src/modules/settings/serverless-functions/components/tabs/SettingsServerlessFunctionCodeEditorTab.tsx

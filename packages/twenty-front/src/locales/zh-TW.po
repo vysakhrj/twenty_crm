@@ -186,6 +186,16 @@ msgstr "{aggregateLabel} 的 {fieldLabel}"
 msgid "{appName} wants to access your account"
 msgstr "{appName} 想要存取您的帳戶"
 
+#. js-lingui-id: +lbvIY
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "{columnLabel} ascending"
+msgstr ""
+
+#. js-lingui-id: CQ3u3s
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "{columnLabel} descending"
+msgstr ""
+
 #. js-lingui-id: zi5SHH
 #: src/modules/object-record/record-index/components/RecordIndexPageHeader.tsx
 msgid "{contextStoreNumberOfSelectedRecords} selected"
@@ -681,6 +691,7 @@ msgstr "ACS 網址已複製到剪貼板"
 
 #. js-lingui-id: bwRvnp
 #: src/modules/workflow/workflow-steps/workflow-actions/utils/getActionHeaderTypeOrThrow.ts
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
 #: src/modules/command-menu/components/CommandMenuWorkflowStepInfo.tsx
 #: src/modules/command-menu/components/CommandMenuWorkflowStepInfo.tsx
 #: src/modules/command-menu/components/CommandMenuWorkflowStepInfo.tsx
@@ -1037,6 +1048,11 @@ msgstr "已添加 {beautifyPastDateRelative}"
 msgid "Added to blocklist"
 msgstr "已添加到阻止列表"
 
+#. js-lingui-id: YFHEdN
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailPage.tsx
+msgid "Additional details"
+msgstr ""
+
 #. js-lingui-id: hW/fMg
 #: src/modules/ui/field/input/components/AddressInput.tsx
 #: src/modules/settings/data-model/fields/forms/address/constants/DefaultSelectionAddressWithMessages.ts
@@ -1248,6 +1264,11 @@ msgstr "全部 ({relationRecordsCount})"
 #: src/modules/settings/roles/role-permissions/permission-flags/components/SettingsRolePermissionsToolSection.tsx
 msgid "All Actions Access"
 msgstr "所有操作存取"
+
+#. js-lingui-id: Yah+aZ
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "All assignees"
+msgstr ""
 
 #. js-lingui-id: 7/XOrv
 #: src/modules/notifications/components/NotificationCenter.tsx
@@ -1799,9 +1820,15 @@ msgid "Assigned {roleTargetDisplayName}"
 msgstr "指派 {roleTargetDisplayName}"
 
 #. js-lingui-id: lxQ+5m
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailBasicInfo.tsx
 #: src/modules/settings/roles/components/SettingsRolesTableHeader.tsx
 msgid "Assigned to"
 msgstr "分配給"
+
+#. js-lingui-id: ojKCLU
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "Assignee"
+msgstr ""
 
 #. js-lingui-id: 0dtKl9
 #: src/modules/settings/roles/role/components/SettingsRole.tsx
@@ -2037,6 +2064,11 @@ msgstr "背景顏色"
 msgid "Base Credits"
 msgstr ""
 
+#. js-lingui-id: jIPNJG
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailBasicInfo.tsx
+msgid "Basic Information"
+msgstr ""
+
 #. js-lingui-id: EmSrGB
 #: src/modules/object-record/record-calendar/month/hooks/useRecordCalendarQueryDateRangeFilter.tsx
 msgid "Before"
@@ -2245,6 +2277,13 @@ msgstr "日曆檢視"
 msgid "Calendars"
 msgstr "日曆"
 
+#. js-lingui-id: 8hvxGX
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailSection.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailActionButtons.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailActionButtons.tsx
+msgid "Call"
+msgstr ""
+
 #. js-lingui-id: msssZq
 #: src/modules/settings/data-model/objects/forms/components/SettingsDataModelObjectAboutForm.tsx
 msgid "Can't change API names for standard objects"
@@ -2258,6 +2297,7 @@ msgstr "無法掃描？ 複製"
 #. js-lingui-id: dEgA5A
 #: src/pages/auth/Authorize.tsx
 #: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailStageSelect.tsx
 #: src/modules/ui/layout/modal/components/ConfirmationModal.tsx
 #: src/modules/ui/feedback/snack-bar-manager/components/SnackBar.tsx
 #: src/modules/spreadsheet-import/steps/components/ImportDataStep.tsx
@@ -3353,6 +3393,11 @@ msgstr "使用的免費積分"
 msgid "Crimson"
 msgstr "緋紅色"
 
+#. js-lingui-id: MSlbwg
+#: src/modules/ui/layout/simple-view/components/SimpleViewLayout.tsx
+msgid "CRM"
+msgstr ""
+
 #. js-lingui-id: 6Oaeoc
 #: src/modules/settings/serverless-functions/components/tabs/SettingsServerlessFunctionTriggersTab.tsx
 msgid "Cron"
@@ -3377,6 +3422,11 @@ msgstr ""
 #. js-lingui-id: 6N5Lt+
 #: src/modules/action-menu/actions/record-actions/constants/DefaultRecordActionsConfig.tsx
 msgid "CSV"
+msgstr ""
+
+#. js-lingui-id: MZGE4v
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "CSV{exportProgressText}"
 msgstr ""
 
 #. js-lingui-id: J1QT+3
@@ -4133,6 +4183,7 @@ msgid "Detach"
 msgstr "解除連結"
 
 #. js-lingui-id: URmyfc
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailPage.tsx
 #: src/modules/ai/components/RoutingDebugDisplay.tsx
 msgid "Details"
 msgstr "詳細資訊"
@@ -4483,6 +4534,9 @@ msgstr ""
 #: src/pages/settings/members/SettingsWorkspaceMembers.tsx
 #: src/pages/auth/PasswordReset.tsx
 #: src/modules/workflow/workflow-steps/workflow-actions/components/WorkflowEditActionSendEmail.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailSection.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailActionButtons.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailActionButtons.tsx
 #: src/modules/settings/security/components/SettingsSecurityEditableProfileFields.tsx
 #: src/modules/settings/roles/role-assignment/components/SettingsRoleAssignmentTableHeader.tsx
 #: src/modules/settings/roles/role-assignment/components/SettingsRoleAssignmentTable.tsx
@@ -5174,6 +5228,11 @@ msgstr "所有內容"
 msgid "Excel"
 msgstr ""
 
+#. js-lingui-id: Id3vB0
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "Excel{exportProgressText}"
+msgstr ""
+
 #. js-lingui-id: QQlMid
 #: src/modules/settings/accounts/components/SettingsAccountsMessageChannelDetails.tsx
 msgid "Exclude group emails"
@@ -5608,6 +5667,12 @@ msgstr "功能標誌"
 msgid "Feature Flags & Impersonation"
 msgstr "功能標誌和模擬"
 
+#. js-lingui-id: X1fkvs
+#. placeholder {0}: formatFeedbackDisplayDateTime(entry.createdAt)
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailNotes.tsx
+msgid "Feedback {feedbackIndex} - {0}"
+msgstr ""
+
 #. js-lingui-id: 2lOBKV
 #: src/modules/metadata-error-handler/hooks/useMetadataErrorHandler.ts
 msgid "field"
@@ -5800,6 +5865,11 @@ msgstr "流程"
 msgid "Folders"
 msgstr "資料夾"
 
+#. js-lingui-id: h+0V38
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailPage.tsx
+msgid "Follow up due"
+msgstr ""
+
 #. js-lingui-id: glx6on
 #: src/modules/auth/sign-in-up/components/SignInUpWorkspaceScopeForm.tsx
 msgid "Forgot your password?"
@@ -5854,6 +5924,11 @@ msgstr "法語"
 #: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Fri"
+msgstr ""
+
+#. js-lingui-id: ejVYRQ
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "From"
 msgstr ""
 
 #. js-lingui-id: qR8gT9
@@ -7315,6 +7390,7 @@ msgid "Loading metrics data..."
 msgstr "正在加載數據指標……"
 
 #. js-lingui-id: tVSmFT
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
 #: src/modules/ui/input/components/IconPicker.tsx
 #: src/modules/object-record/record-picker/multiple-record-picker/components/MultipleRecordPickerFetchMoreLoader.tsx
 #: src/modules/activities/components/CustomResolverFetchMoreLoader.tsx
@@ -7338,6 +7414,8 @@ msgstr "正在載入郵件串"
 
 #. js-lingui-id: Z3FXyt
 #: src/pages/settings/emailing-domains/SettingsEmailingDomainDetail.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailPage.tsx
 #: src/modules/settings/roles/role-assignment/components/SettingsRoleAssignmentEntityPickerDropdown.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminVersionDisplay.tsx
 #: src/modules/activities/timeline-activities/rows/message/components/EventCardMessage.tsx
@@ -8103,6 +8181,7 @@ msgid "Ninth"
 msgstr "第九"
 
 #. js-lingui-id: 1UzENP
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
 #: src/modules/settings/roles/role-permissions/object-level-permissions/components/SettingsRolePermissionsObjectLevelUpdateFieldsValueForObject.tsx
 #: src/modules/settings/roles/role-permissions/object-level-permissions/components/SettingsRolePermissionsObjectLevelSeeFieldsValueForObject.tsx
 msgid "No"
@@ -8127,6 +8206,11 @@ msgstr "無 {fieldLabel}"
 #: src/modules/object-record/record-field/ui/form-types/components/FormSelectFieldInput.tsx
 msgid "No {label}"
 msgstr "無 {label}"
+
+#. js-lingui-id: ae4a/C
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "No {lowerCaseLabelPlural} yet"
+msgstr ""
 
 #. js-lingui-id: 9CpMvJ
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateNoRecordFoundForFilter.tsx
@@ -8288,6 +8372,11 @@ msgstr "沒有事件"
 #: src/modules/activities/calendar/components/CalendarEventsCard.tsx
 msgid "No events have been scheduled with this {objectName} yet."
 msgstr "尚未針對此 {objectName} 排定任何事件。"
+
+#. js-lingui-id: cZ8DR9
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailNotes.tsx
+msgid "No feedback yet."
+msgstr ""
 
 #. js-lingui-id: h+tLhU
 #: src/modules/page-layout/widgets/field/components/FieldWidget.tsx
@@ -8452,6 +8541,11 @@ msgstr ""
 #: src/modules/object-record/record-picker/components/RecordPickerNoRecordFoundMenuItem.tsx
 msgid "No records found"
 msgstr "未找到記錄"
+
+#. js-lingui-id: RBK/qd
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "No records match your search"
+msgstr ""
 
 #. js-lingui-id: FwUgy3
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateNoRecordFoundForFilter.tsx
@@ -9128,6 +9222,11 @@ msgstr "在下方貼上代碼"
 msgid "Path"
 msgstr "路徑"
 
+#. js-lingui-id: 0grOoh
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "PDF{exportProgressText}"
+msgstr ""
+
 #. js-lingui-id: UbRKMZ
 #: src/pages/settings/emailing-domains/utils/getEmailingDomainStatusText.ts
 #: src/modules/settings/security/components/approvedAccessDomains/SettingsApprovedAccessDomainsListCard.tsx
@@ -9720,6 +9819,11 @@ msgstr "記錄圖像"
 msgid "Record label"
 msgstr "記錄標籤"
 
+#. js-lingui-id: kC4rhG
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailPage.tsx
+msgid "Record not found"
+msgstr ""
+
 #. js-lingui-id: mAHjRd
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownLayoutOpenInContent.tsx
 #: src/modules/object-record/object-options-dropdown/components/ObjectOptionsDropdownLayoutContent.tsx
@@ -9786,6 +9890,11 @@ msgstr "重新生成密鑰"
 #: src/pages/settings/developers/api-keys/SettingsDevelopersApiKeyDetail.tsx
 msgid "Regenerate Key"
 msgstr "重新生成密鑰"
+
+#. js-lingui-id: 8Ug9jB
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailPage.tsx
+msgid "Related"
+msgstr ""
 
 #. js-lingui-id: h9AYFD
 #: src/modules/settings/data-model/fields/forms/components/SettingsObjectNewFieldSelector.tsx
@@ -10342,6 +10451,16 @@ msgstr "搜索"
 msgid "Search ''{commandMenuSearch}'' with..."
 msgstr "用\"'{commandMenuSearch}'\"搜索..."
 
+#. js-lingui-id: AMWNlJ
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "Search {labelPlural}"
+msgstr ""
+
+#. js-lingui-id: S7VTob
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "Search {lowerCaseLabelPlural}..."
+msgstr ""
+
 #. js-lingui-id: g2dQp/
 #: src/modules/settings/roles/role-permissions/object-level-permissions/record-level-permissions/components/SettingsRolePermissionsObjectLevelRecordLevelPermissionMeValueSelect.tsx
 msgid "Search 1 {fieldTypeLabelLowercase} field"
@@ -10480,6 +10599,11 @@ msgstr "搜索對象..."
 #: src/modules/ui/input/components/IconPicker.tsx
 msgid "Search icon"
 msgstr "搜索圖標"
+
+#. js-lingui-id: AVIjH+
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "Search leads, customer name, email, phone..."
+msgstr ""
 
 #. js-lingui-id: two5rl
 #: src/modules/command-menu/pages/page-layout/components/dropdown-content/ChartDataSourceDropdownContent.tsx
@@ -10936,6 +11060,11 @@ msgstr ""
 msgid "Set email visibility, manage your blocklist and more."
 msgstr "設置電子郵件可見性，管理您的屏蔽列表等。"
 
+#. js-lingui-id: mxoE1x
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailPage.tsx
+msgid "Set follow up due"
+msgstr ""
+
 #. js-lingui-id: 6KA8xy
 #: src/modules/settings/roles/role-permissions/permission-flags/hooks/useSettingsRolePermissionFlagConfig.ts
 msgid "Set global workspace preferences"
@@ -10989,6 +11118,7 @@ msgstr "正在設置您的數據庫..."
 #: src/pages/settings/ai/SettingsAgentForm.tsx
 #: src/pages/settings/ai/SettingsAI.tsx
 #: src/modules/ui/layout/simple-view/components/SimpleViewSideDrawer.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleViewLayout.tsx
 #: src/modules/sign-in-background-mock/components/SignInAppNavigationDrawerMock.tsx
 #: src/modules/settings/roles/role-permissions/permission-flags/components/SettingsRolePermissionsSettingsSection.tsx
 #: src/modules/settings/roles/role/components/SettingsRole.tsx
@@ -11272,6 +11402,7 @@ msgstr "抱歉，出問題了"
 
 #. js-lingui-id: f6Hub0
 #: src/modules/workflow/workflow-steps/workflow-actions/find-records-action/components/WorkflowEditActionFindRecords.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
 #: src/modules/object-record/record-table/record-table-header/components/RecordTableColumnHeadDropdownMenu.tsx
 #: src/modules/object-record/object-sort-dropdown/components/ObjectSortDropdownButton.tsx
 #: src/modules/object-record/object-sort-dropdown/components/ObjectSortDropdownButton.tsx
@@ -11395,6 +11526,7 @@ msgstr "狀態"
 #. js-lingui-id: uAQUqI
 #: src/pages/settings/members/SettingsWorkspaceMembers.tsx
 #: src/pages/settings/admin-panel/SettingsAdminIndicatorHealthStatus.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailPage.tsx
 #: src/modules/settings/components/SettingsDnsRecordsTable.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceContent.tsx
 #: src/modules/settings/accounts/components/SettingsConnectedAccountsTableHeader.tsx
@@ -11502,10 +11634,21 @@ msgstr "主題、正文和附件將與您的團隊共享。"
 
 #. js-lingui-id: hQRttt
 #: src/modules/workflow/workflow-steps/workflow-actions/form-action/components/WorkflowEditActionFormFiller.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailNotes.tsx
 #: src/modules/spreadsheet-import/steps/components/ValidationStep/ValidationStep.tsx
 #: src/modules/auth/sign-in-up/components/internal/SignInUpTwoFactorAuthenticationVerification.tsx
 msgid "Submit"
 msgstr "提交"
+
+#. js-lingui-id: ZQyX5Z
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailNotes.tsx
+msgid "Submit Feedback"
+msgstr ""
+
+#. js-lingui-id: LMMGPr
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailNotes.tsx
+msgid "Submitting..."
+msgstr ""
 
 #. js-lingui-id: EDl9kS
 #: src/modules/information-banner/components/billing/InformationBannerNoBillingSubscription.tsx
@@ -12200,6 +12343,11 @@ msgstr "計時"
 msgid "title"
 msgstr "標題"
 
+#. js-lingui-id: /jQctM
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "To"
+msgstr ""
+
 #. js-lingui-id: ecUA8p
 #: src/utils/date-utils.ts
 #: src/modules/settings/admin-panel/health-status/constants/WorkerQueueMetricsSelectOptions.ts
@@ -12529,6 +12677,11 @@ msgstr ""
 #. js-lingui-id: UEN0Kn
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Unable to update sales availability"
+msgstr ""
+
+#. js-lingui-id: EbMPZJ
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailBasicInfo.tsx
+msgid "Unassigned"
 msgstr ""
 
 #. js-lingui-id: EUHN7i
@@ -12965,6 +13118,7 @@ msgid "view"
 msgstr "視圖"
 
 #. js-lingui-id: jpctdh
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
 #: src/modules/settings/data-model/object-details/components/SettingsObjectFieldDisabledActionDropdown.tsx
 msgid "View"
 msgstr "視圖"
@@ -13237,6 +13391,13 @@ msgstr ""
 msgid "What this API can do: Select a user role to define its permissions."
 msgstr "此 API 能做什麼：選擇用戶角色以定義其權限。"
 
+#. js-lingui-id: 2+ExvJ
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailSection.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailActionButtons.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailActionButtons.tsx
+msgid "WhatsApp"
+msgstr ""
+
 #. js-lingui-id: XD8J+H
 #: src/modules/settings/roles/role-permissions/objects-permissions/components/SettingsRolePermissionsObjectsSection.tsx
 msgid "When enabled, users can only see records they created"
@@ -13423,6 +13584,11 @@ msgstr "撰寫描述"
 #: src/pages/settings/ai/components/SettingsAgentSettingsTab.tsx
 msgid "Write a description for this agent"
 msgstr "為此代理撰寫描述"
+
+#. js-lingui-id: fGKEMh
+#: src/modules/ui/layout/simple-view/components/SimpleRecordDetailNotes.tsx
+msgid "Write your feedback..."
+msgstr ""
 
 #. js-lingui-id: zeCIJi
 #: src/modules/settings/serverless-functions/components/tabs/SettingsServerlessFunctionCodeEditorTab.tsx
