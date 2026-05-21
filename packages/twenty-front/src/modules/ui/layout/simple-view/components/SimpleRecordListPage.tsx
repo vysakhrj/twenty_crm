@@ -13,6 +13,7 @@ import { useRecoilValue } from 'recoil';
 
 import { useCurrentUserRole } from '@/auth/hooks/useCurrentUserRole';
 import { currentWorkspaceMembersState } from '@/auth/states/currentWorkspaceMembersState';
+import { computeProgressText } from '@/action-menu/utils/computeProgressText';
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
 import { useGenerateDepthRecordGqlFieldsFromObject } from '@/object-record/graphql/record-gql-fields/hooks/useGenerateDepthRecordGqlFieldsFromObject';
 import { useFindManyRecords } from '@/object-record/hooks/useFindManyRecords';
@@ -28,12 +29,15 @@ import {
   buildSimpleRecordListFilter,
   getLeadCustomerRelationInfo,
 } from '@/ui/layout/simple-view/utils/simple-record-list-filter.utils';
+import { useSimpleRecordListExport } from '@/ui/layout/simple-view/hooks/useSimpleRecordListExport';
+import { useHasPermissionFlag } from '@/settings/roles/hooks/useHasPermissionFlag';
 import { Table } from '@/ui/layout/table/components/Table';
 import { TableBody } from '@/ui/layout/table/components/TableBody';
 import { TableCell } from '@/ui/layout/table/components/TableCell';
 import { TableRow } from '@/ui/layout/table/components/TableRow';
-import { IconSearch } from 'twenty-ui/display';
+import { IconFileExport, IconSearch } from 'twenty-ui/display';
 import { MOBILE_VIEWPORT } from 'twenty-ui/theme';
+import { PermissionFlagType } from '~/generated-metadata/graphql';
 
 const TOOLBAR_STACKED_LAYOUT_MAX_WIDTH = MOBILE_VIEWPORT + 120;
 
@@ -55,11 +59,51 @@ const StyledHeader = styled.div`
   padding: ${({ theme }) => theme.spacing(3)} ${({ theme }) => theme.spacing(4)};
 `;
 
+const StyledTitleRow = styled.div`
+  align-items: center;
+  display: flex;
+  gap: ${({ theme }) => theme.spacing(2)};
+  justify-content: space-between;
+`;
+
 const StyledTitle = styled.h1`
   color: ${({ theme }) => theme.font.color.primary};
   font-size: ${({ theme }) => theme.font.size.xl};
   font-weight: ${({ theme }) => theme.font.weight.semiBold};
   margin: 0;
+`;
+
+const StyledExportActions = styled.div`
+  display: flex;
+  flex-shrink: 0;
+  gap: ${({ theme }) => theme.spacing(2)};
+`;
+
+const StyledExportButton = styled.button`
+  align-items: center;
+  background: ${({ theme }) => theme.background.primary};
+  border: 1px solid ${({ theme }) => theme.border.color.medium};
+  border-radius: ${({ theme }) => theme.border.radius.pill};
+  color: ${({ theme }) => theme.font.color.secondary};
+  cursor: pointer;
+  display: flex;
+  flex-shrink: 0;
+  font-family: ${({ theme }) => theme.font.family};
+  font-size: ${({ theme }) => theme.font.size.md};
+  font-weight: ${({ theme }) => theme.font.weight.medium};
+  gap: ${({ theme }) => theme.spacing(1)};
+  height: ${({ theme }) => theme.spacing(8)};
+  padding: 0 ${({ theme }) => theme.spacing(3)};
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  &:focus-visible {
+    border-radius: ${({ theme }) => theme.border.radius.sm};
+    outline: 1px solid ${({ theme }) => theme.color.blue};
+  }
 `;
 
 const StyledToolbar = styled.div`
@@ -315,6 +359,7 @@ export const SimpleRecordListPage = ({
   const navigate = useNavigate();
   const { t } = useLingui();
   const { isAdmin } = useCurrentUserRole();
+  const canExportRecords = useHasPermissionFlag(PermissionFlagType.EXPORT_CSV);
   const workspaceMembers = useRecoilValue(currentWorkspaceMembersState);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAssigneeId, setSelectedAssigneeId] = useState('all');
@@ -464,6 +509,22 @@ export const SimpleRecordListPage = ({
 
   const isLoadingRecords = loading || shouldWaitForCustomerSearch;
 
+  const { exportCsv, exportExcel, exportPdf, isExporting, progress } =
+    useSimpleRecordListExport({
+      columns,
+      effectiveSort,
+      filter,
+      objectMetadataItem,
+      orderBy,
+      recordGqlFields,
+    });
+
+  const exportProgressText = computeProgressText(
+    isExporting ? progress : undefined,
+  );
+
+  const isExportDisabled = isExporting || shouldWaitForCustomerSearch;
+
   const sortedRecords = useMemo(
     () =>
       sortSimpleRecordsForList(
@@ -535,7 +596,43 @@ export const SimpleRecordListPage = ({
   return (
     <StyledContainer>
       <StyledHeader>
-        <StyledTitle>{labelPlural}</StyledTitle>
+        <StyledTitleRow>
+          <StyledTitle>{labelPlural}</StyledTitle>
+          {canExportRecords && (
+            <StyledExportActions>
+              <StyledExportButton
+                type="button"
+                disabled={isExportDisabled}
+                onClick={() => {
+                  void exportCsv();
+                }}
+              >
+                <IconFileExport size={16} />
+                {t`CSV${exportProgressText}`}
+              </StyledExportButton>
+              <StyledExportButton
+                type="button"
+                disabled={isExportDisabled}
+                onClick={() => {
+                  void exportExcel();
+                }}
+              >
+                <IconFileExport size={16} />
+                {t`Excel${exportProgressText}`}
+              </StyledExportButton>
+              <StyledExportButton
+                type="button"
+                disabled={isExportDisabled}
+                onClick={() => {
+                  void exportPdf();
+                }}
+              >
+                <IconFileExport size={16} />
+                {t`PDF${exportProgressText}`}
+              </StyledExportButton>
+            </StyledExportActions>
+          )}
+        </StyledTitleRow>
 
         <StyledToolbar>
           <StyledSearchRow>
