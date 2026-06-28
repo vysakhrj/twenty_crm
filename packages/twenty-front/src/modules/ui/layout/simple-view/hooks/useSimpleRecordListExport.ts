@@ -7,6 +7,7 @@ import {
   downloadSimpleRecordListCsv,
   downloadSimpleRecordListExcel,
   buildSimpleRecordListExportRows,
+  getSimpleRecordListExportFilename,
 } from '@/ui/layout/simple-view/utils/simple-record-list-export.utils';
 import { downloadSimpleRecordListPdf } from '@/ui/layout/simple-view/utils/simple-record-list-pdf.utils';
 import {
@@ -23,6 +24,7 @@ import {
 type UseSimpleRecordListExportParams = {
   columns: SimpleRecordListColumn[];
   effectiveSort: SimpleRecordListSort;
+  exportTitle: string;
   filter?: RecordGqlOperationFilter;
   objectMetadataItem: ObjectMetadataItem;
   orderBy: RecordGqlOperationOrderBy;
@@ -32,6 +34,7 @@ type UseSimpleRecordListExportParams = {
 export const useSimpleRecordListExport = ({
   columns,
   effectiveSort,
+  exportTitle,
   filter,
   objectMetadataItem,
   orderBy,
@@ -73,35 +76,44 @@ export const useSimpleRecordListExport = ({
 
     downloadSimpleRecordListCsv({
       columns,
-      filename: `${objectMetadataItem.nameSingular}.csv`,
+      filename: getSimpleRecordListExportFilename({
+        baseName: exportTitle,
+        extension: 'csv',
+      }),
       rows,
     });
-  }, [columns, fetchExportRows, objectMetadataItem.nameSingular]);
+  }, [columns, exportTitle, fetchExportRows]);
 
   const exportExcel = useCallback(async () => {
     const rows = await fetchExportRows();
 
     downloadSimpleRecordListExcel({
       columns,
-      filename: `${objectMetadataItem.nameSingular}.xlsx`,
+      filename: getSimpleRecordListExportFilename({
+        baseName: exportTitle,
+        extension: 'xlsx',
+      }),
       rows,
     });
-  }, [columns, fetchExportRows, objectMetadataItem.nameSingular]);
+  }, [columns, exportTitle, fetchExportRows]);
 
   const exportPdf = useCallback(async () => {
     const rows = await fetchExportRows();
 
     await downloadSimpleRecordListPdf({
       columns,
-      filename: `${objectMetadataItem.nameSingular}.pdf`,
+      filename: getSimpleRecordListExportFilename({
+        baseName: exportTitle,
+        extension: 'pdf',
+      }),
       rows,
       title: objectMetadataItem.labelPlural,
     });
   }, [
     columns,
+    exportTitle,
     fetchExportRows,
     objectMetadataItem.labelPlural,
-    objectMetadataItem.nameSingular,
   ]);
 
   return {

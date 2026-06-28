@@ -9,6 +9,7 @@ import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
 import { useDefaultHomePagePath } from '@/navigation/hooks/useDefaultHomePagePath';
 import { useSalesAvailability } from '@/settings/members/hooks/useSalesAvailability';
 import { NameFields } from '@/settings/profile/components/NameFields';
+import { ProfileSalesLeaveSection } from '@/settings/profile/components/ProfileSalesLeaveSection';
 import { useHasPermissionFlag } from '@/settings/roles/hooks/useHasPermissionFlag';
 import { WorkspaceMemberPictureUploader } from '@/settings/workspace-member/components/WorkspaceMemberPictureUploader';
 import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
@@ -516,6 +517,7 @@ export const SimpleSettingsPage = () => {
               workspaceMemberId={currentWorkspaceMember.id}
             />
             <NameFields />
+            <ProfileSalesLeaveSection variant="simple" />
           </StyledProfileSection>
         </StyledCard>
       )}

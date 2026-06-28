@@ -22,6 +22,7 @@ describe('isRecordFieldReadOnly', () => {
       isRecordReadOnly: true,
       fieldMetadataItem: {
         id: 'field-123',
+        name: 'title',
         isUIReadOnly: false,
       },
     });
@@ -38,6 +39,7 @@ describe('isRecordFieldReadOnly', () => {
       },
       fieldMetadataItem: {
         id: 'field-123',
+        name: 'title',
         isUIReadOnly: false,
       },
     });
@@ -56,6 +58,7 @@ describe('isRecordFieldReadOnly', () => {
       },
       fieldMetadataItem: {
         id: 'field-123',
+        name: 'title',
         isUIReadOnly: false,
       },
     });
@@ -68,7 +71,21 @@ describe('isRecordFieldReadOnly', () => {
       ...mockParams,
       fieldMetadataItem: {
         id: 'field-123',
+        name: 'title',
         isUIReadOnly: true,
+      },
+    });
+
+    expect(result).toBe(true);
+  });
+
+  it('should return true when field is auto-managed', () => {
+    const result = isRecordFieldReadOnly({
+      ...mockParams,
+      fieldMetadataItem: {
+        id: 'field-123',
+        name: 'readAt',
+        isUIReadOnly: false,
       },
     });
 
@@ -80,6 +97,7 @@ describe('isRecordFieldReadOnly', () => {
       ...mockParams,
       fieldMetadataItem: {
         id: 'field-123',
+        name: 'title',
         isUIReadOnly: false,
       },
     });

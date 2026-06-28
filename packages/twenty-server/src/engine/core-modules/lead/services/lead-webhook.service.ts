@@ -42,6 +42,11 @@ type SalesAvailabilityPermission = {
   isAdminLike: boolean;
 };
 
+type SalesLeavePermission = {
+  canManageOthersLeave: boolean;
+  isAdminLike: boolean;
+};
+
 const WEEKDAY_KEYS = [
   'MONDAY',
   'TUESDAY',
@@ -384,12 +389,18 @@ export class LeadWebhookService {
     input: SalesLeaveUpdateInput,
     authContext: WorkspaceAuthContext,
   ) {
-    const salesAvailabilityPermission = await this.assertManagerOrSuperAdmin(
+    const salesLeavePermission = await this.getSalesLeavePermission(
       workspaceId,
       authContext,
     );
 
-    if (!salesAvailabilityPermission.isAdminLike) {
+    if (!salesLeavePermission.canManageOthersLeave) {
+      if (workspaceMemberId !== authContext.workspaceMemberId) {
+        throw new ForbiddenException(
+          'Sales users can only update their own leave',
+        );
+      }
+    } else if (!salesLeavePermission.isAdminLike) {
       const adminWorkspaceMemberIds = await this.getAdminWorkspaceMemberIds(
         workspaceId,
         authContext,
@@ -498,6 +509,65 @@ export class LeadWebhookService {
     );
   }
 
+  async getSelfSalesUserStatus(
+    workspaceId: string,
+    authContext: WorkspaceAuthContext,
+  ) {
+    const workspaceMemberId = authContext.workspaceMemberId;
+
+    if (!workspaceMemberId) {
+      throw new ForbiddenException(
+        'Only workspace members can view their sales leave status',
+      );
+    }
+
+    await this.getSalesLeavePermission(workspaceId, authContext);
+
+    const salesMemberIds = await this.getSalesWorkspaceMemberIds(
+      workspaceId,
+      authContext,
+    );
+
+    if (!salesMemberIds.includes(workspaceMemberId)) {
+      throw new NotFoundException(
+        `Sales workspace member ${workspaceMemberId} not found`,
+      );
+    }
+
+    return this.globalWorkspaceOrmManager.executeInWorkspaceContext(
+      authContext,
+      async () => {
+        const workspaceMemberRepository =
+          await this.globalWorkspaceOrmManager.getRepository<WorkspaceMemberWorkspaceEntity>(
+            workspaceId,
+            'workspaceMember',
+            { shouldBypassPermissionChecks: true },
+          );
+
+        const member = await workspaceMemberRepository.findOne({
+          where: { id: workspaceMemberId },
+        });
+
+        if (!member) {
+          throw new NotFoundException(
+            `Workspace member ${workspaceMemberId} not found`,
+          );
+        }
+
+        return {
+          workspaceMemberId: member.id,
+          name: `${member.name?.firstName ?? ''} ${member.name?.lastName ?? ''}`.trim(),
+          availabilityStartTime: this.getAvailabilityStartTime(member),
+          availabilityEndTime: this.getAvailabilityEndTime(member),
+          availableDays: this.getAvailableDays(member),
+          leaveStartDate: member.leaveStartDate ?? null,
+          leaveEndDate: member.leaveEndDate ?? null,
+          status: this.computeAvailabilityStatus(member),
+        };
+      },
+    );
+  }
+
   async getSalesUsersStatus(
     workspaceId: string,
     authContext: WorkspaceAuthContext,
@@ -539,6 +609,57 @@ export class LeadWebhookService {
         }));
       },
     );
+  }
+
+  private async getSalesLeavePermission(
+    workspaceId: string,
+    authContext: WorkspaceAuthContext,
+  ): Promise<SalesLeavePermission> {
+    const userWorkspaceId = authContext.userWorkspaceId;
+
+    if (!userWorkspaceId) {
+      throw new ForbiddenException('Only workspace users can perform this action');
+    }
+
+    const rolesByUserWorkspace =
+      await this.userRoleService.getRolesByUserWorkspaces({
+        userWorkspaceIds: [userWorkspaceId],
+        workspaceId,
+      });
+
+    const currentRoles = rolesByUserWorkspace.get(userWorkspaceId) ?? [];
+
+    if (currentRoles.length === 0) {
+      throw new ForbiddenException('Current role could not be resolved');
+    }
+
+    const isAdminLike = currentRoles.some((role) => this.isAdminLikeRole(role));
+    const hasManagerRole = currentRoles.some((role) =>
+      role.label.toLowerCase().includes('manager'),
+    );
+    const hasSalesRole = currentRoles.some((role) => this.isSalesRole(role));
+
+    if (isAdminLike || hasManagerRole) {
+      return {
+        canManageOthersLeave: true,
+        isAdminLike,
+      };
+    }
+
+    if (hasSalesRole) {
+      return {
+        canManageOthersLeave: false,
+        isAdminLike: false,
+      };
+    }
+
+    throw new ForbiddenException(
+      'Only sales, manager, or super admin roles can manage leave',
+    );
+  }
+
+  private isSalesRole(role: Pick<RoleEntity, 'label'>) {
+    return role.label.toLowerCase().includes('sales');
   }
 
   private async assertManagerOrSuperAdmin(

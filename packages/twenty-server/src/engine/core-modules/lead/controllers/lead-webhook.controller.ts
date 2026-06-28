@@ -111,6 +111,21 @@ export class LeadWebhookController {
     res.status(200).send({ data: salesUsers });
   }
 
+  @Get('sales-users/me/status')
+  async getSelfSalesUserStatus(
+    @Req() request: AuthenticatedRequest,
+    @Res() res: Response,
+  ) {
+    const workspaceId = this.getWorkspaceIdOrThrow(request);
+
+    const salesUserStatus = await this.leadWebhookService.getSelfSalesUserStatus(
+      workspaceId,
+      request,
+    );
+
+    res.status(200).send({ data: salesUserStatus });
+  }
+
   @Patch('sales-users/:workspaceMemberId/availability')
   async updateSalesAvailability(
     @Param('workspaceMemberId') workspaceMemberId: string,

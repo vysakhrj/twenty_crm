@@ -12,6 +12,7 @@ import { Trans, useLingui } from '@lingui/react/macro';
 import { useRecoilValue } from 'recoil';
 
 import { useCurrentUserRole } from '@/auth/hooks/useCurrentUserRole';
+import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { currentWorkspaceMembersState } from '@/auth/states/currentWorkspaceMembersState';
 import { computeProgressText } from '@/action-menu/utils/computeProgressText';
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
@@ -30,6 +31,11 @@ import {
   getLeadCustomerRelationInfo,
 } from '@/ui/layout/simple-view/utils/simple-record-list-filter.utils';
 import { useSimpleRecordListExport } from '@/ui/layout/simple-view/hooks/useSimpleRecordListExport';
+import {
+  getLeadExportAssigneeName,
+  getSimpleRecordListExportTitle,
+  getWorkspaceMemberDisplayName,
+} from '@/ui/layout/simple-view/utils/simple-record-list-export.utils';
 import { useHasPermissionFlag } from '@/settings/roles/hooks/useHasPermissionFlag';
 import { Table } from '@/ui/layout/table/components/Table';
 import { TableBody } from '@/ui/layout/table/components/TableBody';
@@ -347,10 +353,6 @@ const StyledLoadingSentinel = styled.div`
   text-align: center;
 `;
 
-const getWorkspaceMemberDisplayName = (workspaceMember: {
-  name: { firstName?: string | null; lastName?: string | null };
-}) => `${workspaceMember.name.firstName ?? ''} ${workspaceMember.name.lastName ?? ''}`.trim();
-
 export const SimpleRecordListPage = ({
   objectNameSingular,
 }: {
@@ -360,6 +362,7 @@ export const SimpleRecordListPage = ({
   const { t } = useLingui();
   const { isAdmin } = useCurrentUserRole();
   const canExportRecords = useHasPermissionFlag(PermissionFlagType.EXPORT_CSV);
+  const currentWorkspaceMember = useRecoilValue(currentWorkspaceMemberState);
   const workspaceMembers = useRecoilValue(currentWorkspaceMembersState);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAssigneeId, setSelectedAssigneeId] = useState('all');
@@ -475,6 +478,28 @@ export const SimpleRecordListPage = ({
     [workspaceMembers],
   );
 
+  const exportTitle = useMemo(
+    () =>
+      getSimpleRecordListExportTitle({
+        assigneeName: getLeadExportAssigneeName({
+          currentWorkspaceMember,
+          isAdminLeadList,
+          isLeadList,
+          selectedAssigneeId,
+          workspaceMembers,
+        }),
+        labelPlural: objectMetadataItem.labelPlural,
+      }),
+    [
+      currentWorkspaceMember,
+      isAdminLeadList,
+      isLeadList,
+      objectMetadataItem.labelPlural,
+      selectedAssigneeId,
+      workspaceMembers,
+    ],
+  );
+
   const effectiveSort = useMemo(
     () =>
       columns.some((column) => column.key === sort.field)
@@ -513,6 +538,7 @@ export const SimpleRecordListPage = ({
     useSimpleRecordListExport({
       columns,
       effectiveSort,
+      exportTitle,
       filter,
       objectMetadataItem,
       orderBy,

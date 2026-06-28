@@ -68,6 +68,36 @@ export const useSalesAvailability = () => {
     useState(false);
   const [isSavingSalesLeave, setIsSavingSalesLeave] = useState(false);
 
+  const fetchSelfSalesStatus = useCallback(async () => {
+    setIsLoadingSalesStatuses(true);
+
+    try {
+      const response = await fetch(
+        `${SALES_API_BASE_URL}/sales-users/me/status`,
+        {
+          method: 'GET',
+          headers: buildAuthHeaders(),
+        },
+      );
+      const json = await parseResponseOrThrow(response);
+
+      const salesStatus: SalesUserStatusRecord | undefined = json?.data;
+
+      if (!salesStatus) {
+        return null;
+      }
+
+      setSalesStatusesByMemberId((previousStatuses) => ({
+        ...previousStatuses,
+        [salesStatus.workspaceMemberId]: salesStatus,
+      }));
+
+      return salesStatus;
+    } finally {
+      setIsLoadingSalesStatuses(false);
+    }
+  }, []);
+
   const fetchSalesUsersStatus = useCallback(async () => {
     setIsLoadingSalesStatuses(true);
 
@@ -193,6 +223,7 @@ export const useSalesAvailability = () => {
     isSavingSalesAvailability,
     isSavingSalesLeave,
     fetchSalesUsersStatus,
+    fetchSelfSalesStatus,
     updateSalesAvailability,
     updateSalesLeave,
   };

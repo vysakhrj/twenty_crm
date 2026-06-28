@@ -1,6 +1,6 @@
 import { json2csv } from 'json-2-csv';
 import { saveAs } from 'file-saver';
-import { utils, write } from 'xlsx-ugnis';
+import { utils, write, type WorkSheet } from 'xlsx-ugnis';
 
 import { type ObjectMetadataItem } from '@/object-metadata/types/ObjectMetadataItem';
 import { type ObjectRecord } from '@/object-record/types/ObjectRecord';
@@ -10,6 +10,77 @@ import {
 } from '@/ui/layout/simple-view/utils/simple-record-table.utils';
 import { formatValueForCSV } from '@/spreadsheet-import/utils/formatValueForCSV';
 import { sanitizeValueForCSVExport } from '@/spreadsheet-import/utils/sanitizeValueForCSVExport';
+
+type WorkspaceMemberName = {
+  name: { firstName?: string | null; lastName?: string | null };
+};
+
+export const getWorkspaceMemberDisplayName = (
+  workspaceMember: WorkspaceMemberName,
+) =>
+  `${workspaceMember.name.firstName ?? ''} ${workspaceMember.name.lastName ?? ''}`.trim();
+
+export const getLeadExportAssigneeName = ({
+  currentWorkspaceMember,
+  isAdminLeadList,
+  isLeadList,
+  selectedAssigneeId,
+  workspaceMembers,
+}: {
+  currentWorkspaceMember?: (WorkspaceMemberName & { id: string }) | null;
+  isAdminLeadList: boolean;
+  isLeadList: boolean;
+  selectedAssigneeId: string;
+  workspaceMembers: (WorkspaceMemberName & { id: string })[];
+}): string | undefined => {
+  if (!isLeadList) {
+    return undefined;
+  }
+
+  if (isAdminLeadList && selectedAssigneeId !== 'all') {
+    const selectedMember = workspaceMembers.find(
+      (workspaceMember) => workspaceMember.id === selectedAssigneeId,
+    );
+
+    if (!selectedMember) {
+      return undefined;
+    }
+
+    const selectedMemberName = getWorkspaceMemberDisplayName(selectedMember);
+
+    return selectedMemberName.length > 0 ? selectedMemberName : undefined;
+  }
+
+  if (!isAdminLeadList && currentWorkspaceMember) {
+    const currentMemberName = getWorkspaceMemberDisplayName(
+      currentWorkspaceMember,
+    );
+
+    return currentMemberName.length > 0 ? currentMemberName : undefined;
+  }
+
+  return undefined;
+};
+
+export const getSimpleRecordListExportTitle = ({
+  assigneeName,
+  labelPlural,
+}: {
+  assigneeName?: string;
+  labelPlural: string;
+}) => (assigneeName ? `${labelPlural} - ${assigneeName}` : labelPlural);
+
+export const getSimpleRecordListExportFilename = ({
+  baseName,
+  extension,
+}: {
+  baseName: string;
+  extension: string;
+}) => {
+  const sanitizedBaseName = baseName.trim().replace(/[/\\?%*:|"<>]/g, '-');
+
+  return `${sanitizedBaseName}.${extension}`;
+};
 
 export const buildSimpleRecordListExportRows = (
   records: ObjectRecord[],
@@ -47,6 +118,38 @@ const sanitizeExportRows = (
 
     return sanitizedRow;
   });
+
+const formatWorksheetCellsAsText = (worksheet: WorkSheet) => {
+  const reference = worksheet['!ref'];
+
+  if (!reference) {
+    return;
+  }
+
+  const range = utils.decode_range(reference);
+
+  for (let rowIndex = range.s.r; rowIndex <= range.e.r; rowIndex++) {
+    for (
+      let columnIndex = range.s.c;
+      columnIndex <= range.e.c;
+      columnIndex++
+    ) {
+      const cellAddress = utils.encode_cell({
+        r: rowIndex,
+        c: columnIndex,
+      });
+      const cell = worksheet[cellAddress];
+
+      if (!cell || cell.v === undefined || cell.v === null) {
+        continue;
+      }
+
+      cell.t = 's';
+      cell.v = String(cell.v);
+      delete cell.w;
+    }
+  }
+};
 
 export const downloadSimpleRecordListCsv = ({
   columns,
@@ -88,13 +191,13 @@ export const downloadSimpleRecordListExcel = ({
     return;
   }
 
-  const sanitizedRows = sanitizeExportRows(rows, columns);
   const headers = columns.map((column) => column.label);
-  const dataRows = sanitizedRows.map((row) =>
+  const dataRows = rows.map((row) =>
     columns.map((column) => row[column.label] ?? ''),
   );
 
   const worksheet = utils.aoa_to_sheet([headers, ...dataRows]);
+  formatWorksheetCellsAsText(worksheet);
   const workbook = utils.book_new();
 
   utils.book_append_sheet(workbook, worksheet, 'Export');

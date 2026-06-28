@@ -5,6 +5,7 @@ import { type FieldMetadata } from '@/object-record/record-field/ui/types/FieldM
 import { getFieldButtonIcon } from '@/object-record/record-field/ui/utils/getFieldButtonIcon';
 import { FieldMetadataType } from 'twenty-shared/types';
 import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
+import { isAutoManagedFieldReadOnly } from '@/object-record/utils/isAutoManagedFieldReadOnly';
 
 export type FieldMetadataItemAsFieldDefinitionProps = {
   field: FieldMetadataItem;
@@ -49,7 +50,8 @@ export const formatFieldMetadataItemAsFieldDefinition = ({
     settings: field.settings,
     isNullable: field.isNullable,
     isCustom: field.isCustom ?? false,
-    isUIReadOnly: field.isUIReadOnly ?? false,
+    isUIReadOnly:
+      (field.isUIReadOnly ?? false) || isAutoManagedFieldReadOnly(field.name),
   };
 
   return {

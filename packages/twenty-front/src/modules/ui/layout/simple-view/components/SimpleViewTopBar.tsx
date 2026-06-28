@@ -1,18 +1,20 @@
 import styled from '@emotion/styled';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 
+import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
 import { useNotifications } from '@/notifications/hooks/useNotifications';
 import { showNotificationCenterState } from '@/notifications/states/notificationsState';
 import { isSimpleViewDrawerOpenState } from '@/ui/layout/simple-view/states/isSimpleViewDrawerOpenState';
-import { IconBell, IconList } from 'twenty-ui/display';
+import { DEFAULT_WORKSPACE_LOGO } from '@/ui/navigation/navigation-drawer/constants/DefaultWorkspaceLogo';
+import { Avatar, IconBell, IconList } from 'twenty-ui/display';
 
 const StyledTopBar = styled.div`
   align-items: center;
   background: ${({ theme }) => theme.background.primary};
   border-bottom: 1px solid ${({ theme }) => theme.border.color.medium};
   display: flex;
-  height: ${({ theme }) => theme.spacing(12)};
-  padding: 0 ${({ theme }) => theme.spacing(3)};
+  height: ${({ theme }) => theme.spacing(14)};
+  padding: 0 ${({ theme }) => theme.spacing(4)};
   flex-shrink: 0;
 `;
 
@@ -24,10 +26,10 @@ const StyledHamburgerButton = styled.button`
   color: ${({ theme }) => theme.font.color.primary};
   cursor: pointer;
   display: flex;
-  height: ${({ theme }) => theme.spacing(8)};
+  height: ${({ theme }) => theme.spacing(10)};
   justify-content: center;
   padding: 0;
-  width: ${({ theme }) => theme.spacing(8)};
+  width: ${({ theme }) => theme.spacing(10)};
 
   &:hover {
     background: ${({ theme }) => theme.background.transparent.light};
@@ -35,11 +37,21 @@ const StyledHamburgerButton = styled.button`
 `;
 
 const StyledTitle = styled.div`
+  align-items: center;
   color: ${({ theme }) => theme.font.color.primary};
+  display: flex;
   flex: 1;
-  font-size: ${({ theme }) => theme.font.size.md};
+  font-size: ${({ theme }) => theme.font.size.lg};
   font-weight: ${({ theme }) => theme.font.weight.semiBold};
-  text-align: center;
+  gap: ${({ theme }) => theme.spacing(2.5)};
+  justify-content: center;
+  min-width: 0;
+`;
+
+const StyledTitleText = styled.span`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 const StyledNotificationButton = styled.button<{ hasUnread: boolean }>`
@@ -50,11 +62,11 @@ const StyledNotificationButton = styled.button<{ hasUnread: boolean }>`
   color: ${({ theme }) => theme.font.color.primary};
   cursor: pointer;
   display: flex;
-  height: ${({ theme }) => theme.spacing(8)};
+  height: ${({ theme }) => theme.spacing(10)};
   justify-content: center;
   padding: 0;
   position: relative;
-  width: ${({ theme }) => theme.spacing(8)};
+  width: ${({ theme }) => theme.spacing(10)};
 
   &:hover {
     background: ${({ theme }) => theme.background.transparent.light};
@@ -74,6 +86,7 @@ const StyledNotificationButton = styled.button<{ hasUnread: boolean }>`
 `;
 
 export const SimpleViewTopBar = ({ title }: { title: string }) => {
+  const currentWorkspace = useRecoilValue(currentWorkspaceState);
   const setIsDrawerOpen = useSetRecoilState(isSimpleViewDrawerOpenState);
   const setShowNotificationCenter = useSetRecoilState(
     showNotificationCenterState,
@@ -83,15 +96,22 @@ export const SimpleViewTopBar = ({ title }: { title: string }) => {
   return (
     <StyledTopBar>
       <StyledHamburgerButton onClick={() => setIsDrawerOpen(true)}>
-        <IconList size={20} />
+        <IconList size={24} />
       </StyledHamburgerButton>
-      <StyledTitle>{title}</StyledTitle>
+      <StyledTitle>
+        <Avatar
+          size="md"
+          placeholder={currentWorkspace?.displayName ?? title}
+          avatarUrl={currentWorkspace?.logo ?? DEFAULT_WORKSPACE_LOGO}
+        />
+        <StyledTitleText>{title}</StyledTitleText>
+      </StyledTitle>
       <StyledNotificationButton
         onClick={() => setShowNotificationCenter(true)}
         hasUnread={unreadCount > 0}
         aria-label="Notifications"
       >
-        <IconBell size={20} />
+        <IconBell size={24} />
       </StyledNotificationButton>
     </StyledTopBar>
   );

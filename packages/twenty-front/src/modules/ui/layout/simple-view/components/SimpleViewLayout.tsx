@@ -1,7 +1,10 @@
 import styled from '@emotion/styled';
 import { useLingui } from '@lingui/react/macro';
 import { Outlet, useLocation } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
+import { isNonEmptyString } from '@sniptt/guards';
 
+import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
 import { SimpleViewSideDrawer } from '@/ui/layout/simple-view/components/SimpleViewSideDrawer';
 import { SimpleViewTopBar } from '@/ui/layout/simple-view/components/SimpleViewTopBar';
 
@@ -31,9 +34,14 @@ const StyledMainContent = styled.div`
 export const SimpleViewLayout = ({ title }: { title?: string }) => {
   const { t } = useLingui();
   const location = useLocation();
+  const currentWorkspace = useRecoilValue(currentWorkspaceState);
   const computedTitle =
     title ??
-    (location.pathname === '/simple/settings' ? t`Settings` : t`CRM`);
+    (location.pathname === '/simple/settings'
+      ? t`Settings`
+      : isNonEmptyString(currentWorkspace?.displayName)
+        ? currentWorkspace.displayName
+        : t`CRM`);
 
   return (
     <StyledLayout>

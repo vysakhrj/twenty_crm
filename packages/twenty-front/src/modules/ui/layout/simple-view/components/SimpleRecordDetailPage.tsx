@@ -15,6 +15,7 @@ import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadata
 import { useGenerateDepthRecordGqlFieldsFromObject } from '@/object-record/graphql/record-gql-fields/hooks/useGenerateDepthRecordGqlFieldsFromObject';
 import { useFindOneRecord } from '@/object-record/hooks/useFindOneRecord';
 import { useUpdateOneRecord } from '@/object-record/hooks/useUpdateOneRecord';
+import { isAutoManagedFieldReadOnly } from '@/object-record/utils/isAutoManagedFieldReadOnly';
 import {
   BasicInfoIcons,
   SimpleRecordDetailBasicInfo,
@@ -289,8 +290,6 @@ const SYSTEM_FIELD_NAMES = new Set([
 ]);
 
 const PRIORITY_FIELD_NAMES = new Set(['body', 'convenientTime']);
-const AUTO_MANAGED_FIELD_NAMES = new Set(['readAt']);
-
 const formatDate = (dateString: string): string => {
   const formatted =
     formatDateISOStringToUnifiedDateTime(dateString);
@@ -826,6 +825,16 @@ export const SimpleRecordDetailPage = ({
       ? getRelatedRecordDisplayName(propertyRecord)
       : null;
 
+    const originRecord =
+      typedRecord.origin &&
+      typeof typedRecord.origin === 'object' &&
+      !Array.isArray(typedRecord.origin)
+        ? (typedRecord.origin as Record<string, unknown>)
+        : undefined;
+    const originName = originRecord
+      ? getRelatedRecordDisplayName(originRecord)
+      : null;
+
     const bodyField = objectMetadataItem.fields.find(
       (field) => field.isActive && field.name === 'body',
     );
@@ -848,6 +857,9 @@ export const SimpleRecordDetailPage = ({
     }
     if (propertyName) {
       fields.push({ label: 'Property', value: propertyName });
+    }
+    if (originName) {
+      fields.push({ label: 'Origin', value: originName });
     }
     if (preference) {
       fields.push({ label: 'Preference', value: preference });
@@ -898,7 +910,7 @@ export const SimpleRecordDetailPage = ({
         (field.type === FieldMetadataType.DATE ||
           field.type === FieldMetadataType.DATE_TIME) &&
         field.name !== followUpField?.name &&
-        !AUTO_MANAGED_FIELD_NAMES.has(field.name) &&
+        !isAutoManagedFieldReadOnly(field.name) &&
         !SYSTEM_FIELD_NAMES.has(field.name),
     );
   }, [objectMetadataItem.fields, followUpField?.name]);

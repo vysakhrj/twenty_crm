@@ -5,6 +5,7 @@ import { SetOrChangePassword } from '@/settings/profile/components/SetOrChangePa
 import { DeleteAccount } from '@/settings/profile/components/DeleteAccount';
 import { EmailField } from '@/settings/profile/components/EmailField';
 import { NameFields } from '@/settings/profile/components/NameFields';
+import { ProfileSalesLeaveSection } from '@/settings/profile/components/ProfileSalesLeaveSection';
 import { WorkspaceMemberPictureUploader } from '@/settings/workspace-member/components/WorkspaceMemberPictureUploader';
 import { useCanChangePassword } from '@/settings/profile/hooks/useCanChangePassword';
 import { useCurrentUserWorkspaceTwoFactorAuthentication } from '@/settings/two-factor-authentication/hooks/useCurrentUserWorkspaceTwoFactorAuthentication';
@@ -66,6 +67,7 @@ export const SettingsProfile = () => {
           />
           <EmailField />
         </Section>
+        <ProfileSalesLeaveSection />
         <Section>
           <H2Title
             title={t`Two Factor Authentication`}
