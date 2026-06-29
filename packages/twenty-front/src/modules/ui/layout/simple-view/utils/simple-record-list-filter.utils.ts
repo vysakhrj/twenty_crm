@@ -208,6 +208,22 @@ export const buildLeadSearchFilter = ({
   } as RecordGqlOperationFilter;
 };
 
+export type LeadReadStatusFilter = 'all' | 'read' | 'unread';
+
+export const buildReadAtFilter = (
+  readStatus: LeadReadStatusFilter,
+): RecordGqlOperationFilter | undefined => {
+  if (readStatus === 'all') {
+    return undefined;
+  }
+
+  return {
+    readAt: {
+      is: readStatus === 'read' ? 'NOT_NULL' : 'NULL',
+    },
+  } as RecordGqlOperationFilter;
+};
+
 export const buildCreatedAtDateFilter = ({
   dateFrom,
   dateTo,
@@ -272,6 +288,7 @@ export const buildSimpleRecordListFilter = ({
   isAdminLeadList,
   dateFrom,
   dateTo,
+  readStatus = 'all',
 }: {
   searchTerm: string;
   labelField?: LeadListLabelField;
@@ -282,6 +299,7 @@ export const buildSimpleRecordListFilter = ({
   isAdminLeadList: boolean;
   dateFrom?: string;
   dateTo?: string;
+  readStatus?: LeadReadStatusFilter;
 }): RecordGqlOperationFilter | undefined => {
   const filterConditions: RecordGqlOperationFilter[] = [];
 
@@ -316,6 +334,12 @@ export const buildSimpleRecordListFilter = ({
 
     if (isDefined(dateFilter)) {
       filterConditions.push(dateFilter);
+    }
+
+    const readAtFilter = buildReadAtFilter(readStatus);
+
+    if (isDefined(readAtFilter)) {
+      filterConditions.push(readAtFilter);
     }
   }
 

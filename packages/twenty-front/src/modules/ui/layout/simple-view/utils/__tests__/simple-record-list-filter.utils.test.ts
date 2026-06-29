@@ -4,6 +4,7 @@ import {
   buildContactSearchFilter,
   buildCreatedAtDateFilter,
   buildLeadSearchFilter,
+  buildReadAtFilter,
   buildSimpleRecordListFilter,
   getLeadCustomerRelationInfo,
 } from '@/ui/layout/simple-view/utils/simple-record-list-filter.utils';
@@ -119,7 +120,17 @@ describe('simple-record-list-filter.utils', () => {
     });
   });
 
-  it('combines lead search, date, and assignee filters', () => {
+  it('builds readAt filters for read and unread leads', () => {
+    expect(buildReadAtFilter('all')).toBeUndefined();
+    expect(buildReadAtFilter('read')).toEqual({
+      readAt: { is: 'NOT_NULL' },
+    });
+    expect(buildReadAtFilter('unread')).toEqual({
+      readAt: { is: 'NULL' },
+    });
+  });
+
+  it('combines lead search, date, assignee, and read status filters', () => {
     expect(
       buildSimpleRecordListFilter({
         searchTerm: 'john',
@@ -137,6 +148,7 @@ describe('simple-record-list-filter.utils', () => {
         isAdminLeadList: true,
         dateFrom: '2024-01-01',
         dateTo: '2024-01-31',
+        readStatus: 'unread',
       }),
     ).toEqual({
       and: [
@@ -152,6 +164,7 @@ describe('simple-record-list-filter.utils', () => {
             { createdAt: { lte: '2024-01-31T23:59:59.999Z' } },
           ],
         },
+        { readAt: { is: 'NULL' } },
         { assigneeId: { eq: 'assignee-1' } },
       ],
     });

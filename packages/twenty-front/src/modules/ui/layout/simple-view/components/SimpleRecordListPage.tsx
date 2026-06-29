@@ -29,6 +29,7 @@ import {
   buildContactSearchFilter,
   buildSimpleRecordListFilter,
   getLeadCustomerRelationInfo,
+  type LeadReadStatusFilter,
 } from '@/ui/layout/simple-view/utils/simple-record-list-filter.utils';
 import { useSimpleRecordListExport } from '@/ui/layout/simple-view/hooks/useSimpleRecordListExport';
 import {
@@ -368,6 +369,7 @@ export const SimpleRecordListPage = ({
   const [selectedAssigneeId, setSelectedAssigneeId] = useState('all');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  const [readStatus, setReadStatus] = useState<LeadReadStatusFilter>('all');
   const [sort, setSort] = useState<SimpleRecordListSort>({
     direction: 'asc',
     field: 'name',
@@ -443,6 +445,7 @@ export const SimpleRecordListPage = ({
         isAdminLeadList,
         dateFrom,
         dateTo,
+        readStatus,
       }),
     [
       customerRelationInfo,
@@ -453,6 +456,7 @@ export const SimpleRecordListPage = ({
       isLeadList,
       labelField,
       matchingCustomerIds,
+      readStatus,
       selectedAssigneeId,
     ],
   );
@@ -605,11 +609,13 @@ export const SimpleRecordListPage = ({
   const lowerCaseLabelPlural = objectMetadataItem.labelPlural.toLowerCase();
   const sortSelectId = `${objectMetadataItem.nameSingular}-simple-list-sort`;
   const assigneeFilterSelectId = `${objectMetadataItem.nameSingular}-simple-list-assignee-filter`;
+  const readStatusFilterSelectId = `${objectMetadataItem.nameSingular}-simple-list-read-status-filter`;
   const dateFromInputId = `${objectMetadataItem.nameSingular}-simple-list-date-from`;
   const dateToInputId = `${objectMetadataItem.nameSingular}-simple-list-date-to`;
   const hasActiveFilters =
     searchTerm.trim().length > 0 ||
     selectedAssigneeId !== 'all' ||
+    readStatus !== 'all' ||
     dateFrom.length > 0 ||
     dateTo.length > 0;
   const searchPlaceholder = isLeadList
@@ -725,6 +731,22 @@ export const SimpleRecordListPage = ({
             </StyledSortControl>
             {isLeadList && (
               <>
+                <StyledSortControl>
+                  <StyledSortLabel htmlFor={readStatusFilterSelectId}>
+                    <Trans>Status</Trans>
+                  </StyledSortLabel>
+                  <StyledSortSelect
+                    id={readStatusFilterSelectId}
+                    value={readStatus}
+                    onChange={(event) =>
+                      setReadStatus(event.target.value as LeadReadStatusFilter)
+                    }
+                  >
+                    <option value="all">{t`All`}</option>
+                    <option value="unread">{t`Unread`}</option>
+                    <option value="read">{t`Read`}</option>
+                  </StyledSortSelect>
+                </StyledSortControl>
                 <StyledSortControl>
                   <StyledSortLabel htmlFor={dateFromInputId}>
                     <Trans>From</Trans>
