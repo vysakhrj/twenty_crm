@@ -742,6 +742,7 @@ msgstr "Aktywuj przepływ pracy"
 #. js-lingui-id: F6pfE9
 #: src/pages/settings/SettingsProfile.tsx
 #: src/pages/settings/members/SettingsWorkspaceMembers.tsx
+#: src/modules/settings/profile/components/ProfileSalesLeaveSection.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 #: src/modules/settings/domains/components/SettingsWorkspaceDomainCard.tsx
 #: src/modules/settings/admin-panel/health-status/components/SettingsAdminQueueJobsTable.tsx
@@ -1244,6 +1245,7 @@ msgstr "Alert"
 
 #. js-lingui-id: N40H+G
 #: src/modules/views/view-picker/components/ViewPickerDropdown.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
 #: src/modules/settings/roles/role-permissions/object-level-permissions/field-permissions/components/SettingsRolePermissionsObjectLevelObjectFieldPermissionTableAllHeaderRow.tsx
 #: src/modules/settings/roles/role-permissions/object-level-permissions/components/SettingsRolePermissionsObjectLevelUpdateFieldsValueForObject.tsx
 #: src/modules/settings/roles/role-permissions/object-level-permissions/components/SettingsRolePermissionsObjectLevelSeeFieldsValueForObject.tsx
@@ -1670,6 +1672,7 @@ msgstr ""
 
 #. js-lingui-id: /q0HFa
 #: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+#: src/modules/settings/profile/components/ProfileSalesLeaveSection.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Apply leave"
 msgstr ""
@@ -2555,6 +2558,7 @@ msgstr "Wyczyść"
 
 #. js-lingui-id: kT0eae
 #: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+#: src/modules/settings/profile/components/ProfileSalesLeaveSection.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Clear leave"
 msgstr ""
@@ -6549,6 +6553,7 @@ msgstr "Za {dateDiff}"
 #. js-lingui-id: NoNwIX
 #: src/pages/settings/members/SettingsWorkspaceMembers.tsx
 #: src/pages/settings/data-model/SettingsObjectFieldTable.tsx
+#: src/modules/settings/profile/components/ProfileSalesLeaveSection.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 #: src/modules/settings/domains/components/SettingsWorkspaceDomainCard.tsx
 #: src/modules/settings/data-model/object-details/components/SettingsObjectRelationsTable.tsx
@@ -7188,6 +7193,12 @@ msgstr "Układ"
 msgid "Layouts"
 msgstr "Układy"
 
+#. js-lingui-id: Mv8CyJ
+#: src/modules/settings/profile/components/ProfileSalesLeaveSection.tsx
+#: src/modules/settings/profile/components/ProfileSalesLeaveSection.tsx
+msgid "Leave"
+msgstr ""
+
 #. js-lingui-id: 8QyoLb
 #: src/modules/settings/accounts/components/SettingsAccountsConnectionForm.tsx
 msgid "Leave blank if you don't need calendar sync."
@@ -7205,23 +7216,28 @@ msgstr "Pozostaw puste, jeśli nie potrzebujesz wysyłać e-maili."
 
 #. js-lingui-id: 1qQfQy
 #: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+#: src/modules/settings/profile/components/ProfileSalesLeaveSection.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Leave cleared"
 msgstr ""
 
 #. js-lingui-id: RoDmEO
+#: src/modules/settings/profile/components/ProfileSalesLeaveSection.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Leave dates updated"
 msgstr ""
 
 #. js-lingui-id: UjKqj6
 #: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+#: src/modules/settings/profile/components/ProfileSalesLeaveSection.tsx
+#: src/modules/settings/profile/components/ProfileSalesLeaveSection.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Leave end date"
 msgstr ""
 
 #. js-lingui-id: 79+i3R
 #: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+#: src/modules/settings/profile/components/ProfileSalesLeaveSection.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Leave end date must be after leave start date"
 msgstr ""
@@ -7233,6 +7249,8 @@ msgstr ""
 
 #. js-lingui-id: ekfMee
 #: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+#: src/modules/settings/profile/components/ProfileSalesLeaveSection.tsx
+#: src/modules/settings/profile/components/ProfileSalesLeaveSection.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Leave start date"
 msgstr ""
@@ -8849,6 +8867,7 @@ msgid "Omit zero values"
 msgstr "Pomiń wartości zerowe"
 
 #. js-lingui-id: d/+Qw7
+#: src/modules/settings/profile/components/ProfileSalesLeaveSection.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "On leave"
 msgstr ""
@@ -9633,6 +9652,7 @@ msgid "Property value"
 msgstr "Wartość właściwości"
 
 #. js-lingui-id: ZnPB5O
+#: src/modules/settings/profile/components/ProfileSalesLeaveSection.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Provide both leave start and end dates"
 msgstr ""
@@ -9742,6 +9762,11 @@ msgstr "Proporcja"
 #: src/modules/workflow/workflow-steps/workflow-actions/http-request-action/components/BodyInput.tsx
 msgid "Raw JSON"
 msgstr "Surowy JSON"
+
+#. js-lingui-id: cQlPDN
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "Read"
+msgstr ""
 
 #. js-lingui-id: 549d7o
 #: src/pages/settings/updates/SettingsUpdates.tsx
@@ -9871,6 +9896,7 @@ msgid "Refreshing sales availability..."
 msgstr ""
 
 #. js-lingui-id: vUi1Qr
+#: src/modules/settings/profile/components/ProfileSalesLeaveSection.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Refreshing status..."
 msgstr ""
@@ -11106,6 +11132,11 @@ msgstr "Skonfiguruj pole typu Wybór w {objectLabel}, aby utworzyć Kanban"
 msgid "Set your application configuration variables"
 msgstr "Ustaw zmienne konfiguracyjne aplikacji"
 
+#. js-lingui-id: JEnqCS
+#: src/modules/settings/profile/components/ProfileSalesLeaveSection.tsx
+msgid "Set your leave period. You will not be assigned new leads while on leave."
+msgstr ""
+
 #. js-lingui-id: dQsqpC
 #: src/pages/onboarding/CreateWorkspace.tsx
 msgid "Setting up your database..."
@@ -11526,6 +11557,7 @@ msgstr "Stan"
 #. js-lingui-id: uAQUqI
 #: src/pages/settings/members/SettingsWorkspaceMembers.tsx
 #: src/pages/settings/admin-panel/SettingsAdminIndicatorHealthStatus.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
 #: src/modules/ui/layout/simple-view/components/SimpleRecordDetailPage.tsx
 #: src/modules/settings/components/SettingsDnsRecordsTable.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceContent.tsx
@@ -12649,6 +12681,7 @@ msgstr ""
 
 #. js-lingui-id: CZT+vy
 #: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+#: src/modules/settings/profile/components/ProfileSalesLeaveSection.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Unable to clear leave"
 msgstr ""
@@ -12670,6 +12703,7 @@ msgstr ""
 
 #. js-lingui-id: 0e4GSb
 #: src/modules/ui/layout/simple-view/components/SimpleSettingsPage.tsx
+#: src/modules/settings/profile/components/ProfileSalesLeaveSection.tsx
 #: src/modules/settings/members/components/MemberSalesAvailabilitySection.tsx
 msgid "Unable to update leave"
 msgstr ""
@@ -12792,6 +12826,11 @@ msgstr ""
 #. js-lingui-id: 9dX/SD
 #: src/modules/advanced-text-editor/extensions/slash-command/DefaultSlashCommands.ts
 msgid "Unordered list with bullets"
+msgstr ""
+
+#. js-lingui-id: KuVpz+
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+msgid "Unread"
 msgstr ""
 
 #. js-lingui-id: wja8aL
