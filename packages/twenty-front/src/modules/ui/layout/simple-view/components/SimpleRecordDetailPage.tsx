@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { useEffect, useMemo, useRef, type ReactNode } from 'react';
+import { useMemo, useRef, type ReactNode } from 'react';
 import { useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,14 +8,15 @@ import {
   formatDateISOStringToUnifiedDate,
   formatDateISOStringToUnifiedDateTime,
 } from '@/localization/utils/formatDateISOStringToUnified';
-import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { currentWorkspaceMembersState } from '@/auth/states/currentWorkspaceMembersState';
 import { CoreObjectNameSingular } from '@/object-metadata/types/CoreObjectNameSingular';
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
 import { useGenerateDepthRecordGqlFieldsFromObject } from '@/object-record/graphql/record-gql-fields/hooks/useGenerateDepthRecordGqlFieldsFromObject';
 import { useFindOneRecord } from '@/object-record/hooks/useFindOneRecord';
+import { useMarkLeadReadAtOnView } from '@/object-record/hooks/useMarkLeadReadAtOnView';
 import { useUpdateOneRecord } from '@/object-record/hooks/useUpdateOneRecord';
 import { isAutoManagedFieldReadOnly } from '@/object-record/utils/isAutoManagedFieldReadOnly';
+import { isReadAtValueEmpty } from '@/object-record/utils/lead-read-at.utils';
 import {
   BasicInfoIcons,
   SimpleRecordDetailBasicInfo,
@@ -260,6 +261,23 @@ const StyledReadOnlyDateValue = styled.div`
   justify-content: space-between;
   padding: ${({ theme }) => theme.spacing(3)} ${({ theme }) => theme.spacing(4)};
   width: 100%;
+`;
+
+const StyledMetaCard = styled.div`
+  background: ${({ theme }) => theme.background.secondary};
+  border: 1px solid ${({ theme }) => theme.border.color.medium};
+  border-radius: ${({ theme }) => theme.border.radius.md};
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing(3)};
+  padding: ${({ theme }) => theme.spacing(3)};
+`;
+
+const StyledReadOnlyTextValue = styled.div`
+  color: ${({ theme }) => theme.font.color.primary};
+  font-family: ${({ theme }) => theme.font.family};
+  font-size: ${({ theme }) => theme.font.size.md};
+  font-weight: ${({ theme }) => theme.font.weight.medium};
 `;
 
 const CONTACT_FIELD_TYPES = new Set([
@@ -582,12 +600,12 @@ const findCustomerRecord = (
   return undefined;
 };
 
-const ASSIGNEE_FIELD_CANDIDATE_NAMES = [
+const ASSIGNEE_FIELD_CANDIDATE_NAMES = new Set([
   'assignedTo',
   'assignee',
   'owner',
   'manager',
-] as const;
+]);
 
 const getAssigneeJoinColumnId = (
   record: Record<string, unknown>,
@@ -608,9 +626,7 @@ const getAssigneeJoinColumnId = (
 
   const preferredRelationField =
     workspaceMemberRelationFields.find((field) =>
-      ASSIGNEE_FIELD_CANDIDATE_NAMES.includes(
-        field.name as (typeof ASSIGNEE_FIELD_CANDIDATE_NAMES)[number],
-      ),
+      ASSIGNEE_FIELD_CANDIDATE_NAMES.has(field.name),
     ) ?? workspaceMemberRelationFields[0];
 
   const joinColumnName = preferredRelationField.settings?.joinColumnName;
@@ -668,8 +684,6 @@ export const SimpleRecordDetailPage = ({
   const navigate = useNavigate();
   const { updateOneRecord } = useUpdateOneRecord();
   const followUpPickerInputRef = useRef<HTMLInputElement>(null);
-  const hasMarkedReadAtRef = useRef(false);
-  const currentWorkspaceMember = useRecoilValue(currentWorkspaceMemberState);
   const workspaceMembers = useRecoilValue(currentWorkspaceMembersState);
 
   const { objectMetadataItem } = useObjectMetadataItem({
@@ -688,6 +702,33 @@ export const SimpleRecordDetailPage = ({
     objectRecordId,
     recordGqlFields,
   });
+
+  useMarkLeadReadAtOnView({
+    objectNameSingular,
+    objectRecordId,
+    record,
+    objectMetadataFields: objectMetadataItem.fields,
+    isRecordLoading: loading,
+  });
+
+  const assigneeField = useMemo(
+    () =>
+      objectMetadataItem.fields.find(
+        (field) =>
+          field.isActive &&
+          field.type === FieldMetadataType.RELATION &&
+          ASSIGNEE_FIELD_CANDIDATE_NAMES.has(field.name),
+      ),
+    [objectMetadataItem.fields],
+  );
+
+  const readAtField = useMemo(
+    () =>
+      objectMetadataItem.fields.find(
+        (field) => field.isActive && field.name === 'readAt',
+      ),
+    [objectMetadataItem.fields],
+  );
 
   const primaryEmail = useMemo(() => {
     if (!record) return undefined;
@@ -883,6 +924,7 @@ export const SimpleRecordDetailPage = ({
     for (const fieldMeta of objectMetadataItem.fields) {
       if (!fieldMeta.isActive) continue;
       if (fieldMeta.type !== FieldMetadataType.RELATION) continue;
+      if (ASSIGNEE_FIELD_CANDIDATE_NAMES.has(fieldMeta.name)) continue;
       if (existingLabels.has(fieldMeta.label.toLowerCase())) continue;
       if (fieldMeta.name.toLowerCase() === 'origin') continue;
 
@@ -953,6 +995,10 @@ export const SimpleRecordDetailPage = ({
   };
 
   const handleDateChange = (fieldName: string, newValue: string) => {
+    if (isAutoManagedFieldReadOnly(fieldName)) {
+      return;
+    }
+
     const dateValue = newValue ? new Date(newValue).toISOString() : null;
     updateOneRecord({
       idToUpdate: objectRecordId,
@@ -968,87 +1014,21 @@ export const SimpleRecordDetailPage = ({
     handleDateChange(followUpField.name, newValue);
   };
 
-  useEffect(() => {
-    hasMarkedReadAtRef.current = false;
-  }, [objectNameSingular, objectRecordId]);
-
-  useEffect(() => {
-    if (
-      objectNameSingular !== 'lead' ||
-      !record ||
-      hasMarkedReadAtRef.current
-    ) {
-      return;
+  const readAtDisplayValue = useMemo(() => {
+    if (!record || !readAtField) {
+      return '-';
     }
 
-    const hasReadAtField = objectMetadataItem.fields.some(
-      (field) => field.name === 'readAt',
-    );
+    const readAtValue = record[readAtField.name];
 
-    if (!hasReadAtField) {
-      hasMarkedReadAtRef.current = true;
-      return;
+    if (isReadAtValueEmpty(readAtValue)) {
+      return '-';
     }
 
-    const typedRecord = record as Record<string, unknown>;
-    const readAt = typedRecord.readAt;
-    const normalizedReadAt =
-      typeof readAt === 'string' ? readAt.trim().toLowerCase() : readAt;
-    const isAlreadyRead =
-      normalizedReadAt !== null &&
-      normalizedReadAt !== undefined &&
-      normalizedReadAt !== '' &&
-      normalizedReadAt !== 'null' &&
-      normalizedReadAt !== 'undefined';
-
-    if (isAlreadyRead) {
-      hasMarkedReadAtRef.current = true;
-      return;
-    }
-
-    const assigneeId =
-      typeof typedRecord.assigneeId === 'string' && typedRecord.assigneeId
-        ? typedRecord.assigneeId
-        : null;
-    const assigneeRelation =
-      typedRecord.assignee &&
-      typeof typedRecord.assignee === 'object' &&
-      !Array.isArray(typedRecord.assignee)
-        ? (typedRecord.assignee as Record<string, unknown>)
-        : null;
-    const assigneeRelationId =
-      assigneeRelation && typeof assigneeRelation.id === 'string'
-        ? assigneeRelation.id
-        : null;
-    const leadAssigneeId = assigneeId ?? assigneeRelationId;
-    const currentMemberId = currentWorkspaceMember?.id ?? null;
-
-    if (
-      leadAssigneeId &&
-      currentMemberId &&
-      currentMemberId !== leadAssigneeId
-    ) {
-      hasMarkedReadAtRef.current = true;
-      return;
-    }
-
-    hasMarkedReadAtRef.current = true;
-
-    void updateOneRecord({
-      idToUpdate: objectRecordId,
-      objectNameSingular,
-      updateOneRecordInput: {
-        readAt: new Date().toISOString(),
-      },
-    });
-  }, [
-    currentWorkspaceMember,
-    objectMetadataItem.fields,
-    objectNameSingular,
-    objectRecordId,
-    record,
-    updateOneRecord,
-  ]);
+    return readAtField.type === FieldMetadataType.DATE_TIME
+      ? formatDate(String(readAtValue))
+      : formatDateOnly(String(readAtValue));
+  }, [readAtField, record]);
 
   const openFollowUpPicker = () => {
     const input = followUpPickerInputRef.current;
@@ -1304,7 +1284,8 @@ export const SimpleRecordDetailPage = ({
               <StyledDateSection key={field.id}>
                 <StyledDateLabel>{field.label}</StyledDateLabel>
                 {field.name === 'dueDate' ||
-                field.label.toLowerCase() === 'due date' ? (
+                field.label.toLowerCase() === 'due date' ||
+                isAutoManagedFieldReadOnly(field.name) ? (
                   <StyledReadOnlyDateValue>
                     <span>
                       {field.type === FieldMetadataType.DATE_TIME
@@ -1342,6 +1323,27 @@ export const SimpleRecordDetailPage = ({
           </StyledLeftColumn>
 
           <StyledRightColumn>
+            {objectNameSingular === 'lead' && isDefined(readAtField) && (
+              <StyledMetaCard>
+                {isDefined(assigneeField) && (
+                  <StyledDateSection>
+                    <StyledDateLabel>{assigneeField.label}</StyledDateLabel>
+                    <StyledReadOnlyTextValue>
+                      {assigneeName ?? <Trans>Unassigned</Trans>}
+                    </StyledReadOnlyTextValue>
+                  </StyledDateSection>
+                )}
+
+                <StyledDateSection>
+                  <StyledDateLabel>{readAtField.label}</StyledDateLabel>
+                  <StyledReadOnlyDateValue>
+                    <span>{readAtDisplayValue}</span>
+                    <IconCalendar size={20} />
+                  </StyledReadOnlyDateValue>
+                </StyledDateSection>
+              </StyledMetaCard>
+            )}
+
             <SimpleRecordDetailNotes
               objectMetadataItem={objectMetadataItem}
               objectNameSingular={objectNameSingular}

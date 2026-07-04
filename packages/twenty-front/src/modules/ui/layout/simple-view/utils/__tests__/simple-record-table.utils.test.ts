@@ -222,9 +222,8 @@ describe('simple-record-table.utils', () => {
     ).toEqual([
       'Customer Name',
       'Customer Phone',
-      'Customer Email',
       'Date',
-      'Lead Name',
+      'Origin',
     ]);
   });
 
@@ -236,8 +235,7 @@ describe('simple-record-table.utils', () => {
     ).toEqual([
       'Customer Name',
       'Customer Phone',
-      'Customer Email',
-      'Lead Name',
+      'Origin',
       'Assignee Name',
       'Date',
     ]);
@@ -267,6 +265,9 @@ describe('simple-record-table.utils', () => {
         firstName: 'Enquiry',
         lastName: '#12',
       },
+      origin: {
+        name: 'Website',
+      },
     };
 
     expect(
@@ -293,10 +294,10 @@ describe('simple-record-table.utils', () => {
     expect(
       getSimpleRecordFieldValue(
         record,
-        adminColumns.find((column) => column.key === 'name')!,
+        adminColumns.find((column) => column.key === 'originName')!,
         objectMetadataItem,
       ),
-    ).toBe('Enquiry #12');
+    ).toBe('Website');
   });
 
   it('uses customer name and contact columns for customer records', () => {
@@ -362,14 +363,13 @@ describe('simple-record-table.utils', () => {
     ).toBe('Available');
   });
 
-  it('sorts visible records by customer email and phone number', () => {
+  it('sorts visible records by customer phone number', () => {
     const records = [
       {
         __typename: 'Lead',
         id: 'record-b',
         createdAt: '2024-01-02T00:00:00.000Z',
         customer: {
-          emails: { primaryEmail: 'zoe@example.com' },
           phones: { primaryPhoneNumber: '222' },
         },
         name: { firstName: 'Zoe', lastName: 'Adams' },
@@ -379,24 +379,11 @@ describe('simple-record-table.utils', () => {
         id: 'record-a',
         createdAt: '2024-01-01T00:00:00.000Z',
         customer: {
-          emails: { primaryEmail: 'amy@example.com' },
           phones: { primaryPhoneNumber: '111' },
         },
         name: { firstName: 'Amy', lastName: 'Brown' },
       },
     ];
-
-    expect(
-      sortSimpleRecordsForList(
-        records,
-        {
-          direction: 'asc',
-          field: 'email',
-        },
-        getSimpleRecordListColumns(objectMetadataItem),
-        objectMetadataItem,
-      ).map((record) => record.id),
-    ).toEqual(['record-a', 'record-b']);
 
     expect(
       sortSimpleRecordsForList(

@@ -342,16 +342,6 @@ const getLabelField = (
     (field) => field.id === objectMetadataItem.labelIdentifierFieldMetadataId,
   );
 
-const buildLeadNameColumn = (
-  labelField: SimpleRecordListFieldMetadata | undefined,
-): SimpleRecordListColumn => ({
-  fieldName: labelField?.name,
-  fieldType: labelField?.type,
-  key: 'name',
-  label: 'Lead Name',
-  width: 'minmax(128px, 0.75fr)',
-});
-
 const LEAD_CUSTOMER_NAME_COLUMN: SimpleRecordListColumn = {
   key: 'customerName',
   label: 'Customer Name',
@@ -364,10 +354,10 @@ const LEAD_CUSTOMER_PHONE_COLUMN: SimpleRecordListColumn = {
   width: 'minmax(160px, 1fr)',
 };
 
-const LEAD_CUSTOMER_EMAIL_COLUMN: SimpleRecordListColumn = {
-  key: 'email',
-  label: 'Customer Email',
-  width: 'minmax(220px, 1.25fr)',
+const LEAD_ORIGIN_COLUMN: SimpleRecordListColumn = {
+  key: 'originName',
+  label: 'Origin',
+  width: 'minmax(180px, 1fr)',
 };
 
 const LEAD_DATE_COLUMN: SimpleRecordListColumn = {
@@ -416,8 +406,7 @@ export const getSimpleRecordListColumns = (
     return [
       LEAD_CUSTOMER_NAME_COLUMN,
       LEAD_CUSTOMER_PHONE_COLUMN,
-      LEAD_CUSTOMER_EMAIL_COLUMN,
-      buildLeadNameColumn(labelField),
+      LEAD_ORIGIN_COLUMN,
       LEAD_ASSIGNEE_NAME_COLUMN,
       LEAD_DATE_COLUMN,
     ];
@@ -427,9 +416,8 @@ export const getSimpleRecordListColumns = (
     return [
       LEAD_CUSTOMER_NAME_COLUMN,
       LEAD_CUSTOMER_PHONE_COLUMN,
-      LEAD_CUSTOMER_EMAIL_COLUMN,
       LEAD_DATE_COLUMN,
-      buildLeadNameColumn(labelField),
+      LEAD_ORIGIN_COLUMN,
     ];
   }
 
@@ -546,6 +534,13 @@ export const getSimpleRecordFieldValue = (
 
       return isRecordLike(assigneeRecord)
         ? (getRelatedRecordDisplayName(assigneeRecord) ?? '-')
+        : '-';
+    }
+    case 'originName': {
+      const originRecord = record.origin;
+
+      return isRecordLike(originRecord)
+        ? (getRelatedRecordDisplayName(originRecord) ?? '-')
         : '-';
     }
     case 'name':

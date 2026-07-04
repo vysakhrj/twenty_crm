@@ -47,26 +47,30 @@ const StyledHeader = styled.div`
 `;
 
 const StyledTitle = styled.div`
-  display: flex;
   align-items: center;
-  gap: ${({ theme }) => theme.spacing(2)};
+  color: ${({ theme }) => theme.font.color.primary};
+  display: flex;
+  flex: 1;
   font-size: ${({ theme }) => theme.font.size.lg};
   font-weight: ${({ theme }) => theme.font.weight.medium};
-  color: ${({ theme }) => theme.font.color.primary};
+  gap: ${({ theme }) => theme.spacing(2)};
+  min-width: 0;
 `;
 
 const StyledCloseButton = styled.button`
-  display: flex;
   align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: none;
   background: transparent;
+  border: none;
   border-radius: ${({ theme }) => theme.border.radius.sm};
   color: ${({ theme }) => theme.font.color.secondary};
   cursor: pointer;
+  display: flex;
+  flex-shrink: 0;
+  height: ${({ theme }) => theme.spacing(10)};
+  justify-content: center;
+  padding: 0;
   transition: all 0.2s ease;
+  width: ${({ theme }) => theme.spacing(10)};
 
   &:hover {
     background: ${({ theme }) => theme.background.transparent.light};
@@ -130,7 +134,7 @@ export const NotificationCenter = () => {
             {t`Notifications`}
           </StyledTitle>
           <StyledCloseButton onClick={handleClose} title={t`Close`}>
-            <IconX size={20} />
+            <IconX size={24} />
           </StyledCloseButton>
         </StyledHeader>
 

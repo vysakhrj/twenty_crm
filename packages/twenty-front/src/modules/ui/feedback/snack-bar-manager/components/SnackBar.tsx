@@ -81,17 +81,24 @@ const StyledHeader = styled.div`
 
 const StyledMessage = styled.div`
   color: ${({ theme }) => theme.font.color.secondary};
+  flex: 1;
   font-size: ${({ theme }) => theme.font.size.sm};
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 const StyledIcon = styled.div`
   align-items: center;
   display: flex;
+  flex-shrink: 0;
 `;
 
 const StyledActions = styled.div`
   align-items: center;
   display: flex;
+  flex-shrink: 0;
   margin-left: auto;
 `;
 
