@@ -210,6 +210,12 @@ export const buildLeadSearchFilter = ({
 
 export type LeadReadStatusFilter = 'all' | 'read' | 'unread';
 
+export const buildExcludeSoftDeletedFilter =
+  (): RecordGqlOperationFilter =>
+    ({
+      deletedAt: { is: 'NULL' },
+    }) as RecordGqlOperationFilter;
+
 export const buildReadAtFilter = (
   readStatus: LeadReadStatusFilter,
 ): RecordGqlOperationFilter | undefined => {
@@ -301,7 +307,9 @@ export const buildSimpleRecordListFilter = ({
   dateTo?: string;
   readStatus?: LeadReadStatusFilter;
 }): RecordGqlOperationFilter | undefined => {
-  const filterConditions: RecordGqlOperationFilter[] = [];
+  const filterConditions: RecordGqlOperationFilter[] = [
+    buildExcludeSoftDeletedFilter(),
+  ];
 
   if (searchTerm.trim().length > 0 && isDefined(labelField)) {
     if (isLeadList && isDefined(customerRelationInfo)) {

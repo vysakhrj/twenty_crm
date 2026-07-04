@@ -9,6 +9,11 @@ export type SimpleRecordListSort = {
   field: SimpleRecordListSortField;
 };
 
+export const DEFAULT_SIMPLE_RECORD_LIST_SORT: SimpleRecordListSort = {
+  direction: 'desc',
+  field: 'createdAt',
+};
+
 type SimpleRecordListFieldMetadata = {
   id: string;
   isActive?: boolean | null;
@@ -337,6 +342,46 @@ const getLabelField = (
     (field) => field.id === objectMetadataItem.labelIdentifierFieldMetadataId,
   );
 
+const buildLeadNameColumn = (
+  labelField: SimpleRecordListFieldMetadata | undefined,
+): SimpleRecordListColumn => ({
+  fieldName: labelField?.name,
+  fieldType: labelField?.type,
+  key: 'name',
+  label: 'Lead Name',
+  width: 'minmax(128px, 0.75fr)',
+});
+
+const LEAD_CUSTOMER_NAME_COLUMN: SimpleRecordListColumn = {
+  key: 'customerName',
+  label: 'Customer Name',
+  width: 'minmax(180px, 1fr)',
+};
+
+const LEAD_CUSTOMER_PHONE_COLUMN: SimpleRecordListColumn = {
+  key: 'phone',
+  label: 'Customer Phone',
+  width: 'minmax(160px, 1fr)',
+};
+
+const LEAD_CUSTOMER_EMAIL_COLUMN: SimpleRecordListColumn = {
+  key: 'email',
+  label: 'Customer Email',
+  width: 'minmax(220px, 1.25fr)',
+};
+
+const LEAD_DATE_COLUMN: SimpleRecordListColumn = {
+  key: 'date',
+  label: 'Date',
+  width: 'minmax(140px, 0.9fr)',
+};
+
+const LEAD_ASSIGNEE_NAME_COLUMN: SimpleRecordListColumn = {
+  key: 'assigneeName',
+  label: 'Assignee Name',
+  width: 'minmax(180px, 1fr)',
+};
+
 const isDisplayableMetadataField = (
   field: SimpleRecordListFieldMetadata,
   labelFieldId: string,
@@ -369,38 +414,22 @@ export const getSimpleRecordListColumns = (
     options?.isAdminLeadList === true
   ) {
     return [
-      nameColumn,
-      {
-        key: 'date',
-        label: 'Date',
-        width: 'minmax(140px, 0.9fr)',
-      },
-      {
-        key: 'customerName',
-        label: 'Customer Name',
-        width: 'minmax(180px, 1fr)',
-      },
-      {
-        key: 'assigneeName',
-        label: 'Assignee Name',
-        width: 'minmax(180px, 1fr)',
-      },
+      LEAD_CUSTOMER_NAME_COLUMN,
+      LEAD_CUSTOMER_PHONE_COLUMN,
+      LEAD_CUSTOMER_EMAIL_COLUMN,
+      buildLeadNameColumn(labelField),
+      LEAD_ASSIGNEE_NAME_COLUMN,
+      LEAD_DATE_COLUMN,
     ];
   }
 
   if (objectMetadataItem.nameSingular === 'lead') {
     return [
-      nameColumn,
-      {
-        key: 'email',
-        label: 'Email',
-        width: 'minmax(220px, 1.25fr)',
-      },
-      {
-        key: 'phone',
-        label: 'Phone No',
-        width: 'minmax(160px, 1fr)',
-      },
+      LEAD_CUSTOMER_NAME_COLUMN,
+      LEAD_CUSTOMER_PHONE_COLUMN,
+      LEAD_CUSTOMER_EMAIL_COLUMN,
+      LEAD_DATE_COLUMN,
+      buildLeadNameColumn(labelField),
     ];
   }
 
@@ -471,6 +500,25 @@ export const getSimpleRecordListColumns = (
     );
 
   return [nameColumn, ...metadataColumns];
+};
+
+export const getDefaultSimpleRecordListSort = (
+  objectMetadataItem: SimpleRecordListObjectMetadataItem,
+  options?: SimpleRecordListColumnOptions,
+): SimpleRecordListSort => {
+  const columns = getSimpleRecordListColumns(objectMetadataItem, options);
+  const dateColumn = columns.find(
+    (column) => column.key === 'date' || column.key === 'createdAt',
+  );
+
+  if (dateColumn !== undefined) {
+    return {
+      direction: 'desc',
+      field: dateColumn.key,
+    };
+  }
+
+  return DEFAULT_SIMPLE_RECORD_LIST_SORT;
 };
 
 export const getSimpleRecordFieldValue = (
@@ -553,30 +601,34 @@ export const sortSimpleRecordsForList = <TRecord extends ObjectRecord>(
   objectMetadataItem: SimpleRecordListObjectMetadataItem,
 ): TRecord[] =>
   [...records].sort((recordA, recordB) => {
+    const isDateSort =
+      sort.field === 'createdAt' || sort.field === 'date';
     const sortColumn = columns.find((column) => column.key === sort.field);
 
-    if (sortColumn === undefined) {
+    if (sortColumn === undefined && !isDateSort) {
       return 0;
     }
 
     const valueA =
-      (sortColumn.key === 'createdAt' || sortColumn.key === 'date') &&
-      typeof recordA.createdAt === 'string'
+      isDateSort && typeof recordA.createdAt === 'string'
         ? recordA.createdAt
-        : getSimpleRecordFieldValue(
-            recordA,
-            sortColumn,
-            objectMetadataItem,
-          ).toLocaleLowerCase();
+        : sortColumn === undefined
+          ? ''
+          : getSimpleRecordFieldValue(
+              recordA,
+              sortColumn,
+              objectMetadataItem,
+            ).toLocaleLowerCase();
     const valueB =
-      (sortColumn.key === 'createdAt' || sortColumn.key === 'date') &&
-      typeof recordB.createdAt === 'string'
+      isDateSort && typeof recordB.createdAt === 'string'
         ? recordB.createdAt
-        : getSimpleRecordFieldValue(
-            recordB,
-            sortColumn,
-            objectMetadataItem,
-          ).toLocaleLowerCase();
+        : sortColumn === undefined
+          ? ''
+          : getSimpleRecordFieldValue(
+              recordB,
+              sortColumn,
+              objectMetadataItem,
+            ).toLocaleLowerCase();
 
     if (valueA.length === 0 && valueB.length === 0) {
       return 0;

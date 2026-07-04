@@ -155,8 +155,19 @@ IMPORTANT: Use Context7 for code generation, setup or configuration steps, or li
 
 - Use **Emotion** for styling with styled-components pattern
 - Follow **Nx** workspace conventions for imports
-- Use **Lingui** for internationalization
+- Use **Lingui** for internationalization (`t\`...\`` and `<Trans>` in `twenty-front`)
 - Components should be in their own directories with tests and stories
+
+### i18n (mandatory when adding user-visible text)
+
+After adding or changing any `t\`...\``, `<Trans>`, or `msg\`...\`` string in `twenty-front`, run extract and compile, then commit the locale files in the same change:
+
+```bash
+npx nx run twenty-front:lingui:extract
+npx nx run twenty-front:lingui:compile
+```
+
+Commit `packages/twenty-front/src/locales/**/*.po` and `packages/twenty-front/src/locales/generated/**/*.ts`. Skipping extract causes production to show Lingui IDs (e.g. `KuVpz+`) instead of labels. See `.cursor/rules/translations.mdc`.
 
 ### Testing Strategy
 

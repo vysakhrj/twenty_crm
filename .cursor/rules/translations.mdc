@@ -1,290 +1,81 @@
 ---
-description: Translation guidelines for Twenty CRM
+description: Lingui i18n workflow for twenty-front — mandatory extract/compile when adding user-visible text
+globs: ["packages/twenty-front/src/**/*.{tsx,ts}", "packages/twenty-front/src/locales/**"]
 alwaysApply: false
 ---
-# Translation Guidelines
+# Translation Guidelines (Lingui)
 
-## Internationalization (i18n) Overview
+Twenty frontend uses **Lingui** (`@lingui/react/macro`), not react-i18next.
 
-### Supported Languages
-- English (en) - Primary language
-- French (fr) - Secondary language
-- German (de) - Planned
-- Spanish (es) - Planned
-- Additional languages based on community contributions
+Catalogs live in `packages/twenty-front/src/locales/` (`.po` files) and compile to `packages/twenty-front/src/locales/generated/` (`.ts`).
 
-### i18n Architecture
-- Use react-i18next for React components
-- Store translations in JSON files
-- Implement namespace-based organization
-- Support for interpolation and pluralization
+## Marking user-visible text
 
-## File Structure
+```typescript
+import { Trans, useLingui } from '@lingui/react/macro';
 
-### Translation Files
-```
-src/locales/
-├── en/                        # English translations
-│   ├── common.json           # Common UI strings
-│   ├── auth.json             # Authentication strings
-│   ├── dashboard.json        # Dashboard specific
-│   ├── forms.json            # Form labels and validation
-│   └── errors.json           # Error messages
-├── fr/                       # French translations
-│   ├── common.json
-│   ├── auth.json
-│   └── ...
-└── index.ts                  # i18n configuration
+// ✅ Template literal macro
+const { t } = useLingui();
+<Button title={t`Apply leave`} />
+
+// ✅ JSX macro
+<Trans>Status</Trans>
+
+// ❌ Plain strings in UI — never ship without Lingui
+<option value="read">Read</option>
 ```
 
-### Translation Keys
-- Use nested objects for organization
-- Follow consistent naming patterns
-- Include context in key names
-  ```json
-  {
-    "auth": {
-      "login": {
-        "title": "Sign In",
-        "email": "Email Address",
-        "password": "Password",
-        "submit": "Sign In",
-        "forgotPassword": "Forgot Password?"
-      },
-      "register": {
-        "title": "Create Account",
-        "confirmPassword": "Confirm Password"
-      }
-    }
-  }
-  ```
+Use `t\`...\`` or `<Trans>` for labels, placeholders, buttons, snackbars, empty states, aria-labels, and option text.
 
-## Translation Implementation
+## Mandatory workflow when adding or changing text
 
-### React Components
-- Use useTranslation hook
-- Specify namespaces for better organization
-- Handle loading states properly
-  ```typescript
-  // ✅ Correct
-  import { useTranslation } from 'react-i18next';
+**Every change that adds, edits, or removes user-visible copy in `twenty-front` MUST include catalog updates in the same PR/commit.**
 
-  const LoginForm = () => {
-    const { t } = useTranslation('auth');
+After editing translatable strings, run:
 
-    return (
-      <form>
-        <h1>{t('login.title')}</h1>
-        <input 
-          placeholder={t('login.email')}
-          type="email"
-        />
-        <input 
-          placeholder={t('login.password')}
-          type="password"
-        />
-        <button type="submit">
-          {t('login.submit')}
-        </button>
-      </form>
-    );
-  };
-  ```
+```bash
+npx nx run twenty-front:lingui:extract
+npx nx run twenty-front:lingui:compile
+```
 
-### Interpolation
-- Use interpolation for dynamic content
-- Pass variables through t() function
-- Keep interpolation simple and readable
-  ```typescript
-  // ✅ Correct
-  const WelcomeMessage = ({ userName }: { userName: string }) => {
-    const { t } = useTranslation('common');
-    
-    return (
-      <h1>{t('welcome.message', { name: userName })}</h1>
-    );
-  };
+Then commit the updated files:
 
-  // Translation file
-  {
-    "welcome": {
-      "message": "Welcome back, {{name}}!"
-    }
-  }
-  ```
+- `packages/twenty-front/src/locales/**/*.po`
+- `packages/twenty-front/src/locales/generated/**/*.ts`
 
-### Pluralization
-- Handle singular/plural forms correctly
-- Use count-based pluralization
-- Support different plural rules per language
-  ```typescript
-  // ✅ Correct
-  const ItemCount = ({ count }: { count: number }) => {
-    const { t } = useTranslation('common');
-    
-    return (
-      <span>{t('items.count', { count })}</span>
-    );
-  };
+### AI assistant checklist
 
-  // Translation file
-  {
-    "items": {
-      "count_one": "{{count}} item",
-      "count_other": "{{count}} items"
-    }
-  }
-  ```
+When you add or change `t\`...\``, `<Trans>`, or `msg\`...\`` in `twenty-front`:
 
-## Translation Management
+1. Run `lingui:extract` and `lingui:compile` before marking the task complete.
+2. Include the locale file changes in the same change set as the component edits.
+3. Do not consider i18n work done if only `.tsx` files changed.
 
-### Adding New Strings
-1. Add English translation first
-2. Use descriptive keys that indicate context
-3. Include comments for translators when needed
-4. Test with long translations to ensure UI flexibility
-  ```json
-  {
-    "user": {
-      "profile": {
-        // Displayed in user profile header
-        "displayName": "Display Name",
-        // Used in forms when editing profile
-        "editDisplayName": "Edit Display Name",
-        // Confirmation message after profile update
-        "updateSuccess": "Profile updated successfully"
-      }
-    }
-  }
-  ```
+### Why this is required
 
-### Translation Validation
-- Use TypeScript for translation key validation
-- Implement automated checks for missing translations
-- Validate interpolation parameters
-  ```typescript
-  // ✅ Correct - Type-safe translations
-  type TranslationKey = 
-    | 'auth.login.title'
-    | 'auth.login.email'
-    | 'auth.login.password'
-    | 'common.welcome.message';
+- `lingui:compile` runs during `nx build twenty-front`, but **extract does not**.
+- Missing catalog entries cause production to show Lingui message IDs (e.g. `KuVpz+`, `cQlPDN`) instead of labels.
+- English `msgstr` in `en.po` must be set; other locales may leave `msgstr ""` (falls back to English).
 
-  const t = (key: TranslationKey, options?: any) => {
-    // Translation implementation
-  };
-  ```
+## Commands
 
-## Best Practices
+```bash
+npx nx run twenty-front:lingui:extract   # Scan source → update .po catalogs
+npx nx run twenty-front:lingui:compile   # Compile .po → generated/*.ts
+```
 
-### Key Naming
-- Use descriptive, hierarchical keys
-- Avoid abbreviations
-- Group related translations
-- Keep keys consistent across languages
-  ```json
-  // ✅ Correct
-  {
-    "dashboard": {
-      "header": {
-        "title": "Dashboard",
-        "subtitle": "Welcome to your workspace"
-      },
-      "actions": {
-        "createNew": "Create New",
-        "refresh": "Refresh Data",
-        "export": "Export"
-      }
-    }
-  }
+Build already depends on `lingui:compile`; deploy only works if `.po` files were extracted and committed first.
 
-  // ❌ Incorrect
-  {
-    "dash_title": "Dashboard",
-    "newBtn": "New",
-    "refreshData": "Refresh"
-  }
-  ```
+## String guidelines
 
-### String Guidelines
-- Write clear, concise text
-- Use consistent terminology
-- Consider character limits for UI elements
-- Avoid concatenating translated strings
-  ```json
-  // ✅ Correct
-  {
-    "user": {
-      "status": {
-        "online": "Online",
-        "offline": "Offline",
-        "away": "Away"
-      }
-    }
-  }
+- Write clear, complete sentences — they become `msgid` values.
+- Avoid concatenating translated fragments; use interpolation instead.
+- Prefer `<Trans>` for inline markup; use `t\`...\`` for attributes and variables.
 
-  // ❌ Incorrect - Don't concatenate
-  {
-    "user": {
-      "statusPrefix": "User is ",
-      "statusOnline": "online"
-    }
-  }
-  ```
+```typescript
+// ✅ Interpolation
+t`Search ${labelPlural}...`
 
-### Context Information
-- Provide context for translators
-- Include character limits when relevant
-- Explain when/where text appears
-- Note any technical constraints
-  ```json
-  {
-    "button": {
-      // Primary action button, max 20 characters
-      "save": "Save Changes",
-      // Secondary button in modal footer
-      "cancel": "Cancel",
-      // Destructive action, should sound cautious
-      "delete": "Delete Permanently"
-    }
-  }
-  ```
-
-## Workflow
-
-### Development Process
-1. Develop features with English translations
-2. Use placeholder keys during development
-3. Finalize translation keys before feature completion
-4. Add translations to all supported languages
-5. Test with different language strings
-
-### Translation Updates
-1. Create translation tasks for new features
-2. Provide context and screenshots to translators
-3. Review translations for consistency
-4. Test UI with translated strings
-5. Update documentation when needed
-
-### Quality Assurance
-- Review translations in context
-- Test with longest expected translations
-- Verify formatting with interpolation
-- Check for cultural appropriateness
-- Ensure accessibility with screen readers
-
-## Maintenance
-
-### Regular Tasks
-- Review and update outdated translations
-- Check for unused translation keys
-- Maintain consistency across languages
-- Update translation documentation
-- Monitor for missing translations in new features
-
-### Tools and Automation
-- Use automated translation validation
-- Implement missing translation detection
-- Set up continuous integration checks
-- Maintain translation coverage reports
-- Use translation management platforms when needed
+// ❌ Concatenation
+t`Search` + ' ' + labelPlural
+```

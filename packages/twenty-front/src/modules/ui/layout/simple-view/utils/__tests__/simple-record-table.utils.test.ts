@@ -1,6 +1,7 @@
 import {
   extractSimpleRecordPrimaryEmail,
   extractSimpleRecordPrimaryPhone,
+  getDefaultSimpleRecordListSort,
   getSimpleRecordFieldValue,
   getSimpleRecordListColumns,
   getSimpleRecordDisplayName,
@@ -166,20 +167,80 @@ describe('simple-record-table.utils', () => {
     ).toEqual([{ createdAt: 'AscNullsLast' }]);
   });
 
-  it('uses contact columns for assignee lead records', () => {
+  it('defaults to date descending for admin lead lists', () => {
+    expect(
+      getDefaultSimpleRecordListSort(objectMetadataItem, {
+        isAdminLeadList: true,
+      }),
+    ).toEqual({
+      direction: 'desc',
+      field: 'date',
+    });
+  });
+
+  it('defaults to date descending for sales lead lists', () => {
+    expect(getDefaultSimpleRecordListSort(objectMetadataItem)).toEqual({
+      direction: 'desc',
+      field: 'date',
+    });
+  });
+
+  it('sorts records by date descending for sales lead lists', () => {
+    const records = [
+      {
+        __typename: 'Lead',
+        id: 'record-old',
+        createdAt: '2024-01-01T00:00:00.000Z',
+        name: { firstName: 'Amy', lastName: 'Brown' },
+      },
+      {
+        __typename: 'Lead',
+        id: 'record-new',
+        createdAt: '2024-01-02T00:00:00.000Z',
+        name: { firstName: 'Zoe', lastName: 'Adams' },
+      },
+    ];
+
+    expect(
+      sortSimpleRecordsForList(
+        records,
+        {
+          direction: 'desc',
+          field: 'date',
+        },
+        getSimpleRecordListColumns(objectMetadataItem),
+        objectMetadataItem,
+      ).map((record) => record.id),
+    ).toEqual(['record-new', 'record-old']);
+  });
+
+  it('uses customer-first columns for sales lead records', () => {
     expect(
       getSimpleRecordListColumns(objectMetadataItem).map(
         (column) => column.label,
       ),
-    ).toEqual(['Name', 'Email', 'Phone No']);
+    ).toEqual([
+      'Customer Name',
+      'Customer Phone',
+      'Customer Email',
+      'Date',
+      'Lead Name',
+    ]);
   });
 
-  it('uses admin enquiry columns for lead records', () => {
+  it('uses customer-first columns for admin lead records', () => {
     expect(
       getSimpleRecordListColumns(objectMetadataItem, {
         isAdminLeadList: true,
       }).map((column) => column.label),
-    ).toEqual(['Name', 'Date', 'Customer Name', 'Assignee Name']);
+    ).toEqual([
+      'Customer Name',
+      'Customer Phone',
+      'Customer Email',
+      'Lead Name',
+      'Assignee Name',
+      'Date',
+    ]);
   });
 
   it('formats admin enquiry column values for lead records', () => {
@@ -202,18 +263,40 @@ describe('simple-record-table.utils', () => {
         },
       },
       id: 'record-id',
-      name: 'Enquiry #12',
+      name: {
+        firstName: 'Enquiry',
+        lastName: '#12',
+      },
     };
 
     expect(
-      getSimpleRecordFieldValue(record, adminColumns[1], objectMetadataItem),
-    ).toBe('Jan 2, 2024');
-    expect(
-      getSimpleRecordFieldValue(record, adminColumns[2], objectMetadataItem),
+      getSimpleRecordFieldValue(
+        record,
+        adminColumns.find((column) => column.key === 'customerName')!,
+        objectMetadataItem,
+      ),
     ).toBe('John Doe');
     expect(
-      getSimpleRecordFieldValue(record, adminColumns[3], objectMetadataItem),
+      getSimpleRecordFieldValue(
+        record,
+        adminColumns.find((column) => column.key === 'assigneeName')!,
+        objectMetadataItem,
+      ),
     ).toBe('Agent Smith');
+    expect(
+      getSimpleRecordFieldValue(
+        record,
+        adminColumns.find((column) => column.key === 'date')!,
+        objectMetadataItem,
+      ),
+    ).toBe('Jan 2, 2024');
+    expect(
+      getSimpleRecordFieldValue(
+        record,
+        adminColumns.find((column) => column.key === 'name')!,
+        objectMetadataItem,
+      ),
+    ).toBe('Enquiry #12');
   });
 
   it('uses customer name and contact columns for customer records', () => {

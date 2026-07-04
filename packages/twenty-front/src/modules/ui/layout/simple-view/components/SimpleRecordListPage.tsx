@@ -1,43 +1,45 @@
 import styled from '@emotion/styled';
+import { Trans, useLingui } from '@lingui/react/macro';
 import {
-  useCallback,
-  useDeferredValue,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
+    useCallback,
+    useDeferredValue,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trans, useLingui } from '@lingui/react/macro';
 import { useRecoilValue } from 'recoil';
 
+import { computeProgressText } from '@/action-menu/utils/computeProgressText';
 import { useCurrentUserRole } from '@/auth/hooks/useCurrentUserRole';
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { currentWorkspaceMembersState } from '@/auth/states/currentWorkspaceMembersState';
-import { computeProgressText } from '@/action-menu/utils/computeProgressText';
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
 import { useGenerateDepthRecordGqlFieldsFromObject } from '@/object-record/graphql/record-gql-fields/hooks/useGenerateDepthRecordGqlFieldsFromObject';
 import { useFindManyRecords } from '@/object-record/hooks/useFindManyRecords';
-import {
-  getSimpleRecordFieldValue,
-  getSimpleRecordListColumns,
-  getSimpleRecordListOrderBy,
-  sortSimpleRecordsForList,
-  type SimpleRecordListSort,
-} from '@/ui/layout/simple-view/utils/simple-record-table.utils';
-import {
-  buildContactSearchFilter,
-  buildSimpleRecordListFilter,
-  getLeadCustomerRelationInfo,
-  type LeadReadStatusFilter,
-} from '@/ui/layout/simple-view/utils/simple-record-list-filter.utils';
+import { useHasPermissionFlag } from '@/settings/roles/hooks/useHasPermissionFlag';
 import { useSimpleRecordListExport } from '@/ui/layout/simple-view/hooks/useSimpleRecordListExport';
 import {
-  getLeadExportAssigneeName,
-  getSimpleRecordListExportTitle,
-  getWorkspaceMemberDisplayName,
+    getLeadExportAssigneeName,
+    getSimpleRecordListExportTitle,
+    getWorkspaceMemberDisplayName,
 } from '@/ui/layout/simple-view/utils/simple-record-list-export.utils';
-import { useHasPermissionFlag } from '@/settings/roles/hooks/useHasPermissionFlag';
+import {
+    buildContactSearchFilter,
+    buildSimpleRecordListFilter,
+    getLeadCustomerRelationInfo,
+    type LeadReadStatusFilter,
+} from '@/ui/layout/simple-view/utils/simple-record-list-filter.utils';
+import {
+    DEFAULT_SIMPLE_RECORD_LIST_SORT,
+    getDefaultSimpleRecordListSort,
+    getSimpleRecordFieldValue,
+    getSimpleRecordListColumns,
+    getSimpleRecordListOrderBy,
+    sortSimpleRecordsForList,
+    type SimpleRecordListSort,
+} from '@/ui/layout/simple-view/utils/simple-record-table.utils';
 import { Table } from '@/ui/layout/table/components/Table';
 import { TableBody } from '@/ui/layout/table/components/TableBody';
 import { TableCell } from '@/ui/layout/table/components/TableCell';
@@ -118,6 +120,8 @@ const StyledToolbar = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing(2)};
+  min-width: 0;
+  width: 100%;
 
   @container (min-width: ${TOOLBAR_STACKED_LAYOUT_MAX_WIDTH}px) {
     align-items: center;
@@ -144,12 +148,25 @@ const StyledSearchRow = styled.div`
 `;
 
 const StyledFiltersRow = styled.div`
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
   display: flex;
+  flex-shrink: 1;
   gap: ${({ theme }) => theme.spacing(2)};
+  margin-left: -${({ theme }) => theme.spacing(4)};
+  margin-right: -${({ theme }) => theme.spacing(4)};
+  min-width: 0;
+  overflow-x: auto;
+  padding-left: ${({ theme }) => theme.spacing(4)};
+  padding-right: ${({ theme }) => theme.spacing(4)};
+  scrollbar-width: none;
   width: 100%;
 
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
   @container (min-width: ${TOOLBAR_STACKED_LAYOUT_MAX_WIDTH}px) {
-    flex-shrink: 0;
     width: auto;
   }
 `;
@@ -181,16 +198,11 @@ const StyledSortControl = styled.div`
   border-radius: ${({ theme }) => theme.border.radius.pill};
   color: ${({ theme }) => theme.font.color.secondary};
   display: flex;
-  flex: 1;
+  flex-shrink: 0;
   gap: ${({ theme }) => theme.spacing(1)};
   height: ${({ theme }) => theme.spacing(8)};
-  min-width: 0;
   padding: 0 ${({ theme }) => theme.spacing(2)} 0
     ${({ theme }) => theme.spacing(3)};
-
-  @container (min-width: ${TOOLBAR_STACKED_LAYOUT_MAX_WIDTH}px) {
-    flex: 0 0 auto;
-  }
 `;
 
 const StyledSortLabel = styled.label`
@@ -205,16 +217,10 @@ const StyledSortSelect = styled.select`
   border: none;
   color: ${({ theme }) => theme.font.color.primary};
   cursor: pointer;
-  flex: 1;
   font-family: ${({ theme }) => theme.font.family};
   font-size: ${({ theme }) => theme.font.size.md};
   font-weight: ${({ theme }) => theme.font.weight.medium};
-  min-width: 0;
   outline: none;
-
-  @container (min-width: ${TOOLBAR_STACKED_LAYOUT_MAX_WIDTH}px) {
-    flex: 0 1 auto;
-  }
 
   &:focus-visible {
     border-radius: ${({ theme }) => theme.border.radius.sm};
@@ -227,11 +233,9 @@ const StyledDateInput = styled.input`
   border: none;
   color: ${({ theme }) => theme.font.color.primary};
   cursor: pointer;
-  flex: 1;
   font-family: ${({ theme }) => theme.font.family};
   font-size: ${({ theme }) => theme.font.size.md};
   font-weight: ${({ theme }) => theme.font.weight.medium};
-  min-width: 0;
   outline: none;
 
   &::-webkit-calendar-picker-indicator {
@@ -370,10 +374,9 @@ export const SimpleRecordListPage = ({
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [readStatus, setReadStatus] = useState<LeadReadStatusFilter>('all');
-  const [sort, setSort] = useState<SimpleRecordListSort>({
-    direction: 'asc',
-    field: 'name',
-  });
+  const [sort, setSort] = useState<SimpleRecordListSort>(
+    DEFAULT_SIMPLE_RECORD_LIST_SORT,
+  );
   const deferredSearchTerm = useDeferredValue(searchTerm);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -472,6 +475,15 @@ export const SimpleRecordListPage = ({
     [isAdminLeadList, objectMetadataItem],
   );
 
+  const defaultSort = useMemo(
+    () => getDefaultSimpleRecordListSort(objectMetadataItem, { isAdminLeadList }),
+    [isAdminLeadList, objectMetadataItem],
+  );
+
+  useEffect(() => {
+    setSort(defaultSort);
+  }, [defaultSort, objectNameSingular]);
+
   const assigneeOptions = useMemo(
     () =>
       [...workspaceMembers].sort((memberA, memberB) =>
@@ -504,16 +516,14 @@ export const SimpleRecordListPage = ({
     ],
   );
 
-  const effectiveSort = useMemo(
-    () =>
-      columns.some((column) => column.key === sort.field)
-        ? sort
-        : {
-            direction: 'asc' as const,
-            field: columns[0]?.key ?? 'name',
-          },
-    [columns, sort],
-  );
+  const effectiveSort = useMemo(() => {
+    const isSortFieldSupported =
+      sort.field === 'createdAt' ||
+      sort.field === 'date' ||
+      columns.some((column) => column.key === sort.field);
+
+    return isSortFieldSupported ? sort : defaultSort;
+  }, [columns, defaultSort, sort]);
 
   const orderBy = useMemo(
     () => getSimpleRecordListOrderBy(effectiveSort),

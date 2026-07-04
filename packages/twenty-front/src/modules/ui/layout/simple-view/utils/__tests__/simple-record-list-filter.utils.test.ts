@@ -3,6 +3,7 @@ import { FieldMetadataType } from 'twenty-shared/types';
 import {
   buildContactSearchFilter,
   buildCreatedAtDateFilter,
+  buildExcludeSoftDeletedFilter,
   buildLeadSearchFilter,
   buildReadAtFilter,
   buildSimpleRecordListFilter,
@@ -130,6 +131,27 @@ describe('simple-record-list-filter.utils', () => {
     });
   });
 
+  it('excludes soft-deleted records', () => {
+    expect(buildExcludeSoftDeletedFilter()).toEqual({
+      deletedAt: { is: 'NULL' },
+    });
+  });
+
+  it('always excludes soft-deleted records even without other filters', () => {
+    expect(
+      buildSimpleRecordListFilter({
+        searchTerm: '',
+        isLeadList: false,
+        customerRelationInfo: null,
+        matchingCustomerIds: [],
+        selectedAssigneeId: 'all',
+        isAdminLeadList: false,
+      }),
+    ).toEqual({
+      deletedAt: { is: 'NULL' },
+    });
+  });
+
   it('combines lead search, date, assignee, and read status filters', () => {
     expect(
       buildSimpleRecordListFilter({
@@ -152,6 +174,7 @@ describe('simple-record-list-filter.utils', () => {
       }),
     ).toEqual({
       and: [
+        { deletedAt: { is: 'NULL' } },
         {
           or: [
             { name: { ilike: '%john%' } },

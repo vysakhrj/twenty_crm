@@ -44,6 +44,12 @@ const UserForm = ({ onSubmit }: UserFormProps) => {
 };
 ```
 
+## User-visible text (i18n)
+
+All labels, buttons, placeholders, snackbars, and option text must use Lingui (`t\`...\`` or `<Trans>`).
+
+**Mandatory after adding or changing copy:** run `npx nx run twenty-front:lingui:extract` and `npx nx run twenty-front:lingui:compile`, then commit the updated `src/locales/**/*.po` and `src/locales/generated/**/*.ts` files in the same change. See `@translations` for full workflow.
+
 ## Component Design
 - **Small, focused components** - Single responsibility
 - **Composition over inheritance** - Combine simple components

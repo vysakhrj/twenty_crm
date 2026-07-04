@@ -187,12 +187,12 @@ msgid "{appName} wants to access your account"
 msgstr "{appName} хоче отримати доступ до вашого облікового запису"
 
 #. js-lingui-id: +lbvIY
-#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListFilters.tsx
 msgid "{columnLabel} ascending"
 msgstr ""
 
 #. js-lingui-id: CQ3u3s
-#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListFilters.tsx
 msgid "{columnLabel} descending"
 msgstr ""
 
@@ -1245,7 +1245,7 @@ msgstr "Попередження"
 
 #. js-lingui-id: N40H+G
 #: src/modules/views/view-picker/components/ViewPickerDropdown.tsx
-#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListFilters.tsx
 #: src/modules/settings/roles/role-permissions/object-level-permissions/field-permissions/components/SettingsRolePermissionsObjectLevelObjectFieldPermissionTableAllHeaderRow.tsx
 #: src/modules/settings/roles/role-permissions/object-level-permissions/components/SettingsRolePermissionsObjectLevelUpdateFieldsValueForObject.tsx
 #: src/modules/settings/roles/role-permissions/object-level-permissions/components/SettingsRolePermissionsObjectLevelSeeFieldsValueForObject.tsx
@@ -1268,7 +1268,7 @@ msgid "All Actions Access"
 msgstr "Доступ до всіх дій"
 
 #. js-lingui-id: Yah+aZ
-#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListFilters.tsx
 msgid "All assignees"
 msgstr ""
 
@@ -1829,7 +1829,7 @@ msgid "Assigned to"
 msgstr "Призначено"
 
 #. js-lingui-id: ojKCLU
-#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListFilters.tsx
 msgid "Assignee"
 msgstr ""
 
@@ -5793,6 +5793,7 @@ msgid "Filtered"
 msgstr ""
 
 #. js-lingui-id: cSev+j
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListFilters.tsx
 #: src/modules/settings/developers/components/SettingsDevelopersWebhookForm.tsx
 msgid "Filters"
 msgstr "Фільтри"
@@ -5931,7 +5932,7 @@ msgid "Fri"
 msgstr ""
 
 #. js-lingui-id: ejVYRQ
-#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListFilters.tsx
 msgid "From"
 msgstr ""
 
@@ -9764,7 +9765,7 @@ msgid "Raw JSON"
 msgstr "Сирий JSON"
 
 #. js-lingui-id: cQlPDN
-#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListFilters.tsx
 msgid "Read"
 msgstr ""
 
@@ -11433,7 +11434,7 @@ msgstr "Вибачте, щось пішло не так"
 
 #. js-lingui-id: f6Hub0
 #: src/modules/workflow/workflow-steps/workflow-actions/find-records-action/components/WorkflowEditActionFindRecords.tsx
-#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListFilters.tsx
 #: src/modules/object-record/record-table/record-table-header/components/RecordTableColumnHeadDropdownMenu.tsx
 #: src/modules/object-record/object-sort-dropdown/components/ObjectSortDropdownButton.tsx
 #: src/modules/object-record/object-sort-dropdown/components/ObjectSortDropdownButton.tsx
@@ -11557,7 +11558,7 @@ msgstr "Стан"
 #. js-lingui-id: uAQUqI
 #: src/pages/settings/members/SettingsWorkspaceMembers.tsx
 #: src/pages/settings/admin-panel/SettingsAdminIndicatorHealthStatus.tsx
-#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListFilters.tsx
 #: src/modules/ui/layout/simple-view/components/SimpleRecordDetailPage.tsx
 #: src/modules/settings/components/SettingsDnsRecordsTable.tsx
 #: src/modules/settings/admin-panel/components/SettingsAdminWorkspaceContent.tsx
@@ -12378,7 +12379,7 @@ msgid "title"
 msgstr "заголовок"
 
 #. js-lingui-id: /jQctM
-#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListFilters.tsx
 msgid "To"
 msgstr ""
 
@@ -12831,7 +12832,7 @@ msgid "Unordered list with bullets"
 msgstr ""
 
 #. js-lingui-id: KuVpz+
-#: src/modules/ui/layout/simple-view/components/SimpleRecordListPage.tsx
+#: src/modules/ui/layout/simple-view/components/SimpleRecordListFilters.tsx
 msgid "Unread"
 msgstr ""
 

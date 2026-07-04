@@ -28,7 +28,7 @@ This directory contains Twenty's development guidelines and best practices in th
 - **testing-guidelines.mdc** - Testing strategies and best practices (Auto-attached to test files)
 
 ### Internationalization
-- **translations.mdc** - Translation workflow and i18n setup (Auto-attached to locale files)
+- **translations.mdc** - Lingui i18n workflow; mandatory extract/compile when adding user-visible text (Auto-attached to `twenty-front` source and locale files)
 
 ## How Rules Work
 
@@ -63,6 +63,10 @@ npx nx lint:diff-with-main twenty-front --configuration=fix  # Auto-fix changed 
 npx nx lint twenty-front                    # Lint all files (slower)
 npx nx typecheck twenty-front               # Type checking
 npx nx run twenty-front:graphql:generate    # Generate GraphQL types
+
+# i18n (required after adding/changing t`...` or <Trans> strings)
+npx nx run twenty-front:lingui:extract      # Update .po catalogs from source
+npx nx run twenty-front:lingui:compile      # Compile catalogs for build/deploy
 ```
 
 ### Backend Commands
