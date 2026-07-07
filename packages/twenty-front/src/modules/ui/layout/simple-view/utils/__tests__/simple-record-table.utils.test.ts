@@ -214,30 +214,30 @@ describe('simple-record-table.utils', () => {
     ).toEqual(['record-new', 'record-old']);
   });
 
-  it('uses customer-first columns for sales lead records', () => {
+  it('uses date-first columns for sales lead records', () => {
     expect(
       getSimpleRecordListColumns(objectMetadataItem).map(
         (column) => column.label,
       ),
     ).toEqual([
+      'Date',
       'Customer Name',
       'Customer Phone',
-      'Date',
       'Origin',
     ]);
   });
 
-  it('uses customer-first columns for admin lead records', () => {
+  it('uses date-first columns for admin lead records', () => {
     expect(
       getSimpleRecordListColumns(objectMetadataItem, {
         isAdminLeadList: true,
       }).map((column) => column.label),
     ).toEqual([
+      'Date',
       'Customer Name',
       'Customer Phone',
       'Origin',
       'Assignee Name',
-      'Date',
     ]);
   });
 

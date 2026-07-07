@@ -404,19 +404,19 @@ export const getSimpleRecordListColumns = (
     options?.isAdminLeadList === true
   ) {
     return [
+      LEAD_DATE_COLUMN,
       LEAD_CUSTOMER_NAME_COLUMN,
       LEAD_CUSTOMER_PHONE_COLUMN,
       LEAD_ORIGIN_COLUMN,
       LEAD_ASSIGNEE_NAME_COLUMN,
-      LEAD_DATE_COLUMN,
     ];
   }
 
   if (objectMetadataItem.nameSingular === 'lead') {
     return [
+      LEAD_DATE_COLUMN,
       LEAD_CUSTOMER_NAME_COLUMN,
       LEAD_CUSTOMER_PHONE_COLUMN,
-      LEAD_DATE_COLUMN,
       LEAD_ORIGIN_COLUMN,
     ];
   }

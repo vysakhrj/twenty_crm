@@ -24045,6 +24045,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/compression@npm:^1.7.5":
+  version: 1.8.1
+  resolution: "@types/compression@npm:1.8.1"
+  dependencies:
+    "@types/express": "npm:*"
+    "@types/node": "npm:*"
+  checksum: 10c0/3b958b1c9b7cdf9852cd8fbd85fb9067196656fb771aaed950b1ae6ebab5e87d2f7b75260160c772038919a12c8ca8bee42aaa3fdb989b0646163979d75fe8b2
+  languageName: node
+  linkType: hard
+
 "@types/concat-stream@npm:^2.0.0":
   version: 2.0.3
   resolution: "@types/concat-stream@npm:2.0.3"
@@ -31731,6 +31741,30 @@ __metadata:
     normalize-path: "npm:^3.0.0"
     readable-stream: "npm:^4.0.0"
   checksum: 10c0/2347031b7c92c8ed5011b07b93ec53b298fa2cd1800897532ac4d4d1aeae06567883f481b6e35f13b65fc31b190c751df6635434d525562f0203fde76f1f0814
+  languageName: node
+  linkType: hard
+
+"compressible@npm:~2.0.18":
+  version: 2.0.18
+  resolution: "compressible@npm:2.0.18"
+  dependencies:
+    mime-db: "npm:>= 1.43.0 < 2"
+  checksum: 10c0/8a03712bc9f5b9fe530cc5a79e164e665550d5171a64575d7dcf3e0395d7b4afa2d79ab176c61b5b596e28228b350dd07c1a2a6ead12fd81d1b6cd632af2fef7
+  languageName: node
+  linkType: hard
+
+"compression@npm:^1.7.4":
+  version: 1.8.1
+  resolution: "compression@npm:1.8.1"
+  dependencies:
+    bytes: "npm:3.1.2"
+    compressible: "npm:~2.0.18"
+    debug: "npm:2.6.9"
+    negotiator: "npm:~0.6.4"
+    on-headers: "npm:~1.1.0"
+    safe-buffer: "npm:5.2.1"
+    vary: "npm:~1.1.2"
+  checksum: 10c0/85114b0b91c16594dc8c671cd9b05ef5e465066a60e5a4ed8b4551661303559a896ed17bb72c4234c04064e078f6ca86a34b8690349499a43f6fc4b844475da4
   languageName: node
   linkType: hard
 
@@ -46677,7 +46711,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mime-db@npm:^1.28.0, mime-db@npm:^1.52.0, mime-db@npm:^1.54.0":
+"mime-db@npm:>= 1.43.0 < 2, mime-db@npm:^1.28.0, mime-db@npm:^1.52.0, mime-db@npm:^1.54.0":
   version: 1.54.0
   resolution: "mime-db@npm:1.54.0"
   checksum: 10c0/8d907917bc2a90fa2df842cdf5dfeaf509adc15fe0531e07bb2f6ab15992416479015828d6a74200041c492e42cce3ebf78e5ce714388a0a538ea9c53eece284
@@ -47481,6 +47515,13 @@ __metadata:
   version: 1.0.0
   resolution: "negotiator@npm:1.0.0"
   checksum: 10c0/4c559dd52669ea48e1914f9d634227c561221dd54734070791f999c52ed0ff36e437b2e07d5c1f6e32909fc625fe46491c16e4a8f0572567d4dd15c3a4fda04b
+  languageName: node
+  linkType: hard
+
+"negotiator@npm:~0.6.4":
+  version: 0.6.4
+  resolution: "negotiator@npm:0.6.4"
+  checksum: 10c0/3e677139c7fb7628a6f36335bf11a885a62c21d5390204590a1a214a5631fcbe5ea74ef6a610b60afe84b4d975cbe0566a23f20ee17c77c73e74b80032108dea
   languageName: node
   linkType: hard
 
@@ -58212,6 +58253,7 @@ __metadata:
     "@sniptt/guards": "npm:0.2.0"
     "@types/babel__preset-env": "npm:7.10.0"
     "@types/bytes": "npm:^3.1.1"
+    "@types/compression": "npm:^1.7.5"
     "@types/dompurify": "npm:^3.0.5"
     "@types/express": "npm:^4.17.13"
     "@types/express-session": "npm:^1.18.0"
@@ -58258,6 +58300,7 @@ __metadata:
     class-validator: "npm:0.14.0"
     class-validator-jsonschema: "npm:^5.0.2"
     cloudflare: "npm:^4.5.0"
+    compression: "npm:^1.7.4"
     connect-redis: "npm:^7.1.1"
     cron-parser: "npm:5.1.1"
     dataloader: "npm:2.2.2"
