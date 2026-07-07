@@ -11,16 +11,17 @@ import { SimpleViewObjectConfig } from '@/ui/layout/simple-view/components/Simpl
 import { isSimpleViewDrawerOpenState } from '@/ui/layout/simple-view/states/isSimpleViewDrawerOpenState';
 import { isSimpleViewEnabledState } from '@/ui/layout/simple-view/states/isSimpleViewEnabledState';
 import { simpleViewObjectsState } from '@/ui/layout/simple-view/states/simpleViewObjectsState';
+import { DEFAULT_WORKSPACE_LOGO } from '@/ui/navigation/navigation-drawer/constants/DefaultWorkspaceLogo';
 import { useColorScheme } from '@/ui/theme/hooks/useColorScheme';
 import { useLingui } from '@lingui/react/macro';
 import {
   IconArrowLeft,
   IconLayoutSidebarRightCollapse,
+  IconLogout,
   IconMoon,
   IconSettings,
   IconSettings2,
   IconSun,
-  IconLogout,
 } from 'twenty-ui/display';
 
 const StyledOverlay = styled(motion.div)`
@@ -50,6 +51,19 @@ const StyledDrawerHeader = styled.div`
   display: flex;
   justify-content: space-between;
   padding: ${({ theme }) => theme.spacing(4)};
+`;
+
+const StyledWorkspaceInfo = styled.div`
+  align-items: center;
+  display: flex;
+  gap: ${({ theme }) => theme.spacing(2)};
+`;
+
+const StyledWorkspaceLogo = styled.img`
+  border-radius: ${({ theme }) => theme.border.radius.sm};
+  height: ${({ theme }) => theme.spacing(12)};
+  object-fit: cover;
+  width: ${({ theme }) => theme.spacing(12)};
 `;
 
 const StyledWorkspaceName = styled.div`
@@ -239,9 +253,15 @@ export const SimpleViewSideDrawer = () => {
             transition={{ type: 'tween', duration: 0.25 }}
           >
             <StyledDrawerHeader>
-              <StyledWorkspaceName>
-                {currentWorkspace?.displayName ?? t`Workspace`}
-              </StyledWorkspaceName>
+              <StyledWorkspaceInfo>
+                <StyledWorkspaceLogo
+                  src={DEFAULT_WORKSPACE_LOGO}
+                  alt={currentWorkspace?.displayName ?? t`Workspace`}
+                />
+                <StyledWorkspaceName>
+                  {currentWorkspace?.displayName ?? t`Workspace`}
+                </StyledWorkspaceName>
+              </StyledWorkspaceInfo>
               <StyledCloseButton onClick={() => setIsOpen(false)}>
                 <IconArrowLeft size={16} />
               </StyledCloseButton>

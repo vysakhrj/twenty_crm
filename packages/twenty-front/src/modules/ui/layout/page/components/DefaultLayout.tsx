@@ -12,8 +12,6 @@ import { useIsSettingsPage } from '@/navigation/hooks/useIsSettingsPage';
 import { NotificationCenter } from '@/notifications/components/NotificationCenter';
 import { useFirebaseNotifications } from '@/notifications/hooks/useFirebaseNotifications';
 import { OBJECT_SETTINGS_WIDTH } from '@/settings/data-model/constants/ObjectSettings';
-import { SignInAppNavigationDrawerMock } from '@/sign-in-background-mock/components/SignInAppNavigationDrawerMock';
-import { SignInBackgroundMockPage } from '@/sign-in-background-mock/components/SignInBackgroundMockPage';
 import { useShowFullscreen } from '@/ui/layout/fullscreen/hooks/useShowFullscreen';
 import { useShowAuthModal } from '@/ui/layout/hooks/useShowAuthModal';
 import { NAVIGATION_DRAWER_CONSTRAINTS } from '@/ui/layout/resizable-panel/constants/NavigationDrawerConstraints';
@@ -26,8 +24,9 @@ import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
 import { Outlet } from 'react-router-dom';
 import { useScreenSize } from 'twenty-ui/utilities';
 
-const StyledLayout = styled.div`
-  background: ${({ theme }) => theme.background.noisy};
+const StyledLayout = styled.div<{ isPlainBackground?: boolean }>`
+  background: ${({ theme, isPlainBackground }) =>
+    isPlainBackground ? theme.background.primary : theme.background.noisy};
   display: flex;
   flex-direction: column;
   height: 100dvh;
@@ -49,10 +48,6 @@ const StyledPageContainer = styled(motion.div)`
 `;
 
 const StyledAppNavigationDrawer = styled(AppNavigationDrawer)`
-  flex-shrink: 0;
-`;
-
-const StyledAppNavigationDrawerMock = styled(SignInAppNavigationDrawerMock)`
   flex-shrink: 0;
 `;
 
@@ -106,7 +101,7 @@ export const DefaultLayout = () => {
           }
         `}
       />
-      <StyledLayout>
+      <StyledLayout isPlainBackground={showAuthModal}>
         <AppErrorBoundary FallbackComponent={AppFullScreenErrorFallback}>
           <InformationBannerIsImpersonating />
           <StyledPageContainer
@@ -125,16 +120,12 @@ export const DefaultLayout = () => {
             }}
           >
             {!showAuthModal && <KeyboardShortcutMenu />}
-            {showAuthModal ? (
-              <StyledAppNavigationDrawerMock />
-            ) : useShowFullScreen ? null : (
+            {showAuthModal ? null : useShowFullScreen ? null : (
               <StyledAppNavigationDrawer />
             )}
             {showAuthModal ? (
               <>
-                <StyledMainContainer>
-                  <SignInBackgroundMockPage />
-                </StyledMainContainer>
+                <StyledMainContainer />
                 <AnimatePresence mode="wait">
                   <LayoutGroup>
                     <AuthModal>

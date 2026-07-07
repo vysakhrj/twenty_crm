@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import { isNonEmptyString } from '@sniptt/guards';
 import { getImageAbsoluteURI, isDefined } from 'twenty-shared/utils';
 import { Avatar } from 'twenty-ui/display';
+import { SHOW_WORKSPACE_LOGO_ON_AUTH } from '@/auth/constants/ShowWorkspaceLogoOnAuth';
 import { REACT_APP_SERVER_BASE_URL } from '~/config';
 
 type LogoProps = {
@@ -12,12 +13,12 @@ type LogoProps = {
 };
 
 const StyledContainer = styled.div`
-  height: ${({ theme }) => theme.spacing(12)};
+  height: ${({ theme }) => theme.spacing(20)};
   margin-bottom: ${({ theme }) => theme.spacing(4)};
   margin-top: ${({ theme }) => theme.spacing(4)};
 
   position: relative;
-  width: ${({ theme }) => theme.spacing(12)};
+  width: ${({ theme }) => theme.spacing(20)};
 `;
 
 const StyledSecondaryLogo = styled.img`
@@ -70,22 +71,23 @@ export const Logo = ({
   return (
     <StyledContainer onClick={() => onClick?.()}>
       <StyledPrimaryLogo src={primaryLogoUrl} />
-      {isDefined(secondaryLogoUrl) ? (
-        <StyledSecondaryLogoContainer>
-          <StyledSecondaryLogo src={secondaryLogoUrl} />
-        </StyledSecondaryLogoContainer>
-      ) : (
-        isDefined(placeholder) && (
+      {SHOW_WORKSPACE_LOGO_ON_AUTH &&
+        (isDefined(secondaryLogoUrl) ? (
           <StyledSecondaryLogoContainer>
-            <Avatar
-              size="lg"
-              placeholder={placeholder}
-              type="squared"
-              placeholderColorSeed={placeholder}
-            />
+            <StyledSecondaryLogo src={secondaryLogoUrl} />
           </StyledSecondaryLogoContainer>
-        )
-      )}
+        ) : (
+          isDefined(placeholder) && (
+            <StyledSecondaryLogoContainer>
+              <Avatar
+                size="lg"
+                placeholder={placeholder}
+                type="squared"
+                placeholderColorSeed={placeholder}
+              />
+            </StyledSecondaryLogoContainer>
+          )
+        ))}
     </StyledContainer>
   );
 };

@@ -6,7 +6,7 @@ import { useNotifications } from '@/notifications/hooks/useNotifications';
 import { showNotificationCenterState } from '@/notifications/states/notificationsState';
 import { isSimpleViewDrawerOpenState } from '@/ui/layout/simple-view/states/isSimpleViewDrawerOpenState';
 import { DEFAULT_WORKSPACE_LOGO } from '@/ui/navigation/navigation-drawer/constants/DefaultWorkspaceLogo';
-import { Avatar, IconBell, IconList } from 'twenty-ui/display';
+import { IconBell, IconList } from 'twenty-ui/display';
 
 const StyledTopBar = styled.div`
   align-items: center;
@@ -54,6 +54,13 @@ const StyledTitleText = styled.span`
   white-space: nowrap;
 `;
 
+const StyledLogo = styled.img`
+  border-radius: ${({ theme }) => theme.border.radius.sm};
+  height: ${({ theme }) => theme.spacing(12)};
+  object-fit: cover;
+  width: ${({ theme }) => theme.spacing(12)};
+`;
+
 const StyledNotificationButton = styled.button<{ hasUnread: boolean }>`
   align-items: center;
   background: none;
@@ -99,10 +106,9 @@ export const SimpleViewTopBar = ({ title }: { title: string }) => {
         <IconList size={24} />
       </StyledHamburgerButton>
       <StyledTitle>
-        <Avatar
-          size="md"
-          placeholder={currentWorkspace?.displayName ?? title}
-          avatarUrl={currentWorkspace?.logo ?? DEFAULT_WORKSPACE_LOGO}
+        <StyledLogo
+          src={DEFAULT_WORKSPACE_LOGO}
+          alt={currentWorkspace?.displayName ?? title}
         />
         <StyledTitleText>{title}</StyledTitleText>
       </StyledTitle>
